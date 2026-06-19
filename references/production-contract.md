@@ -124,10 +124,12 @@ Required fields:
 - title policy
 - copy density
 - visual noise budget
+- color budget
 - palette
 - typography
 - layout rhythm
 - background rhythm
+- background asset policy
 - layout role matrix
 - image slot contract
 - visible provenance policy
@@ -154,6 +156,7 @@ Required fields:
 - layout_rhythm
 - background_rhythm
 - visual_noise_budget
+- color_budget
 - layout_roles
 - image_slot_contract
 - image_policy
@@ -172,6 +175,9 @@ Required fields:
 - `background_roles`: list of reusable roles such as `hero_dark`, `evidence_dark`, `evidence_light`, `split_panel`, `diagram_focus`, `claim_card`.
 - `slide_roles`: per-slide mapping of `slide_no`, `layout_role`, `background_role`, `dominant_object`.
 - `visual_noise_budget`: normally `quiet`; use `moderate` only when justified by brand or route.
+- `color_budget`: `max_active_colors_per_slide: 3`, `count_source_images: false`, and a one-accent policy.
+- `slide_palette_slots`: per-slide mapping of `slide_no` and `active_colors`; each slide must stay within the color budget.
+- `background_asset_policy`: whether generated bitmap backgrounds were used, unavailable, or forbidden by the user.
 - `image_slots`: every source image/chart slot with `slot_id`, `slide_no`, `x`, `y`, `w`, `h`, `fit`, `mask`, `padding`, and `overflow_policy`.
 - `max_consecutive_background_role`: normally `2`.
 - `thumbnail_review_required`: `true` for PPTX decks.
@@ -179,7 +185,9 @@ Required fields:
 Hard rules:
 
 - No repeated decorative background role for more than 2 consecutive slides.
-- Background decoration must stay subordinate to content. Avoid repeated hard rails, oversized saturated wedges, and multiple decorative systems on the same slide.
+- Background decoration must stay subordinate to content. Avoid repeated hard rails, oversized saturated wedges, ornamental grids, meaningless thin rules, and multiple decorative systems on the same slide.
+- Prefer generated 16:9 bitmap background packs in Codex image-generation environments. If unavailable, use clean neutral surfaces instead of line-based decoration.
+- No slide should use more than 3 active non-image colors. Do not combine cyan, green, yellow, red, and other accent colors on one page.
 - Dense charts use `contain` unless a crop is explicitly justified.
 - A rounded frame is not a clipping mask; if `mask` is `rounded_rect`, the renderer must actually clip or pre-compose the image.
 

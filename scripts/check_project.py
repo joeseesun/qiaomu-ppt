@@ -44,6 +44,7 @@ SVG_BANNED = [
 VISUAL_BACKGROUND_ROLES_MIN = 4
 VISUAL_BACKGROUND_MAX_REPEAT = 2
 ALLOWED_VISUAL_NOISE_BUDGETS = {"quiet", "moderate", "expressive"}
+DEFAULT_MAX_ACTIVE_COLORS = 3
 IMAGE_SLOT_FIELDS = [
     "slot_id",
     "slide_no",
@@ -130,6 +131,15 @@ def iter_image_slots(contract: Any) -> list[dict[str, Any]]:
     if not isinstance(contract, dict):
         return []
     slots = contract.get("image_slots")
+    if isinstance(slots, list):
+        return [slot for slot in slots if isinstance(slot, dict)]
+    return []
+
+
+def iter_slide_palette_slots(contract: Any) -> list[dict[str, Any]]:
+    if not isinstance(contract, dict):
+        return []
+    slots = contract.get("slide_palette_slots")
     if isinstance(slots, list):
         return [slot for slot in slots if isinstance(slot, dict)]
     return []
@@ -252,6 +262,52 @@ def check_visual_contract(path: Path, slide_count: int) -> tuple[list[str], list
     if visual_noise_budget and str(visual_noise_budget) != "quiet":
         warnings.append("visual_noise_budget is not quiet; verify this is intentional and content-led")
 
+    color_budget = contract.get("color_budget")
+    max_active_colors = DEFAULT_MAX_ACTIVE_COLORS
+    if slide_count > 8 and not isinstance(color_budget, dict):
+        failures.append("visual_contract.json needs color_budget for decks over 8 slides")
+    if isinstance(color_budget, dict):
+        declared_max = color_budget.get("max_active_colors_per_slide")
+        try:
+            max_active_colors = int(declared_max)
+        except Exception:
+            failures.append("color_budget.max_active_colors_per_slide must be an integer")
+        if max_active_colors > DEFAULT_MAX_ACTIVE_COLORS:
+            failures.append(
+                f"color_budget.max_active_colors_per_slide must be <= {DEFAULT_MAX_ACTIVE_COLORS}"
+            )
+        accent_policy = str(color_budget.get("accent_policy") or color_budget.get("default_formula") or "").lower()
+        if "one" not in accent_policy and "1" not in accent_policy:
+            warnings.append("color_budget should declare a one-accent-per-slide policy")
+    evidence["max_active_colors_per_slide"] = max_active_colors
+
+    palette_slots = iter_slide_palette_slots(contract)
+    evidence["slide_palette_slot_count"] = len(palette_slots)
+    if slide_count > 8 and len(palette_slots) < slide_count:
+        failures.append("visual_contract.json needs slide_palette_slots for every slide")
+    for idx, slot in enumerate(palette_slots, start=1):
+        colors = slot.get("active_colors")
+        if not isinstance(colors, list) or not colors:
+            failures.append(f"slide_palette_slot {idx} needs non-empty active_colors")
+            continue
+        unique_colors = {str(color).strip().lower() for color in colors if str(color).strip()}
+        if len(unique_colors) > max_active_colors:
+            failures.append(
+                f"slide {slot.get('slide_no', idx)} uses {len(unique_colors)} active colors; max is {max_active_colors}"
+            )
+
+    background_policy = contract.get("background_asset_policy")
+    if slide_count > 8 and not isinstance(background_policy, dict):
+        failures.append("visual_contract.json needs background_asset_policy for decks over 8 slides")
+    if isinstance(background_policy, dict):
+        mode = str(background_policy.get("mode") or background_policy.get("generated_backgrounds") or "")
+        evidence["background_asset_policy"] = mode
+        line_policy = str(background_policy.get("decorative_line_policy") or "").lower()
+        if "functional" not in line_policy and "forbid" not in line_policy and "no decorative" not in line_policy:
+            failures.append(
+                "background_asset_policy.decorative_line_policy must forbid non-functional decorative lines"
+            )
+
     roles = contract.get("background_roles")
     if not isinstance(roles, list) or len(roles) < VISUAL_BACKGROUND_ROLES_MIN:
         failures.append(
@@ -267,7 +323,16 @@ def check_visual_contract(path: Path, slide_count: int) -> tuple[list[str], list
             previous = None
             run_length = 0
             used_roles: set[str] = set()
-            for item in slide_roles:
+            for idx, item in enumerate(slide_roles, start=1):
+                missing_role_fields = [
+                    field
+                    for field in ("slide_no", "layout_role", "background_role", "dominant_object")
+                    if not item.get(field)
+                ]
+                if missing_role_fields:
+                    failures.append(
+                        f"slide_role {idx} missing fields: {', '.join(missing_role_fields)}"
+                    )
                 role = str(item.get("background_role") or "")
                 if role:
                     used_roles.add(role)
@@ -285,6 +350,21 @@ def check_visual_contract(path: Path, slide_count: int) -> tuple[list[str], list
                 failures.append(
                     f"deck has {slide_count} slides but uses only {len(used_roles)} background roles"
                 )
+
+    layout_policy = contract.get("layout_quality_policy")
+    if slide_count > 8 and not isinstance(layout_policy, dict):
+        failures.append("visual_contract.json needs layout_quality_policy for decks over 8 slides")
+    if isinstance(layout_policy, dict):
+        evidence["layout_quality_policy"] = layout_policy.get("composition_formula", "")
+        filler_policy = str(layout_policy.get("decorative_filler_policy") or "").lower()
+        if "forbid" not in filler_policy and "no" not in filler_policy:
+            failures.append("layout_quality_policy.decorative_filler_policy must forbid decorative filler")
+        try:
+            max_regions = int(layout_policy.get("max_primary_regions", 0))
+        except Exception:
+            max_regions = 0
+        if max_regions <= 0 or max_regions > 3:
+            failures.append("layout_quality_policy.max_primary_regions must be between 1 and 3")
 
     slots = iter_image_slots(contract)
     evidence["image_slot_count"] = len(slots)

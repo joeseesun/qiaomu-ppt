@@ -1,6 +1,6 @@
 interface:
   display_name: Qiaomu PPT
-  short_description: Chinese-first URL/PDF-to-PPT workflow router for editable PPTX, brand launch decks, courseware, speaker notes, persuasive content strategy, calm background systems, image-slot containment, and verified slide production.
+  short_description: Chinese-first URL/PDF-to-PPT workflow router for editable PPTX, brand launch decks, courseware, speaker notes, persuasive content strategy, max-three color budgets, generated background prompt packs, image-slot containment, and verified slide production.
   default_prompt: |
     Use qiaomu-ppt to route this presentation task, create the narrative and visual plan, then produce the appropriate deck deliverable with verification evidence.
 
@@ -41,6 +41,7 @@ compatibility:
     upstream_skills: not_required
     bootstrap: scripts/bootstrap.py
     url_ingester: scripts/url_to_markdown.py
+    background_prompt_pack: scripts/background_prompt_pack.py
     project_checker: scripts/check_project.py
     style_recommender: scripts/recommend_style.py
     visual_contract_checker: scripts/check_project.py

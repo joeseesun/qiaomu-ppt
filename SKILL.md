@@ -1,8 +1,8 @@
 ---
 name: qiaomu-ppt
 description: |
-  Independent Qiaomu PPT production skill for creating Chinese-first PPT, PowerPoint, PPTX, presentation, slide deck, brand launch deck, teaching courseware, URL-to-PPT, and speaker-ready decks. It routes requests, fetches URLs/PDFs/images into Markdown sources when needed, builds an audience or learning-state plan, chooses persuasive structure frameworks, improves content and copy through claim-title outlines, recommends a suitable design style from a local PPT style library when needed, locks a calm Qiaomu visual system, enforces background rhythm, visual-noise budget, and image-slot containment, produces fixed-stage HTML previews or PPTX-oriented SVG artifacts, runs local artifact checks, and prefers editable PPTX delivery when an exporter is available. Use when the user asks to 做PPT, 生成PPT, URL做PPT, 根据链接做PPT, 优化PPT文案, 改PPT内容, 制作课件, 品牌发布PPT, 发布会deck, 演讲slides, PowerPoint, PPTX, 自动推荐PPT风格, or wants a Qiaomu workflow that combines practical editability, stronger content, aesthetics, speaker notes, and verification without relying on upstream skills at runtime.
-version: 0.5.0
+  Independent Qiaomu PPT production skill for creating Chinese-first PPT, PowerPoint, PPTX, presentation, slide deck, brand launch deck, teaching courseware, URL-to-PPT, and speaker-ready decks. It routes requests, fetches URLs/PDFs/images into Markdown sources when needed, builds an audience or learning-state plan, chooses persuasive structure frameworks, improves content and copy through claim-title outlines, recommends a suitable design style from a local PPT style library when needed, locks a calm Qiaomu visual system, enforces a per-slide max-three active color budget, prefers generated bitmap background packs in Codex image-generation environments, rejects meaningless decorative lines, enforces visual-noise budget and image-slot containment, produces fixed-stage HTML previews or PPTX-oriented SVG artifacts, runs local artifact checks, and prefers editable PPTX delivery when an exporter is available. Use when the user asks to 做PPT, 生成PPT, URL做PPT, 根据链接做PPT, 优化PPT文案, 改PPT内容, 制作课件, 品牌发布PPT, 发布会deck, 演讲slides, PowerPoint, PPTX, 自动推荐PPT风格, or wants a Qiaomu workflow that combines practical editability, stronger content, aesthetics, speaker notes, and verification without relying on upstream skills at runtime.
+version: 0.5.1
 owner: 向阳乔木
 ---
 
@@ -30,7 +30,7 @@ GitHub: https://github.com/joeseesun/
 - Do not copy upstream templates, long wording, bundled code, or exact style packs into generated artifacts. Use Qiaomu-owned route contracts, visual systems, artifact contracts, and checks.
 
 See [references/routing-playbook.md](references/routing-playbook.md) for route details.
-Read [references/independent-method.md](references/independent-method.md), [references/url-ingestion.md](references/url-ingestion.md), [references/content-copy-method.md](references/content-copy-method.md), [references/visual-systems.md](references/visual-systems.md), [references/design-style-library.md](references/design-style-library.md), [references/ppt-visual-failure-patterns.md](references/ppt-visual-failure-patterns.md), and [references/svg-pptx-compatibility.md](references/svg-pptx-compatibility.md) before changing this skill's production strategy.
+Read [references/independent-method.md](references/independent-method.md), [references/url-ingestion.md](references/url-ingestion.md), [references/content-copy-method.md](references/content-copy-method.md), [references/visual-systems.md](references/visual-systems.md), [references/codex-image-backgrounds.md](references/codex-image-backgrounds.md), [references/design-style-library.md](references/design-style-library.md), [references/ppt-visual-failure-patterns.md](references/ppt-visual-failure-patterns.md), and [references/svg-pptx-compatibility.md](references/svg-pptx-compatibility.md) before changing this skill's production strategy.
 
 ## Compact Workflow
 
@@ -56,8 +56,11 @@ Read [references/independent-method.md](references/independent-method.md), [refe
    - Create a style brief: visual thesis, palette, typography, layout rhythm, media policy, chart policy, and forbidden moves.
    - If the user did not specify a style, run `python3 <skill>/scripts/recommend_style.py --query "<brief>" --route "<route>" --top 5` and choose a style whose `avoid_for` does not conflict with the task.
    - Use `data/design_style_presets.json` as a PPT style library: extract the selected preset's palette, typography, slide patterns, media policy, chart policy, and animation hints into `style_brief.md` and `spec_lock.json`.
+   - Define a `color_budget`: each slide may use at most 3 active non-image colors. Default to neutral base, readable text, and one accent. Do not use rainbow metrics, alternating cyan/green/yellow/red dots, or more than one accent family on the same page.
    - Define a `background_rhythm` with 4-6 roles for decks longer than 8 slides; no decorative background role may repeat more than 2 consecutive slides.
-   - Define a `visual_noise_budget`: default `quiet`. Backgrounds should support the content, not compete with it. Avoid large saturated wedges, repeated neon rails, busy cards, and decorative motifs behind evidence.
+   - Define a `visual_noise_budget`: default `quiet`. Backgrounds should support the content, not compete with it. Avoid large saturated wedges, repeated neon rails, busy cards, ornamental grids, and decorative lines behind evidence.
+   - Run `python3 <skill>/scripts/background_prompt_pack.py --subject "<deck subject>" --route "<route>" --count 5 --output <project>/assets/backgrounds/background_prompts.json` when image generation may be used.
+   - In Codex environments where the built-in image generation tool is available, use the prompt pack to generate 3-5 quiet 16:9 text-free background bitmap assets before rendering. Use those as the background system instead of shape-based decoration. If image generation is unavailable, use neutral surfaces only; do not fake richness with decorative lines.
    - Define an `image_slot_contract`: every image/chart has a declared slot, fit mode, mask/crop method, padding, and `overflow_policy: clip_or_fail`.
    - Define `visible_provenance_policy`: default to no visible internal source/toolchain footer. Keep sources, fetch method, model name, QA evidence, and speaker cues in `qa_report.md`, speaker notes, or an optional final references page unless the user explicitly asks for visible citations.
    - For brand decks, generate or request 2-3 visual directions before full production when the brief is open-ended.
@@ -71,6 +74,8 @@ Read [references/independent-method.md](references/independent-method.md), [refe
    - Check copy quality: one slide = one claim, title is a judgment not a label, visible copy stays within 3-5 chunks unless route is report-like or classroom-specific.
    - Thumbnail-scan the whole deck for background monotony and repeated layouts. If the deck reads as one repeated page, revise the background/layout roles before export.
    - Thumbnail-scan for visual noise. If backgrounds feel harder to read than the content, simplify surfaces before export.
+   - Thumbnail-scan for color noise. If any slide reads as more than three active colors excluding source images, reduce to neutral base + text + one accent before export.
+   - Reject decorative background lines unless they are functional chart axes, table rules, connectors, or part of a generated bitmap background. Lines that only add "tech feel" are defects.
    - Inspect every source-image/chart slide for fake rounded frames: a frame behind an image is not clipping. Use real crop/mask/compositing or a rectangular frame.
    - Inspect visible slide text for internal metadata such as `fetched via`, `generated with`, `qiaomu-markdown-proxy`, and `Speaker cue:`. These are QA artifacts, not presentation content.
    - Run `python3 <skill>/scripts/check_project.py <project_dir>` when a project folder has been produced.
