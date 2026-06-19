@@ -1,0 +1,243 @@
+{
+  "schema_version": "2.0.0-qiaomu-lite",
+  "generated_at": "2026-06-20",
+  "package": {
+    "name": "qiaomu-ppt",
+    "version": "0.5.0",
+    "owner": "向阳乔木",
+    "maturity_tier": "production-lite",
+    "lifecycle_stage": "open-source-url-self-contained",
+    "upstream_inspiration": [
+      "hugohe3/ppt-master",
+      "JimLiu/baoyu-design",
+      "zarazhangrui/frontend-slides",
+      "op7418/guizang-ppt-skill",
+      "LearnPrompt/humanize-ppt",
+      "voltagent/awesome-design-md",
+      "yaojingang/yao-meta-skill"
+    ]
+  },
+  "intent": {
+    "description": "Independent Qiaomu PPT production skill for creating Chinese-first PPT, PowerPoint, PPTX, presentation, slide deck, brand launch deck, teaching courseware, URL-to-PPT, and speaker-ready decks. It routes requests, fetches URLs/PDFs/images into Markdown sources when needed, builds an audience or learning-state plan, chooses persuasive structure frameworks, improves content and copy through claim-title outlines, recommends a suitable design style from a local PPT style library when needed, locks a calm Qiaomu visual system, enforces background rhythm, visual-noise budget, and image-slot containment, produces fixed-stage HTML previews or PPTX-oriented SVG artifacts, runs local artifact checks, and prefers editable PPTX delivery when an exporter is available. Use when the user asks to 做PPT, 生成PPT, URL做PPT, 根据链接做PPT, 优化PPT文案, 改PPT内容, 制作课件, 品牌发布PPT, 发布会deck, 演讲slides, PowerPoint, PPTX, 自动推荐PPT风格, or wants a Qiaomu workflow that combines practical editability, stronger content, aesthetics, speaker notes, and verification without relying on upstream skills at runtime.\n",
+    "job_to_be_done": "Turn topics, URLs, PDFs, old PPTX files, brand briefs, teaching content, and raw research into route-aware Qiaomu presentation plans, persuasive content contracts, calm visual systems, and verified editable PPTX or HTML deck deliverables.",
+    "target_users": [
+      "Qiaomu creator/operator",
+      "presenters and brand storytellers",
+      "teachers creating editable courseware",
+      "teams turning URLs or PDFs into presentation material",
+      "teams needing stronger PPT content and copy",
+      "public skill installer"
+    ],
+    "qiaomu_defaults": {
+      "language": "zh-CN-first",
+      "default_final_delivery": "editable_pptx",
+      "copyright": "Copyright (c) 向阳乔木",
+      "x": "https://x.com/vista8",
+      "github": "https://github.com/joeseesun/"
+    }
+  },
+  "triggers": {
+    "should_trigger": [
+      "用 qiaomu-ppt 做一份小米17SU 品牌发布 PPT，最终要可编辑 PPTX，带演讲备注。",
+      "帮我把这节高中数学课做成课件，含例题、课堂练习和教师备注。",
+      "我有一份老 PowerPoint，想重新设计成可二次编辑的演示文稿。",
+      "先给我一个品牌发布会 slide deck 的路线，看看要走 HTML 预览还是 PPTX。",
+      "根据我的产品发布主题，自动推荐几个 PPT 设计风格和模板规范。",
+      "帮我把这份 PPT 的内容和文案改得更有说服力，标题要更吸引人。",
+      "做一个PPT：https://z.ai/blog/glm-5.2，保留关键图片和数据证据，最终导出可编辑 PPTX。",
+      "根据这个网页链接做一份演讲 slides，自动抓取文章内容和图片。"
+    ],
+    "should_not_trigger": [
+      "帮我修一下 React 路由 bug。",
+      "只写一篇公众号文章，不需要 PPT。",
+      "给我生成一张小红书封面图，不做 PPT。",
+      "整理这段访谈成会议纪要。"
+    ],
+    "near_neighbor": [
+      "用 baoyu-design 做一个 App 设置页原型，不要 PPT。",
+      "用 guizang-ppt-skill 做一个网页横向翻页 deck，不需要 PPTX 和可编辑。",
+      "用 humanize-ppt 先做演讲体检，不要生成幻灯片。"
+    ]
+  },
+  "workflow": {
+    "router_rules": [
+      "Start by writing a short route card before generating slides:",
+      "`route`: `brand_release`, `high_school_courseware`, `business_report`, `talk_deck`, `pptx_beautify`, or `html_preview`.",
+      "`final_delivery`: `editable_pptx`, `html_deck`, `preview_then_pptx`, or `planning_only`.",
+      "`confidence`: high / medium / low.",
+      "`assumptions`: only the assumptions that affect output.",
+      "If the user says PPT, PowerPoint, PPTX, 课件, 可编辑, 二次修改, 老师要改, or deliverable is unclear, default to `editable_pptx`.",
+      "If the user says 网页 PPT, HTML, 横向翻页, WebGL, 先看风格, 快速预览, or does not need PowerPoint editing, route to `html_preview` or `preview_then_pptx`.",
+      "Brand launch decks prioritize story tension, brand signal, first-slide impact, sparse copy, media decisions, and a polished visual thesis.",
+      "High school courseware prioritizes learning objective, prerequisite check, concept ladder, examples, exercises, board-work rhythm, answer reveal plan, and teacher notes. Do not use a sparse keynote style for dense teaching unless the user asks for a public talk.",
+      "If the user provides one or more URLs, route through the built-in URL ingestion step first. Save clean Markdown, images, and source metadata before writing slide claims.",
+      "Do not call `ppt-master`, `baoyu-design`, `frontend-slides`, `guizang-ppt-skill`, or `humanize-ppt` as runtime dependencies. Their local clones are research evidence only.",
+      "Do not copy upstream templates, long wording, bundled code, or exact style packs into generated artifacts. Use Qiaomu-owned route contracts, visual systems, artifact contracts, and checks."
+    ],
+    "compact_workflow": [
+      "Inspect the source material and goal.",
+      "Read user files, pasted notes, links, old decks, images, brand material, syllabus, textbook sections, and constraints.",
+      "If this is a fresh install, run `python3 <skill>/scripts/bootstrap.py --check` before relying on URL/PDF/PPTX conversion tools.",
+      "If URLs are present, run `python3 <skill>/scripts/url_to_markdown.py \"<url>\" --output-dir <project>/sources --download-images` before planning.",
+      "For PDFs, article pages, and image-rich pages, keep `source_manifest.json` and downloaded images as evidence inputs for the slide plan.",
+      "If the user supplied only a topic, do lightweight research only when requested or necessary, then cite sources in the work notes.",
+      "For high school courseware, identify subject, grade, textbook/module, teaching duration, and whether it is new lesson, review, exam explanation, or open class.",
+      "Create the route card and deck contract.",
+      "Output route, audience, desired audience state change, final format, page count range, density mode, and verification plan.",
+      "Write an audience-purpose card: audience, purpose, desired action, current state, desired state, stakes, density mode.",
+      "Choose the structure framework: `pyramid`, `SCQA`, `MECE`, `storyline`, `teaching_arc`, or a hybrid.",
+      "Ask at most 1-3 questions only when a wrong assumption would change route, cost, rights, or teaching correctness."
+    ],
+    "gate_ladder": [
+      "Route gate: route and final delivery match the user’s real need.",
+      "Source gate: every required claim, data point, image, brand asset, or textbook fact is either sourced, user-provided, or labeled as a draft assumption.",
+      "Narrative gate: every slide has a clear audience/learning state change.",
+      "Copy gate: every normal slide has a claim title, a visible proof focus, and concise supporting copy.",
+      "Visual gate: palette, typography, layout density, and media treatment are consistent; no generic purple-gradient default, no style soup.",
+      "Provenance gate: source/model/toolchain evidence exists in sidecar artifacts, but internal QA metadata is not printed on the slide canvas by default.",
+      "Readability gate: no text overflow, no overlap, no unreadable small type, no buried CJK punctuation issues obvious in preview.",
+      "Production gate: SVG/HTML/PPTX files exist in the declared output paths; export commands succeeded or are explicitly unavailable.",
+      "Speaker gate: speaker notes or teacher notes exist when the route requires them.",
+      "Verification gate: preview/open/export checks ran; missing apps, credentials, fonts, or PPTX exporters are marked as `missing evidence`."
+    ],
+    "output_contract": [
+      "`deck_brief.md`: audience, goal, route, final delivery, assumptions, success criteria.",
+      "`sources/source_manifest.json` when URLs, PDFs, or page images are ingested: source URL/path, fetch route, Markdown path, image paths, warnings, and missing evidence.",
+      "`content_contract.json` or equivalent for decks longer than 8 slides: audience-purpose card, structure framework, title policy, evidence policy, and per-slide claim titles.",
+      "`slide_plan.json` or equivalent structured plan.",
+      "`style_recommendations.json` when style is unspecified or the user asks for automatic style selection.",
+      "`style_brief.md`: visual thesis, tokens, layout rhythm, media policy.",
+      "`layout_variation` or equivalent: per-slide layout/background roles and image slot contract.",
+      "`visible_provenance_policy` or equivalent: whether sources/citations appear on slides, in notes, in a final references page, or only in QA.",
+      "deck source files, such as SVG pages or HTML preview.",
+      "exported `.pptx` when the route is editable PPTX and an exporter is available; otherwise checked SVG/HTML artifacts plus `missing evidence`.",
+      "speaker notes / teacher notes when expected.",
+      "`qa_report.md`: passed gates, failed gates, missing evidence, and next actions."
+    ]
+  },
+  "resources": {
+    "references": [
+      "references/content-copy-method.md",
+      "references/design-style-library.md",
+      "references/independent-method.md",
+      "references/ppt-visual-failure-patterns.md",
+      "references/production-contract.md",
+      "references/quality-gates.md",
+      "references/routing-playbook.md",
+      "references/svg-pptx-compatibility.md",
+      "references/upstream-research.md",
+      "references/url-ingestion.md",
+      "references/visual-systems.md"
+    ],
+    "scripts": [
+      "scripts/bootstrap.py",
+      "scripts/check_project.py",
+      "scripts/recommend_style.py",
+      "scripts/url_to_markdown.py"
+    ],
+    "evals": [
+      "evals/trigger_cases.json"
+    ],
+    "reports": [
+      "reports/skill-ir.json",
+      "reports/trigger-eval.json"
+    ]
+  },
+  "portability": {
+    "canonical_format": "agent-skill",
+    "adapter_targets": [
+      "openai",
+      "claude",
+      "generic",
+      "agent-skills-compatible"
+    ],
+    "activation": {
+      "trigger_terms": [
+        "qiaomu-ppt",
+        "做PPT",
+        "生成PPT",
+        "品牌发布PPT",
+        "高中课件",
+        "PPTX",
+        "PowerPoint",
+        "演讲slides",
+        "PPT文案",
+        "PPT内容",
+        "优化PPT文案",
+        "改PPT内容",
+        "让PPT更有说服力",
+        "自动推荐PPT风格",
+        "设计模板",
+        "URL做PPT",
+        "根据链接做PPT",
+        "网页转PPT",
+        "PDF转PPT",
+        "url-to-ppt",
+        "url to ppt"
+      ]
+    },
+    "execution": {
+      "filesystem": "required",
+      "shell": "optional",
+      "browser_preview": "recommended",
+      "upstream_skills": "not_required",
+      "bootstrap": "scripts/bootstrap.py",
+      "url_ingester": "scripts/url_to_markdown.py",
+      "project_checker": "scripts/check_project.py",
+      "style_recommender": "scripts/recommend_style.py",
+      "visual_contract_checker": "scripts/check_project.py",
+      "content_contract_checker": "scripts/check_project.py"
+    },
+    "trust": {
+      "secret_handling": "never store or print API keys; mark paid providers and missing credentials as missing evidence",
+      "upstream_code": "research-only, not vendored, not runtime dependency",
+      "design_style_source": "data/design_style_presets.json is a derived PPT abstraction, not a license to third-party brand assets"
+    },
+    "permissions": {
+      "default_writes": [
+        "deck project folders created for the current task",
+        "generated brief, plan, style, deck, export, and QA files"
+      ],
+      "forbidden_without_user_approval": [
+        "publishing to remote repositories",
+        "uploading private source materials",
+        "buying API credits or using paid services",
+        "destructive edits to original source decks"
+      ]
+    },
+    "degradation": {
+      "missing_pptx_exporter": "produce checked SVG/HTML artifacts and mark editable PPTX export as missing evidence",
+      "missing_powerpoint": "verify generated files and previews, then label native-office open check as missing evidence"
+    }
+  },
+  "gates": {
+    "required": [
+      "route gate",
+      "source gate",
+      "narrative gate",
+      "copy gate",
+      "visual gate",
+      "image slot gate",
+      "provenance gate",
+      "readability gate",
+      "production gate",
+      "speaker gate",
+      "verification gate"
+    ],
+    "production_reports": [
+      "reports/trigger-eval.json",
+      "reports/skill-ir.json"
+    ],
+    "runtime_data": [
+      "data/design_style_presets.json",
+      "data/dependency_manifest.json",
+      "data/font_manifest.json"
+    ]
+  },
+  "evidence_boundary": {
+    "generated_reports_are_evidence": true,
+    "planned_work_is_evidence": false,
+    "missing_external_or_human_evidence_label": "missing evidence",
+    "public_claim_policy": "claim only what local validation, install proof, human review, or provider-backed evidence actually supports"
+  }
+}

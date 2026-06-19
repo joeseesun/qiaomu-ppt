@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Declare qiaomu-ppt runtime dependencies for open-source installation and reproducible deck production.",
+  "python": {
+    "minimum": "3.10",
+    "requirements": "requirements.txt",
+    "install": "python3 scripts/bootstrap.py --install-python"
+  },
+  "external_tools": [
+    {
+      "name": "LibreOffice",
+      "required": false,
+      "commands": ["soffice", "libreoffice"],
+      "used_for": "PPTX to PDF/image preview conversion and native export checks when PowerPoint/Keynote are unavailable.",
+      "macos_install": "brew install --cask libreoffice",
+      "ubuntu_install": "sudo apt-get install libreoffice"
+    },
+    {
+      "name": "Poppler",
+      "required": false,
+      "commands": ["pdftotext", "pdftoppm"],
+      "used_for": "PDF text extraction and PDF-to-image thumbnail rendering.",
+      "macos_install": "brew install poppler",
+      "ubuntu_install": "sudo apt-get install poppler-utils"
+    },
+    {
+      "name": "ImageMagick",
+      "required": false,
+      "commands": ["magick", "convert"],
+      "used_for": "Optional image optimization, contact-sheet generation, and format conversion.",
+      "macos_install": "brew install imagemagick",
+      "ubuntu_install": "sudo apt-get install imagemagick"
+    },
+    {
+      "name": "Playwright Chromium",
+      "required": false,
+      "commands": ["playwright"],
+      "used_for": "Optional login/JS-heavy page capture when direct URL ingestion is blocked.",
+      "install": "python3 -m pip install playwright && python3 -m playwright install chromium"
+    }
+  ],
+  "fonts": {
+    "manifest": "data/font_manifest.json",
+    "download": "python3 scripts/bootstrap.py --download-fonts",
+    "note": "Font binaries are not committed by default to keep the repository small; they are declared and downloadable."
+  },
+  "degradation_policy": [
+    "If Python URL packages are missing, run scripts/bootstrap.py --install-python or use direct Markdown/local files.",
+    "If LibreOffice is missing, do not claim PPTX-to-PDF preview verification.",
+    "If Poppler is missing, use pypdf fallback for PDF text extraction and mark layout fidelity as missing evidence.",
+    "If fonts are missing, use system CJK fonts and record typography as missing evidence for exact rendering."
+  ]
+}

@@ -1,0 +1,84 @@
+interface:
+  display_name: Qiaomu PPT
+  short_description: Chinese-first URL/PDF-to-PPT workflow router for editable PPTX, brand launch decks, courseware, speaker notes, persuasive content strategy, calm background systems, image-slot containment, and verified slide production.
+  default_prompt: |
+    Use qiaomu-ppt to route this presentation task, create the narrative and visual plan, then produce the appropriate deck deliverable with verification evidence.
+
+compatibility:
+  canonical_format: agent-skill
+  adapter_targets:
+    - openai
+    - claude
+    - generic
+    - agent-skills-compatible
+  activation:
+    trigger_terms:
+      - qiaomu-ppt
+      - 做PPT
+      - 生成PPT
+      - 品牌发布PPT
+      - 高中课件
+      - PPTX
+      - PowerPoint
+      - 演讲slides
+      - PPT文案
+      - PPT内容
+      - 优化PPT文案
+      - 改PPT内容
+      - 让PPT更有说服力
+      - 自动推荐PPT风格
+      - 设计模板
+      - URL做PPT
+      - 根据链接做PPT
+      - 网页转PPT
+      - PDF转PPT
+      - url-to-ppt
+      - url to ppt
+  execution:
+    filesystem: required
+    shell: optional
+    browser_preview: recommended
+    upstream_skills: not_required
+    bootstrap: scripts/bootstrap.py
+    url_ingester: scripts/url_to_markdown.py
+    project_checker: scripts/check_project.py
+    style_recommender: scripts/recommend_style.py
+    visual_contract_checker: scripts/check_project.py
+    content_contract_checker: scripts/check_project.py
+  trust:
+    secret_handling: never store or print API keys; mark paid providers and missing credentials as missing evidence
+    upstream_code: research-only, not vendored, not runtime dependency
+    design_style_source: data/design_style_presets.json is a derived PPT abstraction, not a license to third-party brand assets
+  permissions:
+    default_writes:
+      - deck project folders created for the current task
+      - generated brief, plan, style, deck, export, and QA files
+    forbidden_without_user_approval:
+      - publishing to remote repositories
+      - uploading private source materials
+      - buying API credits or using paid services
+      - destructive edits to original source decks
+  degradation:
+    missing_pptx_exporter: produce checked SVG/HTML artifacts and mark editable PPTX export as missing evidence
+    missing_powerpoint: verify generated files and previews, then label native-office open check as missing evidence
+
+gates:
+  required:
+    - route gate
+    - source gate
+    - narrative gate
+    - copy gate
+    - visual gate
+    - image slot gate
+    - provenance gate
+    - readability gate
+    - production gate
+    - speaker gate
+    - verification gate
+  production_reports:
+    - reports/trigger-eval.json
+    - reports/skill-ir.json
+  runtime_data:
+    - data/design_style_presets.json
+    - data/dependency_manifest.json
+    - data/font_manifest.json

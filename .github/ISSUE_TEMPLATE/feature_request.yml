@@ -1,0 +1,39 @@
+name: Feature request
+description: Suggest a new route, extractor, style preset, exporter, or QA gate.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What presentation workflow problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should qiaomu-ppt do differently?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - URL/PDF ingestion
+        - PPTX export
+        - visual system
+        - content/copy method
+        - courseware
+        - style presets
+        - quality gates
+        - docs
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Links, screenshots, prompts, or deck examples that illustrate the need.
