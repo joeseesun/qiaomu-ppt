@@ -1,0 +1,244 @@
+{
+  "ok": true,
+  "threshold": 0.34,
+  "description_concepts": [
+    "brand",
+    "copy",
+    "courseware",
+    "editable",
+    "ppt",
+    "qiaomu",
+    "skill",
+    "speaker",
+    "style",
+    "url",
+    "workflow"
+  ],
+  "missing_description_concepts": [],
+  "summary": {
+    "total": 16,
+    "passed": 16,
+    "false_positive": 0,
+    "false_negative": 0,
+    "pass_rate": 1.0
+  },
+  "failures": [],
+  "results": {
+    "should_trigger": [
+      {
+        "prompt": "用 qiaomu-ppt 做一份小米17SU 品牌发布 PPT，最终要可编辑 PPTX，带演讲备注。",
+        "family": "brand_release",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 1.0,
+        "matched_concepts": [
+          "brand",
+          "editable",
+          "ppt",
+          "qiaomu",
+          "speaker"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "帮我把这节高中数学课做成课件，含例题、课堂练习和教师备注。",
+        "family": "courseware",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "courseware",
+          "speaker"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "我有一份老 PowerPoint，想重新设计成可二次编辑的演示文稿。",
+        "family": "pptx_beautify",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "editable",
+          "ppt"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "先给我一个品牌发布会 slide deck 的路线，看看要走 HTML 预览还是 PPTX。",
+        "family": "route_planning",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.6,
+        "matched_concepts": [
+          "brand",
+          "ppt",
+          "workflow"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "根据我的产品发布主题，自动推荐几个 PPT 设计风格和模板规范。",
+        "family": "style_recommendation",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.6,
+        "matched_concepts": [
+          "brand",
+          "ppt",
+          "style"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "帮我把这份 PPT 的内容和文案改得更有说服力，标题要更吸引人。",
+        "family": "content_copy_improvement",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "copy",
+          "ppt"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "做一个PPT：https://z.ai/blog/glm-5.2，保留关键图片和数据证据，最终导出可编辑 PPTX。",
+        "family": "url_to_ppt",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "editable",
+          "ppt"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "根据这个网页链接做一份演讲 slides，自动抓取文章内容和图片。",
+        "family": "url_to_ppt",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.8,
+        "matched_concepts": [
+          "copy",
+          "ppt",
+          "speaker",
+          "url"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "把这份线上 PDF 报告转成 PPT，先抽取来源和图表。",
+        "family": "pdf_to_ppt",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "ppt",
+          "url"
+        ],
+        "negative_pattern": null
+      }
+    ],
+    "should_not_trigger": [
+      {
+        "prompt": "帮我修一下 React 路由 bug。",
+        "family": "coding",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.0,
+        "matched_concepts": [],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "只写一篇公众号文章，不需要 PPT。",
+        "family": "writing",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.2,
+        "matched_concepts": [
+          "ppt"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "给我生成一张小红书封面图，不做 PPT。",
+        "family": "image_only",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "ppt",
+          "workflow"
+        ],
+        "negative_pattern": "不做 ppt"
+      },
+      {
+        "prompt": "整理这段访谈成会议纪要。",
+        "family": "notes",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.0,
+        "matched_concepts": [],
+        "negative_pattern": null
+      }
+    ],
+    "near_neighbor": [
+      {
+        "prompt": "用 baoyu-design 做一个 App 设置页原型，不要 PPT。",
+        "family": "design_prototype",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.2,
+        "matched_concepts": [
+          "ppt"
+        ],
+        "negative_pattern": "不要 ppt"
+      },
+      {
+        "prompt": "用 guizang-ppt-skill 做一个网页横向翻页 deck，不需要 PPTX 和可编辑。",
+        "family": "upstream_html_deck",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.8,
+        "matched_concepts": [
+          "editable",
+          "ppt",
+          "skill",
+          "url"
+        ],
+        "negative_pattern": "不需要 pptx"
+      },
+      {
+        "prompt": "用 humanize-ppt 先做演讲体检，不要生成幻灯片。",
+        "family": "upstream_planning_only",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.6,
+        "matched_concepts": [
+          "ppt",
+          "speaker",
+          "workflow"
+        ],
+        "negative_pattern": "不要生成幻灯片"
+      }
+    ]
+  }
+}

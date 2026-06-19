@@ -1,0 +1,48 @@
+{
+  "name": "qiaomu-ppt",
+  "version": "0.5.0",
+  "owner": "向阳乔木",
+  "updated_at": "2026-06-20",
+  "status": "public-release-candidate",
+  "maturity_tier": "production-lite",
+  "lifecycle_stage": "open-source-url-self-contained",
+  "upstream_inspiration": [
+    "hugohe3/ppt-master",
+    "JimLiu/baoyu-design",
+    "zarazhangrui/frontend-slides",
+    "op7418/guizang-ppt-skill",
+    "LearnPrompt/humanize-ppt",
+    "voltagent/awesome-design-md",
+    "yaojingang/yao-meta-skill"
+  ],
+  "qiaomu_defaults": {
+    "language": "zh-CN-first",
+    "default_final_delivery": "editable_pptx",
+    "copyright": "Copyright (c) 向阳乔木",
+    "x": "https://x.com/vista8",
+    "github": "https://github.com/joeseesun/"
+  },
+  "release_gates": [
+    "validate_skill.py passes",
+    "trigger_eval.py passes",
+    "reports/skill-ir.json exists",
+    "no upstream code is vendored or required at runtime",
+    "scripts/check_project.py has argparse help",
+    "scripts/recommend_style.py has argparse help and sample recommendations",
+    "scripts/url_to_markdown.py has argparse help and URL smoke test",
+    "scripts/bootstrap.py has argparse help and dependency check",
+    "requirements.txt exists",
+    "data/dependency_manifest.json declares PDF/PPTX/image tooling",
+    "data/font_manifest.json declares open-source CJK fonts",
+    "data/design_style_presets.json covers 74 derived style presets",
+    "references/content-copy-method.md exists",
+    "references/url-ingestion.md exists",
+    "scripts/check_project.py enforces content_contract.json for decks over 8 slides",
+    "references/ppt-visual-failure-patterns.md exists",
+    "scripts/check_project.py enforces visual_contract.json for decks over 8 slides",
+    "scripts/check_project.py rejects visible internal provenance in PPTX exports",
+    "README is Chinese-first bilingual for public release",
+    "LICENSE and community health files exist before GitHub release",
+    "README does not claim unverified deck quality"
+  ]
+}

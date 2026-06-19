@@ -1,0 +1,103 @@
+{
+  "recommended_threshold": 0.34,
+  "description_required_concepts": [
+    "skill",
+    "qiaomu",
+    "ppt",
+    "workflow"
+  ],
+  "positive_concepts": {
+    "skill": ["skill", "技能", "能力包"],
+    "qiaomu": ["qiaomu", "乔木", "向阳乔木"],
+    "ppt": ["ppt", "powerpoint", "pptx", "slides", "slide deck", "演示文稿", "幻灯片"],
+    "workflow": ["workflow", "工作流", "路线", "流程", "生成", "制作"],
+    "brand": ["品牌发布", "新品发布", "发布会", "brand launch", "产品发布"],
+    "courseware": ["课件", "高中", "教学", "课堂", "例题", "老师"],
+    "editable": ["可编辑", "二次编辑", "二次修改", "editable", "PowerPoint"],
+    "speaker": ["演讲", "speaker notes", "演讲备注", "教师备注", "讲稿"],
+    "style": ["风格", "设计样式", "自动推荐", "模板", "template"],
+    "copy": ["文案", "内容", "说服力", "标题", "claim title", "claim-title", "内容策略"],
+    "url": ["URL", "url", "链接", "网页", "文章链接", "PDF", "pdf", "url-to-ppt", "根据链接做PPT", "网页转PPT", "PDF转PPT"]
+  },
+  "negative_patterns": [
+    "不要 ppt",
+    "不做 ppt",
+    "不是 ppt",
+    "no ppt",
+    "not slides",
+    "不需要 pptx",
+    "不要生成幻灯片",
+    "只要图片",
+    "只写文章"
+  ],
+  "should_trigger": [
+    {
+      "text": "用 qiaomu-ppt 做一份小米17SU 品牌发布 PPT，最终要可编辑 PPTX，带演讲备注。",
+      "family": "brand_release"
+    },
+    {
+      "text": "帮我把这节高中数学课做成课件，含例题、课堂练习和教师备注。",
+      "family": "courseware"
+    },
+    {
+      "text": "我有一份老 PowerPoint，想重新设计成可二次编辑的演示文稿。",
+      "family": "pptx_beautify"
+    },
+    {
+      "text": "先给我一个品牌发布会 slide deck 的路线，看看要走 HTML 预览还是 PPTX。",
+      "family": "route_planning"
+    },
+    {
+      "text": "根据我的产品发布主题，自动推荐几个 PPT 设计风格和模板规范。",
+      "family": "style_recommendation"
+    },
+    {
+      "text": "帮我把这份 PPT 的内容和文案改得更有说服力，标题要更吸引人。",
+      "family": "content_copy_improvement"
+    },
+    {
+      "text": "做一个PPT：https://z.ai/blog/glm-5.2，保留关键图片和数据证据，最终导出可编辑 PPTX。",
+      "family": "url_to_ppt"
+    },
+    {
+      "text": "根据这个网页链接做一份演讲 slides，自动抓取文章内容和图片。",
+      "family": "url_to_ppt"
+    },
+    {
+      "text": "把这份线上 PDF 报告转成 PPT，先抽取来源和图表。",
+      "family": "pdf_to_ppt"
+    }
+  ],
+  "should_not_trigger": [
+    {
+      "text": "帮我修一下 React 路由 bug。",
+      "family": "coding"
+    },
+    {
+      "text": "只写一篇公众号文章，不需要 PPT。",
+      "family": "writing"
+    },
+    {
+      "text": "给我生成一张小红书封面图，不做 PPT。",
+      "family": "image_only"
+    },
+    {
+      "text": "整理这段访谈成会议纪要。",
+      "family": "notes"
+    }
+  ],
+  "near_neighbor": [
+    {
+      "text": "用 baoyu-design 做一个 App 设置页原型，不要 PPT。",
+      "family": "design_prototype"
+    },
+    {
+      "text": "用 guizang-ppt-skill 做一个网页横向翻页 deck，不需要 PPTX 和可编辑。",
+      "family": "upstream_html_deck"
+    },
+    {
+      "text": "用 humanize-ppt 先做演讲体检，不要生成幻灯片。",
+      "family": "upstream_planning_only"
+    }
+  ]
+}
