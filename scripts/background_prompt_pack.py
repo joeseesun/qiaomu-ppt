@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a 3-5 item background-image prompt pack for qiaomu-ppt decks."""
+"""Create a 3-5 item atmosphere-only background prompt pack."""
 
 from __future__ import annotations
 
@@ -10,11 +10,42 @@ from pathlib import Path
 
 
 ROLES = [
-    ("cover", "quiet opening background with a strong but calm focal depth"),
-    ("evidence_dark", "dark evidence background with a calm chart-safe area"),
-    ("evidence_light", "light paper-like evidence background with generous white space"),
-    ("diagram", "neutral diagram background with depth but no grid or decorative lines"),
-    ("closing", "quiet closing background with subtle momentum and no extra objects"),
+    ("cover_atmosphere", "quiet opening atmosphere with soft depth and no layout objects"),
+    ("dark_gradient", "dark atmospheric color wash for evidence slides"),
+    ("light_gradient", "light paper-like color wash for dense readable slides"),
+    ("abstract_texture", "neutral abstract texture with subtle material depth"),
+    ("closing_atmosphere", "quiet closing atmosphere with subtle momentum"),
+]
+
+NEGATIVE_CONSTRAINTS = [
+    "text",
+    "letters",
+    "numbers",
+    "logo",
+    "icon",
+    "UI chrome",
+    "button",
+    "chart",
+    "table",
+    "diagram",
+    "screenshot",
+    "mockup",
+    "box",
+    "rectangle",
+    "square",
+    "card",
+    "panel",
+    "frame",
+    "window",
+    "container",
+    "placeholder",
+    "layout scaffolding",
+    "image slot",
+    "content block",
+    "decorative linework",
+    "ornamental grid",
+    "neon rail",
+    "multiple accent colors",
 ]
 
 
@@ -22,10 +53,12 @@ def build_prompt(subject: str, route: str, role: str, role_goal: str, accent: st
     return (
         f"Create a quiet 16:9 presentation background for a {route} deck about {subject}. "
         f"Role: {role} - {role_goal}. "
-        f"Use a neutral base, readable quiet space for slide content, and one restrained {accent} accent only. "
-        "No text, no logos, no icons, no UI controls, no charts, no fake screenshots, no decorative stripes, "
-        "no ornamental grids, no thin tech lines, no neon rails. "
-        "The background must support foreground typography and source images without competing."
+        f"Use only atmosphere: color fields, soft gradients, diffuse glow, subtle grain, and restrained abstract decoration. "
+        f"Use a neutral base and one restrained {accent} accent only. "
+        "Do not create slide structure. No boxes, rectangles, cards, panels, frames, windows, placeholders, "
+        "chart areas, image slots, UI containers, text blocks, labels, diagrams, mockups, screenshots, logos, or icons. "
+        "Foreground titles, cards, charts, frames, and all page elements will be added later as editable objects. "
+        "The background must stay behind the layout and never imply a non-editable content container."
     )
 
 
@@ -39,14 +72,7 @@ def create_pack(subject: str, route: str, accent: str, count: int) -> dict:
                 "size": "16:9",
                 "recommended_pixels": "1920x1080",
                 "prompt": build_prompt(subject, route, role, role_goal, accent),
-                "negative_constraints": [
-                    "text",
-                    "logo",
-                    "UI chrome",
-                    "chart",
-                    "decorative linework",
-                    "multiple accent colors",
-                ],
+                "negative_constraints": NEGATIVE_CONSTRAINTS,
             }
         )
     return {
@@ -61,8 +87,8 @@ def create_pack(subject: str, route: str, accent: str, count: int) -> dict:
             "accent": accent,
         },
         "prompts": prompts,
-        "use_policy": "Generate these with Codex image generation when available; save outputs under assets/backgrounds/ and record paths in visual_contract.json.",
-        "fallback_policy": "If image generation is unavailable, use neutral solid surfaces only; do not replace with decorative lines or grids.",
+        "use_policy": "Generate these with Codex image generation when available; save outputs under assets/backgrounds/ and record paths in visual_contract.json. These images are atmosphere-only; all slide elements remain editable foreground objects.",
+        "fallback_policy": "If image generation is unavailable, use neutral solid/gradient surfaces only; do not replace with boxes, panels, decorative lines, grids, or fake layout containers.",
     }
 
 

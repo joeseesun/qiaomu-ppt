@@ -3,10 +3,10 @@
   "generated_at": "2026-06-20",
   "package": {
     "name": "qiaomu-ppt",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "owner": "向阳乔木",
     "maturity_tier": "production-lite",
-    "lifecycle_stage": "open-source-visual-budget",
+    "lifecycle_stage": "open-source-atmosphere-backgrounds",
     "upstream_inspiration": [
       "hugohe3/ppt-master",
       "JimLiu/baoyu-design",
@@ -18,8 +18,8 @@
     ]
   },
   "intent": {
-    "description": "Independent Qiaomu PPT production skill for creating Chinese-first PPT, PowerPoint, PPTX, presentation, slide deck, brand launch deck, teaching courseware, URL-to-PPT, and speaker-ready decks. It routes requests, fetches URLs/PDFs/images into Markdown sources when needed, builds an audience or learning-state plan, chooses persuasive structure frameworks, improves content and copy through claim-title outlines, recommends a suitable design style from a local PPT style library when needed, locks a calm Qiaomu visual system, enforces a per-slide max-three active color budget, prefers generated bitmap background packs in Codex image-generation environments, rejects meaningless decorative lines, enforces visual-noise budget and image-slot containment, produces fixed-stage HTML previews or PPTX-oriented SVG artifacts, runs local artifact checks, and prefers editable PPTX delivery when an exporter is available. Use when the user asks to 做PPT, 生成PPT, URL做PPT, 根据链接做PPT, 优化PPT文案, 改PPT内容, 制作课件, 品牌发布PPT, 发布会deck, 演讲slides, PowerPoint, PPTX, 自动推荐PPT风格, or wants a Qiaomu workflow that combines practical editability, stronger content, aesthetics, speaker notes, and verification without relying on upstream skills at runtime.\n",
-    "job_to_be_done": "Turn topics, URLs, PDFs, old PPTX files, brand briefs, teaching content, and raw research into route-aware Qiaomu presentation plans, persuasive content contracts, calm visual systems, generated-background-ready visual briefs, and verified editable PPTX or HTML deck deliverables.",
+    "description": "Independent Qiaomu PPT production skill for creating Chinese-first PPT, PowerPoint, PPTX, presentation, slide deck, brand launch deck, teaching courseware, URL-to-PPT, and speaker-ready decks. It routes requests, fetches URLs/PDFs/images into Markdown sources when needed, builds an audience or learning-state plan, chooses persuasive structure frameworks, improves content and copy through claim-title outlines, recommends a suitable design style from a local PPT style library when needed, locks a calm Qiaomu visual system, enforces a per-slide max-three active color budget, prefers atmosphere-only generated bitmap background packs in Codex image-generation environments, rejects baked-in background layout objects and meaningless decorative lines, enforces visual-noise budget and image-slot containment, produces fixed-stage HTML previews or PPTX-oriented SVG artifacts, runs local artifact checks, and prefers editable PPTX delivery when an exporter is available. Use when the user asks to 做PPT, 生成PPT, URL做PPT, 根据链接做PPT, 优化PPT文案, 改PPT内容, 制作课件, 品牌发布PPT, 发布会deck, 演讲slides, PowerPoint, PPTX, 自动推荐PPT风格, or wants a Qiaomu workflow that combines practical editability, stronger content, aesthetics, speaker notes, and verification without relying on upstream skills at runtime.\n",
+    "job_to_be_done": "Turn topics, URLs, PDFs, old PPTX files, brand briefs, teaching content, and raw research into route-aware Qiaomu presentation plans, persuasive content contracts, calm visual systems, atmosphere-only generated-background briefs, and verified editable PPTX or HTML deck deliverables.",
     "target_users": [
       "Qiaomu creator/operator",
       "presenters and brand storytellers",

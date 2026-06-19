@@ -96,6 +96,29 @@ Fix:
 
 ## 5. Fake Rounded Image Frame
 
+## 5. Baked-In Background Layout Objects
+
+Symptom:
+
+- Generated background images contain boxes, rectangles, card panels, frames, windows, placeholders, chart areas, or text-block zones.
+- The slide looks structured, but those structures are trapped inside a bitmap and cannot be edited in PowerPoint.
+- Foreground titles, charts, or cards have to fight a pre-baked container drawn by the background.
+
+Root cause:
+
+- The prompt asked for "chart-safe area", "card area", "dashboard background", or "evidence background" without forbidding actual UI/layout objects.
+- The generator tried to solve page composition inside the background image.
+- Background design and editable foreground layout were not separated.
+
+Fix:
+
+- Prompt backgrounds as atmosphere only: color fields, gradients, soft glow, subtle grain, abstract texture.
+- Explicitly forbid boxes, rectangles, cards, panels, frames, placeholders, chart areas, image slots, UI chrome, text blocks, diagrams, and screenshots.
+- Add cards, chart frames, labels, source images, and diagram structures later as editable PPT/HTML foreground objects.
+- Record `background_asset_policy.atmosphere_only_policy` and `editable_foreground_policy` in `visual_contract.json`.
+
+## 6. Fake Rounded Image Frame
+
 Symptom:
 
 - A rounded rectangle is drawn behind an image, but the image itself is rectangular and spills beyond the intended card.
@@ -124,7 +147,7 @@ Fix:
   - Use a native PowerPoint picture crop / placeholder route.
 - Never place a rectangular image over a rounded rectangle and call it clipped.
 
-## 6. Evidence Chart Legibility Drift
+## 7. Evidence Chart Legibility Drift
 
 Symptom:
 
@@ -139,7 +162,7 @@ Fix:
   - `chart_then_takeaway`: first slide shows full chart, next slide extracts 2-3 callouts.
 - Do not shrink a dense benchmark chart below the size where labels are readable in the rendered preview.
 
-## 7. Visible Internal Provenance Footer
+## 8. Visible Internal Provenance Footer
 
 Symptom:
 
@@ -159,13 +182,14 @@ Fix:
 - Use visible citations only when the route needs them, such as academic/report decks, and keep them content-level, not toolchain-level.
 - Never print `fetched via`, `generated with`, model/provider names, or internal speaker cues on every slide unless the user explicitly asks.
 
-## 8. Required Visual QA
+## 9. Required Visual QA
 
 Before calling a deck complete:
 
 - Render the PPTX to PDF/images or open it in PowerPoint/Keynote and screenshot thumbnails.
 - Inspect the thumbnail grid for repeated backgrounds, samey layouts, blank slides, and visual fatigue.
 - Inspect every slide for color budget drift: max three active non-image colors, one accent.
+- Inspect generated backgrounds for baked-in layout objects. Regenerate backgrounds that include boxes, panels, cards, frames, placeholders, or chart/image slots.
 - Inspect every slide for decorative linework. Remove lines that are not axes, table rules, connectors, separators, or real frames.
 - Inspect every chart/image slide for image overflow beyond the declared slot.
 - Inspect visible slide text for internal provenance or speaker-cue leakage.

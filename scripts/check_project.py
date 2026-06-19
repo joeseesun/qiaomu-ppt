@@ -45,6 +45,17 @@ VISUAL_BACKGROUND_ROLES_MIN = 4
 VISUAL_BACKGROUND_MAX_REPEAT = 2
 ALLOWED_VISUAL_NOISE_BUDGETS = {"quiet", "moderate", "expressive"}
 DEFAULT_MAX_ACTIVE_COLORS = 3
+REQUIRED_BACKGROUND_FORBIDDEN_OBJECTS = {
+    "box",
+    "card",
+    "panel",
+    "frame",
+    "placeholder",
+    "chart area",
+    "image slot",
+    "ui chrome",
+    "text block",
+}
 IMAGE_SLOT_FIELDS = [
     "slot_id",
     "slide_no",
@@ -307,6 +318,32 @@ def check_visual_contract(path: Path, slide_count: int) -> tuple[list[str], list
             failures.append(
                 "background_asset_policy.decorative_line_policy must forbid non-functional decorative lines"
             )
+        atmosphere_policy = str(background_policy.get("atmosphere_only_policy") or "").lower()
+        editable_policy = str(background_policy.get("editable_foreground_policy") or "").lower()
+        forbidden_objects = background_policy.get("forbidden_generated_objects")
+        evidence["background_atmosphere_only"] = bool(atmosphere_policy)
+        if "atmosphere" not in atmosphere_policy or "only" not in atmosphere_policy:
+            failures.append(
+                "background_asset_policy.atmosphere_only_policy must declare that generated backgrounds are atmosphere-only"
+            )
+        if "editable" not in editable_policy or "foreground" not in editable_policy:
+            failures.append(
+                "background_asset_policy.editable_foreground_policy must declare that layout objects stay editable foreground objects"
+            )
+        if not isinstance(forbidden_objects, list) or not forbidden_objects:
+            failures.append("background_asset_policy.forbidden_generated_objects must list forbidden baked-in layout objects")
+        else:
+            normalized_forbidden = {
+                str(item).strip().lower()
+                for item in forbidden_objects
+                if str(item).strip()
+            }
+            missing_forbidden = sorted(REQUIRED_BACKGROUND_FORBIDDEN_OBJECTS - normalized_forbidden)
+            if missing_forbidden:
+                failures.append(
+                    "background_asset_policy.forbidden_generated_objects missing: "
+                    + ", ".join(missing_forbidden)
+                )
 
     roles = contract.get("background_roles")
     if not isinstance(roles, list) or len(roles) < VISUAL_BACKGROUND_ROLES_MIN:

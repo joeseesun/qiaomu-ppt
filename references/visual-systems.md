@@ -140,7 +140,8 @@ The default visual taste for `qiaomu-ppt` is calm, not loud. The deck should fee
 Rules:
 
 - Default `visual_noise_budget` is `quiet`.
-- Use generated bitmap backgrounds when the environment supports it; otherwise use large quiet surfaces and paper bands.
+- Use generated bitmap backgrounds when the environment supports it; otherwise use large quiet surfaces and paper bands. Generated backgrounds are atmosphere only: color, gradient, light, grain, and abstract texture.
+- Generated backgrounds must not include boxes, rectangles, panels, cards, frames, placeholders, chart areas, image slots, windows, UI chrome, or text blocks. Those are editable foreground objects.
 - Do not use ornamental grids, random thin rules, tech lines, side rails, or abstract stripes as decoration. Lines are allowed only as chart axes, table rules, connectors, or true content structure.
 - Use one accent system per slide. Do not combine neon wedges, rails, glows, multiple card stacks, and saturated dots on the same page.
 - Enforce a max-three active color budget per slide: neutral base, readable text, and one accent. Source images/charts are exempt, but surrounding UI must become quieter when a source image is colorful.
@@ -153,13 +154,24 @@ Preferred background families:
 
 | Family | Use | Treatment |
 |---|---|---|
-| `generated_cover` | cover, chapter open, closing | full-slide text-free generated bitmap, quiet focal depth |
-| `generated_evidence` | technical proof, source charts | generated bitmap with calm chart-safe area |
+| `generated_cover` | cover, chapter open, closing | full-slide text-free atmosphere bitmap, quiet focal depth |
+| `generated_evidence` | technical proof, source charts | atmosphere bitmap only; chart frames and cards stay editable foreground objects |
 | `quiet_dark` | technical proof, product narrative | near-black/navy ground, no decorative lines |
 | `quiet_light` | dense charts, courseware, reports | off-white/paper surface, no ornamental rules |
 | `editorial_band` | chapter open, argument transition | wide neutral band with one restrained accent edge |
 | `split_surface` | compare, problem/solution | calm 50/50 or 60/40 surfaces without heavy shadows |
 | `focus_canvas` | diagram/process | clean frame or generated surface, diagram owns attention |
+
+Generated background prompt boundaries:
+
+```json
+{
+  "atmosphere_only": true,
+  "allowed": ["color fields", "soft gradients", "diffuse glow", "subtle grain", "abstract texture"],
+  "forbidden": ["boxes", "cards", "panels", "frames", "placeholders", "chart areas", "image slots", "UI chrome", "text blocks"],
+  "editable_foreground_policy": "titles, cards, charts, frames, diagrams, and labels are added later as editable objects"
+}
+```
 
 ## Color Budget
 
