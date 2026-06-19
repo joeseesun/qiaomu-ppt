@@ -36,6 +36,7 @@
 - Decks longer than 8 slides declare `visual_noise_budget`, normally `quiet`.
 - Decks longer than 8 slides declare `color_budget` with `max_active_colors_per_slide <= 3`, and each slide declares `active_colors`.
 - When Codex image generation is available, decks declare a 3-5 item generated background bitmap pack; if unavailable, the fallback must be neutral surfaces, not decorative linework.
+- Generated backgrounds are atmosphere only. They must not contain boxes, rectangles, panels, cards, frames, placeholders, chart areas, image slots, UI chrome, or text blocks; these must remain editable foreground objects.
 - The thumbnail grid shows visible variation in background tone, dominant object placement, and slide density.
 - Backgrounds are calmer than the content: no repeated hard side stripes, oversized saturated wedges, stacked decorative motifs, meaningless tech lines, ornamental grids, or noisy chart backdrops unless explicitly brand-required.
 - Lines are functional only: chart axes, table rules, connectors, or content separators. Lines that exist only to add texture or "tech feel" fail the visual gate.

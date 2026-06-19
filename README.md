@@ -17,7 +17,7 @@
 - 内容先赢：用受众状态变化、claim title、证据策略和 speaker notes 组织材料，避免“资料搬运式 PPT”。
 - 单页三色预算：默认每页只允许“中性底 + 可读文字 + 一个强调色”，源图片/图表色彩不计入周边 UI。
 - 背景降噪：默认 `visual_noise_budget: quiet`，限制大色块、霓虹边栏、复杂装饰、无意义线条和图表背后噪声。
-- Codex 生图背景：在有内置生图能力时，先生成 3-5 张安静的 16:9 背景图作为背景系统，替代传统线条/色块装饰。
+- Codex 生图背景：在有内置生图能力时，先生成 3-5 张安静的 16:9 氛围背景图；背景只负责颜色、渐变、光感、纹理和抽象装饰，不生成方框、卡片、面板、文字或图表占位。
 - 图片不出框：所有图片/图表都要有 image slot、fit、mask、padding 和 `overflow_policy: clip_or_fail`。
 - 风格自动推荐：内置 74 个从 `awesome-design-md` 抽象出的 PPT 风格预设，可按场景推荐。
 - 开源自包含：声明 Python 包、PDF/PPTX 转换工具、CJK 字体和降级策略，不依赖原始 upstream skill 运行。
@@ -125,6 +125,12 @@ python3 scripts/check_project.py <project_dir>
     "max_active_colors_per_slide": 3,
     "accent_policy": "one accent per slide"
   },
+  "background_asset_policy": {
+    "mode": "bitmap_background_pack",
+    "atmosphere_only_policy": "generated backgrounds are atmosphere-only",
+    "editable_foreground_policy": "cards, charts, frames, labels, and page structure stay editable foreground objects",
+    "forbidden_generated_objects": ["box", "card", "panel", "frame", "placeholder", "chart area", "image slot", "ui chrome", "text block"]
+  },
   "background_roles": ["hero_dark", "evidence_light", "split_panel", "diagram_focus"],
   "max_consecutive_background_role": 2
 }
@@ -140,6 +146,8 @@ python3 scripts/background_prompt_pack.py \
   --count 5 \
   --output demo/assets/backgrounds/background_prompts.json
 ```
+
+背景 prompt 的边界：只生成 atmosphere-only bitmap。标题、卡片、图表框、图片槽位、说明文字和所有页面结构，都必须在 PPT/HTML 层作为可编辑对象生成。
 
 ## URL / PDF 能力
 
@@ -200,6 +208,7 @@ python3 scripts/check_project.py /path/to/generated-project
 ## Troubleshooting
 
 - 背景太花：检查 `visual_contract.json` 是否声明 `visual_noise_budget: quiet`，并删除大色块、霓虹边栏、多套装饰系统和无意义线条。
+- 背景图里出现方框/卡片/占位区：这是背景 prompt 错误。重新生成 atmosphere-only 背景，所有框、卡片、图表槽位和文字都应作为可编辑前景对象加入。
 - 配色太乱：检查 `color_budget.max_active_colors_per_slide` 是否大于 3，检查每页是否只有一个强调色。
 - 版式单调：给长 deck 至少 4 种背景/布局角色，缩略图网格里不应该像同一页换文字。
 - 图片出框：检查 image slot，不要只放圆角底框；图片本身要真实裁切、mask 或预合成。
