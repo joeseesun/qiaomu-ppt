@@ -13,7 +13,6 @@ env/
 outputs/
 tmp/
 demo/sources/
-assets/fonts/*.otf
-assets/fonts/*.ttf
-assets/fonts/*.woff
-assets/fonts/*.woff2
+assets/fonts/*.zip
+assets/fonts/*.tmp
+assets/fonts/*.part

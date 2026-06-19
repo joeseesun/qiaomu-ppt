@@ -1,4 +1,4 @@
-*.otf
-*.ttf
-*.woff
-*.woff2
+*.zip
+*.tmp
+*.part
+.DS_Store

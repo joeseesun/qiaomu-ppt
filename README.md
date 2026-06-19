@@ -15,7 +15,9 @@
 - URL / PDF 到 PPT：用户说“做一个 PPT：URL”时，内置 `scripts/url_to_markdown.py` 会抓取网页/PDF正文、发现图片、保存 `source_manifest.json`。
 - 可编辑优先：默认面向 PowerPoint/PPTX，而不是只生成一张好看的网页截图。
 - 内容先赢：用受众状态变化、claim title、证据策略和 speaker notes 组织材料，避免“资料搬运式 PPT”。
-- 背景降噪：默认 `visual_noise_budget: quiet`，限制大色块、霓虹边栏、复杂装饰和图表背后噪声。
+- 单页三色预算：默认每页只允许“中性底 + 可读文字 + 一个强调色”，源图片/图表色彩不计入周边 UI。
+- 背景降噪：默认 `visual_noise_budget: quiet`，限制大色块、霓虹边栏、复杂装饰、无意义线条和图表背后噪声。
+- Codex 生图背景：在有内置生图能力时，先生成 3-5 张安静的 16:9 背景图作为背景系统，替代传统线条/色块装饰。
 - 图片不出框：所有图片/图表都要有 image slot、fit、mask、padding 和 `overflow_policy: clip_or_fail`。
 - 风格自动推荐：内置 74 个从 `awesome-design-md` 抽象出的 PPT 风格预设，可按场景推荐。
 - 开源自包含：声明 Python 包、PDF/PPTX 转换工具、CJK 字体和降级策略，不依赖原始 upstream skill 运行。
@@ -32,11 +34,11 @@ npx skills add joeseesun/qiaomu-ppt
 git clone https://github.com/joeseesun/qiaomu-ppt.git
 cd qiaomu-ppt
 python3 scripts/bootstrap.py --check
-python3 scripts/bootstrap.py --install-python
+python3 scripts/bootstrap.py --install-python --venv
 python3 scripts/bootstrap.py --download-fonts
 ```
 
-`--download-fonts` 会按 `data/font_manifest.json` 下载 Noto Sans CJK SC 到 `assets/fonts/`。字体文件默认不提交到仓库，避免包体积膨胀。
+仓库已内置 Noto Sans CJK SC Regular/Bold；`--download-fonts` 用于修复或重新下载字体文件。
 
 ## 快速使用
 
@@ -111,15 +113,32 @@ python3 scripts/check_project.py <project_dir>
 - 布局单调：12 页看起来像同一页换文字，没有背景/密度/主视觉节奏。
 - 图片假裁切：圆角底框在后面，图片本身没有被裁切，导致截图越出框。
 - 内部元数据泄漏：`Source: ... fetched via ... generated with ...` 不应该默认出现在每页画布上。
+- 彩虹式配色：同一页同时出现 cyan、green、yellow、red 等多个强调色，会让页面变廉价。
+- 无意义装饰线：只为了“科技感”而加的细线、网格、边栏、光轨，默认都算视觉噪声。
 
 长 deck 必须声明：
 
 ```json
 {
   "visual_noise_budget": "quiet",
+  "color_budget": {
+    "max_active_colors_per_slide": 3,
+    "accent_policy": "one accent per slide"
+  },
   "background_roles": ["hero_dark", "evidence_light", "split_panel", "diagram_focus"],
   "max_consecutive_background_role": 2
 }
+```
+
+生成背景 prompt pack：
+
+```bash
+python3 scripts/background_prompt_pack.py \
+  --subject "AI coding model technical launch" \
+  --route talk_deck \
+  --accent cyan \
+  --count 5 \
+  --output demo/assets/backgrounds/background_prompts.json
 ```
 
 ## URL / PDF 能力
@@ -180,7 +199,8 @@ python3 scripts/check_project.py /path/to/generated-project
 
 ## Troubleshooting
 
-- 背景太花：检查 `visual_contract.json` 是否声明 `visual_noise_budget: quiet`，并删除大色块、霓虹边栏和多套装饰系统。
+- 背景太花：检查 `visual_contract.json` 是否声明 `visual_noise_budget: quiet`，并删除大色块、霓虹边栏、多套装饰系统和无意义线条。
+- 配色太乱：检查 `color_budget.max_active_colors_per_slide` 是否大于 3，检查每页是否只有一个强调色。
 - 版式单调：给长 deck 至少 4 种背景/布局角色，缩略图网格里不应该像同一页换文字。
 - 图片出框：检查 image slot，不要只放圆角底框；图片本身要真实裁切、mask 或预合成。
 - URL 没图片：确认 `source_manifest.json` 的 `images` 字段；Jina fallback 会从 Markdown 图片链接里补图。

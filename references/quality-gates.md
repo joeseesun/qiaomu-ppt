@@ -34,8 +34,11 @@
 - The visual system has a thesis, palette, type scale, layout rhythm, and media policy.
 - Decks longer than 8 slides have a `background_rhythm` with at least 4 roles and no role repeated more than 2 consecutive slides.
 - Decks longer than 8 slides declare `visual_noise_budget`, normally `quiet`.
+- Decks longer than 8 slides declare `color_budget` with `max_active_colors_per_slide <= 3`, and each slide declares `active_colors`.
+- When Codex image generation is available, decks declare a 3-5 item generated background bitmap pack; if unavailable, the fallback must be neutral surfaces, not decorative linework.
 - The thumbnail grid shows visible variation in background tone, dominant object placement, and slide density.
-- Backgrounds are calmer than the content: no repeated hard side stripes, oversized saturated wedges, stacked decorative motifs, or noisy chart backdrops unless explicitly brand-required.
+- Backgrounds are calmer than the content: no repeated hard side stripes, oversized saturated wedges, stacked decorative motifs, meaningless tech lines, ornamental grids, or noisy chart backdrops unless explicitly brand-required.
+- Lines are functional only: chart axes, table rules, connectors, or content separators. Lines that exist only to add texture or "tech feel" fail the visual gate.
 - If style was unspecified, `style_recommendations.json` exists or the reason for skipping style recommendation is stated.
 - Any selected Design-MD preset is copied into `style_brief.md` and `spec_lock.json` as PPT rules, not left as vague inspiration.
 - No one-note generic palette, no default purple-gradient design, no arbitrary style mixing.

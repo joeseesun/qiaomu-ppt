@@ -20,5 +20,5 @@
     }
   ],
   "install": "python3 scripts/bootstrap.py --download-fonts",
-  "note": "Font binaries are downloaded into assets/fonts/ and ignored by git by default."
+  "note": "Font binaries are bundled for self-contained public installs and can be repaired with the download command."
 }

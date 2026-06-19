@@ -123,7 +123,7 @@ For decks longer than 8 slides, define at least 4 roles before production. Use t
 | `evidence_dark` | dramatic proof slide | dark canvas + bright evidence card | chart/image plus compact takeaway rail |
 | `evidence_light` | dense chart/table readability | light canvas | chart owns 65-85% of slide |
 | `split_panel` | comparison or explanation | two-tone or divided surface | 50/50 or 60/40 split |
-| `diagram_focus` | architecture/process | quiet canvas, subtle grid | centered diagram with label rail |
+| `diagram_focus` | architecture/process | quiet canvas or generated bitmap | centered diagram with compact labels |
 | `claim_card` | argument transition | solid field or paper band | one large sentence, small proof |
 
 Rules:
@@ -140,8 +140,10 @@ The default visual taste for `qiaomu-ppt` is calm, not loud. The deck should fee
 Rules:
 
 - Default `visual_noise_budget` is `quiet`.
-- Use large quiet surfaces, paper bands, subtle grids, thin rules, and restrained contrast.
+- Use generated bitmap backgrounds when the environment supports it; otherwise use large quiet surfaces and paper bands.
+- Do not use ornamental grids, random thin rules, tech lines, side rails, or abstract stripes as decoration. Lines are allowed only as chart axes, table rules, connectors, or true content structure.
 - Use one accent system per slide. Do not combine neon wedges, rails, glows, multiple card stacks, and saturated dots on the same page.
+- Enforce a max-three active color budget per slide: neutral base, readable text, and one accent. Source images/charts are exempt, but surrounding UI must become quieter when a source image is colorful.
 - Evidence slides should use the quietest backgrounds in the deck.
 - Decorative shapes should not occupy more than roughly 15% of a slide unless they are the main subject.
 - Avoid repeated hard side stripes, oversized cyan wedges, heavy shadows, glassy cards, and ornamental backgrounds behind charts.
@@ -151,11 +153,33 @@ Preferred background families:
 
 | Family | Use | Treatment |
 |---|---|---|
-| `quiet_dark` | technical proof, product narrative | near-black/navy ground, thin accent line, no large glow |
-| `quiet_light` | dense charts, courseware, reports | off-white/paper surface, low-contrast rules |
-| `editorial_band` | chapter open, argument transition | wide neutral band with one accent edge |
+| `generated_cover` | cover, chapter open, closing | full-slide text-free generated bitmap, quiet focal depth |
+| `generated_evidence` | technical proof, source charts | generated bitmap with calm chart-safe area |
+| `quiet_dark` | technical proof, product narrative | near-black/navy ground, no decorative lines |
+| `quiet_light` | dense charts, courseware, reports | off-white/paper surface, no ornamental rules |
+| `editorial_band` | chapter open, argument transition | wide neutral band with one restrained accent edge |
 | `split_surface` | compare, problem/solution | calm 50/50 or 60/40 surfaces without heavy shadows |
-| `focus_canvas` | diagram/process | subtle grid or frame, diagram owns attention |
+| `focus_canvas` | diagram/process | clean frame or generated surface, diagram owns attention |
+
+## Color Budget
+
+Every slide needs a color budget before rendering:
+
+```json
+{
+  "max_active_colors_per_slide": 3,
+  "count_source_images": false,
+  "default_formula": "neutral base + readable text + one accent",
+  "forbidden": ["rainbow metrics", "alternating accent bullets", "more than one accent family per page"]
+}
+```
+
+Rules:
+
+- A slide with dark background, white text, and cyan accent is valid.
+- A slide with dark background, white text, cyan dots, green badges, yellow metric cards, and red metric cards fails.
+- If semantic status colors are required, use shape, label, or ordering first; add a second semantic color only when the user explicitly needs it and the slide still stays within 3 active colors.
+- If a screenshot or chart contains many colors, those colors belong to the evidence object, not to the surrounding slide system. The UI around it should use neutral plus one accent.
 
 ## Image Slot Contract
 

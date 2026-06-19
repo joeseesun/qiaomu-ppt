@@ -52,7 +52,49 @@ Fix:
 - Use one accent system per slide.
 - Remove large saturated wedges or hard side rails unless they are part of the brand and the content stays clearly dominant.
 
-## 3. Fake Rounded Image Frame
+## 3. Rainbow Color Budget Failure
+
+Symptom:
+
+- One slide uses cyan bullets, green badges, yellow metric cards, red metric cards, and several neutral surfaces.
+- The page feels cheap or dashboard-like even when each component is individually tidy.
+- The user cannot tell which color carries meaning.
+
+Root cause:
+
+- The generator treats color as decoration rather than information hierarchy.
+- Status/metric cards use different colors by index.
+- The style brief lacks a per-slide color budget.
+
+Fix:
+
+- Set `color_budget.max_active_colors_per_slide <= 3`.
+- Default formula: neutral base + readable text + one accent.
+- Use one accent per slide; vary hierarchy with size, weight, spacing, or ordering instead of new colors.
+- Source charts/screenshots are exempt, but the surrounding slide UI must become quieter when the evidence object is colorful.
+
+## 4. Meaningless Decorative Linework
+
+Symptom:
+
+- Slides contain thin lines, grids, rails, or light streaks that do not connect content or frame a real object.
+- The design says "technical" but does not improve reading, hierarchy, or evidence focus.
+- Backgrounds look busy even after saturated shapes are removed.
+
+Root cause:
+
+- The generator tries to replace weak composition with surface texture.
+- Words such as `subtle grid`, `thin rule`, or `tech line` were treated as a style recipe.
+- Layout roles are not strong enough, so linework becomes filler.
+
+Fix:
+
+- Lines must be functional: chart axes, table rules, connectors, content separators, or real framing.
+- Prefer generated bitmap backgrounds in Codex image-generation environments.
+- If image generation is unavailable, use clean neutral surfaces, not faux-technical linework.
+- Record `background_asset_policy.decorative_line_policy` in `visual_contract.json`.
+
+## 5. Fake Rounded Image Frame
 
 Symptom:
 
@@ -82,7 +124,7 @@ Fix:
   - Use a native PowerPoint picture crop / placeholder route.
 - Never place a rectangular image over a rounded rectangle and call it clipped.
 
-## 4. Evidence Chart Legibility Drift
+## 6. Evidence Chart Legibility Drift
 
 Symptom:
 
@@ -97,9 +139,7 @@ Fix:
   - `chart_then_takeaway`: first slide shows full chart, next slide extracts 2-3 callouts.
 - Do not shrink a dense benchmark chart below the size where labels are readable in the rendered preview.
 
-## 4. Required Visual QA
-
-## 5. Visible Internal Provenance Footer
+## 7. Visible Internal Provenance Footer
 
 Symptom:
 
@@ -119,12 +159,14 @@ Fix:
 - Use visible citations only when the route needs them, such as academic/report decks, and keep them content-level, not toolchain-level.
 - Never print `fetched via`, `generated with`, model/provider names, or internal speaker cues on every slide unless the user explicitly asks.
 
-## 6. Required Visual QA
+## 8. Required Visual QA
 
 Before calling a deck complete:
 
 - Render the PPTX to PDF/images or open it in PowerPoint/Keynote and screenshot thumbnails.
 - Inspect the thumbnail grid for repeated backgrounds, samey layouts, blank slides, and visual fatigue.
+- Inspect every slide for color budget drift: max three active non-image colors, one accent.
+- Inspect every slide for decorative linework. Remove lines that are not axes, table rules, connectors, separators, or real frames.
 - Inspect every chart/image slide for image overflow beyond the declared slot.
 - Inspect visible slide text for internal provenance or speaker-cue leakage.
 - If a screenshot reveals a frame/clip problem, fix the generation method, not just that slide's coordinates.
