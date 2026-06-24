@@ -1,0 +1,238 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-06-20",
+  "source_boundary": "Qiaomu-owned abstraction of visual asset acquisition methodology. This file does not vendor upstream prompts, templates, provider code, or image assets.",
+  "acquire_via": {
+    "ai": {
+      "label": "AI generated image",
+      "initial_status": "Pending",
+      "terminal_statuses": [
+        "Generated",
+        "Needs-Manual",
+        "Missing",
+        "Failed"
+      ],
+      "artifacts": [
+        "assets/images/image_prompts.json",
+        "assets/images/image_prompts.md",
+        "visual_asset_manifest.json"
+      ],
+      "use_for": [
+        "atmosphere backgrounds",
+        "chapter art",
+        "concept metaphors",
+        "scenario illustrations",
+        "object cutaways",
+        "texture packs",
+        "moodboard exploration"
+      ],
+      "hard_rule": "Generated images must not fake evidence, charts, screenshots, logos, UI, or editable slide layout objects."
+    },
+    "web": {
+      "label": "Rights-clear web sourced image",
+      "initial_status": "Pending",
+      "terminal_statuses": [
+        "Sourced",
+        "Needs-Manual",
+        "Missing",
+        "Failed"
+      ],
+      "artifacts": [
+        "assets/images/image_sources.json",
+        "visual_asset_manifest.json"
+      ],
+      "use_for": [
+        "public-domain or licensed photography",
+        "place images",
+        "historical images",
+        "educational diagrams",
+        "stock-style people or workplace photos"
+      ],
+      "license_tiers": [
+        "no-attribution",
+        "attribution-required"
+      ],
+      "forbidden_licenses": [
+        "CC BY-NC",
+        "CC BY-NC-SA",
+        "CC BY-ND",
+        "CC BY-NC-ND",
+        "All Rights Reserved",
+        "unknown"
+      ]
+    },
+    "user": {
+      "label": "User-provided image",
+      "initial_status": "Existing",
+      "terminal_statuses": [
+        "Existing",
+        "Needs-Manual",
+        "Missing"
+      ],
+      "artifacts": [
+        "visual_asset_manifest.json"
+      ],
+      "use_for": [
+        "owned brand assets",
+        "owned screenshots",
+        "owned product images",
+        "private team photos"
+      ]
+    },
+    "source": {
+      "label": "Extracted from ingested source",
+      "initial_status": "Existing",
+      "terminal_statuses": [
+        "Existing",
+        "Needs-Manual",
+        "Missing"
+      ],
+      "artifacts": [
+        "sources/source_manifest.json",
+        "visual_asset_manifest.json"
+      ],
+      "use_for": [
+        "paper figures",
+        "article images",
+        "PDF charts",
+        "WeChat article images",
+        "document screenshots"
+      ],
+      "hard_rule": "Source images are evidence candidates; they still need image slots, crop policy, and provenance handling."
+    },
+    "formula": {
+      "label": "Rendered formula or equation",
+      "initial_status": "Rendered",
+      "terminal_statuses": [
+        "Rendered",
+        "Needs-Manual",
+        "Missing"
+      ],
+      "artifacts": [
+        "assets/formulas/",
+        "visual_asset_manifest.json"
+      ],
+      "use_for": [
+        "LaTeX formulas",
+        "paper equations",
+        "classroom math"
+      ]
+    },
+    "placeholder": {
+      "label": "Intentional placeholder",
+      "initial_status": "Placeholder",
+      "terminal_statuses": [
+        "Placeholder",
+        "Needs-Manual",
+        "Missing"
+      ],
+      "artifacts": [
+        "visual_asset_manifest.json"
+      ],
+      "use_for": [
+        "planning-only decks",
+        "asset awaiting user approval"
+      ],
+      "hard_rule": "A placeholder is a declared gap, not a completed image."
+    }
+  },
+  "asset_roles": [
+    "background",
+    "cover_art",
+    "chapter_art",
+    "closing_art",
+    "concept_metaphor",
+    "scenario",
+    "object_cutaway",
+    "screenshot",
+    "source_evidence",
+    "chart_context",
+    "texture",
+    "moodboard",
+    "formula",
+    "icon",
+    "logo",
+    "map",
+    "portrait"
+  ],
+  "page_roles": {
+    "hero_page": "The image is the page's main visual voice, such as a cover, chapter divider, mood transition, single-number hero, or closing. SVG/PPT foreground may overlay editable text.",
+    "local": "The image sits inside a declared region of a slide, such as a side image, proof object, screenshot, card image, or context block. Do not reserve overlay space inside the image unless the slide contract actually overlays text."
+  },
+  "text_policies": {
+    "none": "No text of any kind inside the generated image.",
+    "embedded": "Stable visual lettering or image-internal identifiers may be baked into the image, but page-level titles, body copy, captions, data values, sources, and editable claims stay in SVG/PPT foreground."
+  },
+  "ai_renderings": {
+    "editorial": "Editorial magazine imagery with careful crop, controlled negative space, natural texture, and visual restraint.",
+    "luxury-editorial": "High-end magazine art direction with refined materials, strong photography logic, and sparse premium composition.",
+    "blueprint": "Technical schematic/blueprint language with precise linework, geometric rigor, restrained depth, and calm evidence surfaces.",
+    "screen-print": "Risograph or silkscreen-inspired flat color blocks, halftone texture, tactile paper grain, and slight registration imperfection.",
+    "flat": "Clean flat illustration with simplified silhouettes, crisp geometry, and clear compositional hierarchy.",
+    "glassmorphism": "Layered translucent depth, frosted surfaces, subtle highlights, and soft technology atmosphere.",
+    "ink-notes": "Ink or visual-note style with hand-drawn line quality, natural variation, and human explanatory warmth.",
+    "corporate-photo": "Editorial photography style with natural light, realistic setting, professional subjects, and restrained color grading.",
+    "minimalist-swiss": "Swiss modernist restraint, modular spacing, flat geometry, strong negative space, and functional hierarchy.",
+    "atmospheric-texture": "Texture-first abstract atmosphere with no subject, no layout scaffolding, and quiet background depth."
+  },
+  "ai_palette_behaviors": {
+    "duotone": "Use two deck colors plus paper/background; one color dominates shapes, one small accent adds rhythm, and the background carries breathing space.",
+    "cool-corporate": "Use a calm professional base, restrained primary color for structure, and a small credible accent.",
+    "dark-cinematic": "Use a dark field, controlled light source, low saturation, and one small signal accent.",
+    "mono-ink-red-signal": "Use ink-like monochrome surfaces with a single red/signal accent, never rainbow highlights.",
+    "tech-neon": "Use dark or neutral technology depth with one constrained neon accent; avoid multi-color rails.",
+    "warm-stone": "Use warm neutral surfaces, quiet material texture, and muted accent details.",
+    "vivid-launch": "Use expressive flat color only when the route is event/launch/consumer; keep accents role-based and readable.",
+    "mono-ink": "Use black/gray ink values and paper-like background, with texture carrying warmth.",
+    "custom": "Use the custom palette_behavior prose from spec_lock.json."
+  },
+  "local_visual_types": [
+    "scene",
+    "framework",
+    "flowchart",
+    "matrix",
+    "cycle",
+    "funnel",
+    "pyramid",
+    "comparison",
+    "timeline",
+    "map",
+    "object",
+    "portrait",
+    "screenshot_context",
+    "texture"
+  ],
+  "hero_primitives": {
+    "single_subject": "One dominant object, product, symbol, or concept owns the image with generous negative space.",
+    "portrait": "One human subject or symbolic portrait with controlled background and no competing subject.",
+    "typographic": "A short stable word or number is the artwork itself; use only when the text should be rasterized.",
+    "atmospheric": "No dominant subject; quiet field for editable SVG/PPT foreground overlays.",
+    "custom": "Use custom composition prose that names subject count, layout structure, and breathing room."
+  },
+  "prompt_contract": {
+    "paragraph_order": [
+      "rendering_style",
+      "palette_behavior",
+      "composition_or_type",
+      "specific_subject",
+      "container_note",
+      "hard_rules"
+    ],
+    "routine_word_budget": "150-300 words",
+    "subject_accuracy_word_budget": "500-1000+ words when scientific, academic, engineering, medical, legal, or regulated visuals need field conventions",
+    "forbidden": [
+      "tag-soup keyword prompts",
+      "mixing renderings or palette behaviors within one deck",
+      "showing HEX codes or color names as visible image text",
+      "baking editable slide titles, captions, bullets, data values, or sources into images",
+      "generating brand logos or trademarked product likenesses without user-owned assets",
+      "using generated images to replace source evidence"
+    ]
+  },
+  "qiaomu_default_path": {
+    "path_a": "Configured API backend such as gpt-image-2 or another provider, when available.",
+    "path_b": "Host-native image tool such as Codex built-in image generation, when available.",
+    "path_c": "Offline manual mode: write prompts, mark Needs-Manual, and let the user place files later.",
+    "status_rule": "Do not claim Generated unless a file exists at the expected project path."
+  }
+}

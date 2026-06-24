@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-06-20",
+  "source": {
+    "kind": "user_prompt",
+    "runtime_dependency": false,
+    "note": "Adapted from a user-provided luxury digital magazine knowledge-card prompt. The prompt listed 29 entries, with Memphis appearing twice; Qiaomu treats them as separate variants."
+  },
+  "styles": [
+    {
+      "id": "qiaomu-magazine-art-direction",
+      "label": "Magazine Art Direction",
+      "source": {
+        "repo": "local-user-prompt",
+        "commit": "2026-06-20",
+        "path": "attachments/pasted-text.txt",
+        "source_category": "Qiaomu Prompt Library",
+        "readme_summary": "Luxury digital magazine art direction adapted for PPT, knowledge cards, editorial essays, and visual previews."
+      },
+      "ppt": {
+        "template_name": "Magazine Art Direction PPT Style",
+        "archetype": "editorial_argument",
+        "archetype_label": "Editorial Argument",
+        "qiaomu_visual_system": "Launch Editorial",
+        "recommended_routes": [
+          "talk_deck",
+          "brand_release",
+          "html_preview",
+          "pptx_beautify"
+        ],
+        "density": "medium",
+        "best_for": [
+          "essay-to-slides",
+          "knowledge cards",
+          "luxury editorial preview",
+          "culture and media decks",
+          "thought-leadership talks",
+          "visual direction exploration"
+        ],
+        "avoid_for": [
+          "dense spreadsheet reports",
+          "exam courseware requiring maximum projection clarity",
+          "strict enterprise compliance decks",
+          "charts that need plain evidence-first treatment"
+        ],
+        "keywords": [
+          "magazine",
+          "editorial",
+          "luxury",
+          "fashion",
+          "vogue",
+          "elle",
+          "knowledge card",
+          "pull quote",
+          "folio",
+          "art direction",
+          "高级",
+          "时尚",
+          "杂志",
+          "知识卡片",
+          "奢华",
+          "主编",
+          "版式"
+        ],
+        "palette": {
+          "primary": "#111111",
+          "canvas": "#F6F0E7",
+          "swatches": [
+            {
+              "role": "ink",
+              "hex": "#111111"
+            },
+            {
+              "role": "paper",
+              "hex": "#F6F0E7"
+            },
+            {
+              "role": "muted-ink",
+              "hex": "#5E554B"
+            },
+            {
+              "role": "editorial-red",
+              "hex": "#B11226"
+            },
+            {
+              "role": "champagne",
+              "hex": "#C7A96B"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Serif CJK SC / Didot-like high-contrast serif",
+          "body": "Noto Sans CJK SC / Inter",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "Noto Serif CJK SC or Songti SC for editorial Chinese display, Noto Sans CJK SC / PingFang SC for body, Inter / Aptos for Latin",
+          "headline_treatment": "magazine headline hierarchy: large claim title, concise deck/subtitle, pull quote, folio/caption scale"
+        },
+        "slide_patterns": [
+          {
+            "name": "cover_issue",
+            "role": "first impression",
+            "layout": "full-bleed or paper-canvas cover with oversized headline, issue/date mark, and one image or typographic focal object"
+          },
+          {
+            "name": "feature_spread",
+            "role": "argument",
+            "layout": "headline plus deck, one strong proof object, and editorial sidebar"
+          },
+          {
+            "name": "pull_quote",
+            "role": "memory hook",
+            "layout": "large quotation, source/date folio, minimal supporting note"
+          },
+          {
+            "name": "editor_note",
+            "role": "aside",
+            "layout": "compact marginal note beside image/chart/proof object"
+          },
+          {
+            "name": "style_gallery",
+            "role": "preview",
+            "layout": "2-4 variant previews using the same content; only for style selection, not final deck mixing"
+          },
+          {
+            "name": "closing_back_page",
+            "role": "closing",
+            "layout": "single editorial sentence, small source/action mark, generous negative space"
+          }
+        ],
+        "layout_rules": [
+          "Select one primary magazine variant for a production deck; use multiple variants only for a style gallery or preview.",
+          "Map card prompt elements to PPT objects: date as folio, title as headline, subtitle as deck, quote as pull quote, key points as sidebar, QR as optional action/source code.",
+          "Keep readable text editable in SVG/PPTX/HTML; generated images provide texture, atmosphere, collage, or object context only.",
+          "Use ornament, frames, and texture only when they strengthen the editorial page; evidence slides stay readable.",
+          "Do not turn every slide into cards. Use magazine spreads, cropped images, pull quotes, folios, and marginalia."
+        ],
+        "media_policy": "Use source images, generated editorial atmospheres, collage fragments, paper texture, or object photography as context. Do not bake Chinese text, charts, QR codes, or citations into generated images.",
+        "chart_policy": "Charts should feel like magazine data graphics: direct labels, strong takeaway, restrained ornament, and enough plot area to read.",
+        "animation_hint": "slow editorial fade or page-turn rhythm; avoid distracting HUD/glitch effects unless the selected variant requires it",
+        "speaker_note_hint": "Use notes for the editorial rationale, source context, and why this page exists."
+      },
+      "description_summary": "A high-end digital magazine art-direction system for PPT: editorial headline hierarchy, pull quotes, folios, sidebar notes, image-as-context, and luxury/experimental style variants adapted from a user-provided prompt.",
+      "recommendation_text": "magazine art direction luxury editorial fashion vogue elle knowledge card 高级 时尚 杂志 知识卡片 奢华 主编 版式 pull quote folio editor note cover issue feature spread minimalist bold modern elegant vintage futuristic tech scandinavian art deco japanese minimalism postmodern deconstruction punk british rock black metal memphis cyberpunk pop art deconstructed swiss vaporwave neo expressionism extreme minimalism neo futurism surrealist digital collage neo baroque liquid digital morphism hypersensory minimalism neo expressionist data visualization victorian bauhaus constructivism german expressionism editorial_argument launch editorial talk_deck brand_release html_preview pptx_beautify"
+    }
+  ],
+  "variants": [
+    {"id": "minimalist", "label": "极简主义 / Minimalist", "intensity": "quiet", "use_for": "premium clarity, restrained essays", "avoid_when": "the slide needs emotional drama"},
+    {"id": "bold_modern", "label": "大胆现代 / Bold Modern", "intensity": "expressive", "use_for": "manifesto, launch title, strong social preview", "avoid_when": "dense evidence needs calm reading"},
+    {"id": "elegant_vintage", "label": "优雅复古 / Elegant Vintage", "intensity": "editorial", "use_for": "culture, history, literary argument", "avoid_when": "the topic needs modern product precision"},
+    {"id": "futuristic_tech", "label": "未来科技 / Futuristic Tech", "intensity": "expressive", "use_for": "AI, infrastructure, future scenarios", "avoid_when": "HUD decoration would hide evidence"},
+    {"id": "scandinavian", "label": "斯堪的纳维亚 / Scandinavian", "intensity": "quiet", "use_for": "friendly premium explanation", "avoid_when": "the deck needs strong contrast"},
+    {"id": "art_deco", "label": "艺术装饰 / Art Deco", "intensity": "editorial", "use_for": "luxury, ritual, awards, premium brand", "avoid_when": "ornament competes with data"},
+    {"id": "japanese_minimalism", "label": "日式极简 / Japanese Minimalism", "intensity": "quiet", "use_for": "reflection, philosophy, calm teaching", "avoid_when": "too much material must be shown"},
+    {"id": "postmodern_deconstruction", "label": "后现代解构 / Postmodern Deconstruction", "intensity": "experimental", "use_for": "media critique, creative provocation", "avoid_when": "brand trust or readability matters most"},
+    {"id": "punk", "label": "朋克 / Punk", "intensity": "experimental", "use_for": "rebellion, DIY, counterculture", "avoid_when": "formal business setting"},
+    {"id": "british_rock", "label": "英伦摇滚 / British Rock", "intensity": "expressive", "use_for": "music, creator culture, heritage-plus-rebellion", "avoid_when": "the brief needs clean neutrality"},
+    {"id": "black_metal", "label": "黑金属 / Black Metal", "intensity": "experimental", "use_for": "dark ritual, extreme moodboard, art critique", "avoid_when": "ordinary information delivery"},
+    {"id": "memphis_compact", "label": "孟菲斯 / Memphis Design", "intensity": "expressive", "use_for": "playful creative cards", "avoid_when": "serious evidence must dominate"},
+    {"id": "cyberpunk", "label": "赛博朋克 / Cyberpunk", "intensity": "expressive", "use_for": "dystopian technology, urban future", "avoid_when": "neon/glitch would reduce legibility"},
+    {"id": "pop_art", "label": "波普艺术 / Pop Art", "intensity": "expressive", "use_for": "consumer culture, simple punchy ideas", "avoid_when": "subtle nuance is required"},
+    {"id": "deconstructed_swiss", "label": "瑞士国际主义解构 / Deconstructed Swiss", "intensity": "editorial", "use_for": "structured argument with controlled disruption", "avoid_when": "the layout system is already complex"},
+    {"id": "vaporwave", "label": "蒸汽波 / Vaporwave", "intensity": "experimental", "use_for": "internet nostalgia, retro future", "avoid_when": "corporate credibility is the goal"},
+    {"id": "neo_expressionism", "label": "新表现主义 / Neo-Expressionism", "intensity": "expressive", "use_for": "emotion, creator manifesto, rough energy", "avoid_when": "source accuracy must feel clinical"},
+    {"id": "extreme_minimalism", "label": "极端极简 / Extreme Minimalism", "intensity": "quiet", "use_for": "one-sentence keynote moments", "avoid_when": "the slide lacks a proof object"},
+    {"id": "neo_futurism", "label": "新未来主义 / Neo-Futurism", "intensity": "editorial", "use_for": "premium future product, architecture, design", "avoid_when": "organic curves would distract from labels"},
+    {"id": "surrealist_digital_collage", "label": "超现实数字拼贴 / Surrealist Digital Collage", "intensity": "experimental", "use_for": "abstract idea made tangible", "avoid_when": "the image might be mistaken for evidence"},
+    {"id": "neo_baroque_digital", "label": "新巴洛克数字 / Neo-Baroque Digital", "intensity": "experimental", "use_for": "maximal luxury, drama, ceremony", "avoid_when": "data and labels need quiet space"},
+    {"id": "liquid_digital_morphism", "label": "液态数字形态 / Liquid Digital Morphism", "intensity": "expressive", "use_for": "fluid future, AI/product mood", "avoid_when": "gradient/animation noise would dominate"},
+    {"id": "hypersensory_minimalism", "label": "超感官极简 / Hypersensory Minimalism", "intensity": "quiet", "use_for": "subtle premium interfaces, quiet luxury", "avoid_when": "projector contrast is weak"},
+    {"id": "neo_expressionist_data_visualization", "label": "新表现主义数据可视化 / Neo-Expressionist Data Visualization", "intensity": "editorial", "use_for": "humanized data storytelling", "avoid_when": "audience needs standard chart grammar"},
+    {"id": "victorian", "label": "维多利亚 / Victorian", "intensity": "editorial", "use_for": "historical, literary, ornate culture pages", "avoid_when": "decorative border would trap content"},
+    {"id": "bauhaus", "label": "包豪斯 / Bauhaus", "intensity": "editorial", "use_for": "geometry, design principles, direct teaching", "avoid_when": "the topic needs soft emotion"},
+    {"id": "constructivism", "label": "构成主义 / Constructivism", "intensity": "expressive", "use_for": "dynamic argument, revolution, industrial structure", "avoid_when": "diagonals would fight a chart"},
+    {"id": "memphis_full", "label": "孟菲斯详版 / Memphis Design Full", "intensity": "expressive", "use_for": "80s pop, MTV-like creative previews", "avoid_when": "the brief already has many colors"},
+    {"id": "german_expressionism", "label": "德国表现主义 / German Expressionism", "intensity": "experimental", "use_for": "psychological tension, dramatic critique", "avoid_when": "the slide should feel calm or trustworthy"}
+  ]
+}

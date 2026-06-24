@@ -1,24 +1,298 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.2.0",
   "default_font_family": "Noto Sans CJK SC",
+  "default_latin_font_family": "Inter Variable",
   "license": "SIL Open Font License 1.1",
-  "license_url": "https://github.com/notofonts/noto-cjk/blob/main/LICENSE",
+  "license_urls": {
+    "Noto": "https://github.com/notofonts/noto-cjk/blob/main/LICENSE",
+    "Inter": "https://github.com/rsms/inter/blob/master/LICENSE.txt",
+    "IBM Plex": "https://github.com/IBM/plex/blob/master/LICENSE.txt",
+    "Smiley Sans": "https://github.com/atelier-anchor/smiley-sans/blob/main/LICENSE",
+    "LXGW WenKai": "https://github.com/lxgw/LxgwWenKai/blob/main/OFL.txt",
+    "Sarasa Gothic": "https://github.com/be5invis/Sarasa-Gothic/blob/main/LICENSE",
+    "JetBrains Mono": "https://github.com/JetBrains/JetBrainsMono/blob/master/OFL.txt"
+  },
+  "recommended_stacks": [
+    {
+      "id": "qiaomu_default",
+      "label": "Default Chinese-first PPT",
+      "title": ["Noto Sans CJK SC", "Inter Variable", "IBM Plex Sans"],
+      "body": ["Noto Sans CJK SC", "IBM Plex Sans", "Inter Variable"],
+      "used_for": "Business reports, courseware, and general Chinese-first decks."
+    },
+    {
+      "id": "editorial_quote",
+      "label": "Editorial and quote slides",
+      "title": ["Noto Serif CJK SC", "Noto Sans CJK SC"],
+      "body": ["Noto Sans CJK SC", "IBM Plex Sans"],
+      "used_for": "Chapter turns, quotes, reading-heavy reports, and magazine-like title pages."
+    },
+    {
+      "id": "tech_product",
+      "label": "Product and technical decks",
+      "title": ["Inter Variable", "Noto Sans CJK SC"],
+      "body": ["IBM Plex Sans", "Noto Sans CJK SC"],
+      "used_for": "Developer, AI, SaaS, and technical-evidence presentations."
+    },
+    {
+      "id": "display_title",
+      "label": "High-impact Chinese display titles",
+      "title": ["Smiley Sans", "Noto Sans CJK SC"],
+      "body": ["Noto Sans CJK SC", "IBM Plex Sans"],
+      "used_for": "Covers, event title slides, campaign-like slogans, and short hero phrases."
+    },
+    {
+      "id": "courseware_wenkai",
+      "label": "Warm courseware and reading decks",
+      "title": ["LXGW WenKai", "Noto Sans CJK SC"],
+      "body": ["LXGW WenKai", "Noto Sans CJK SC", "IBM Plex Sans"],
+      "used_for": "Teaching decks, reading clubs, reflective notes, and softer classroom pages."
+    },
+    {
+      "id": "code_cjk",
+      "label": "CJK code and terminal blocks",
+      "title": ["JetBrains Mono", "Sarasa Mono SC", "Noto Sans CJK SC"],
+      "body": ["Sarasa Mono SC", "JetBrains Mono", "Noto Sans CJK SC"],
+      "used_for": "Code blocks, CLI examples, terminal screenshots recreated as editable text, and aligned CJK/Latin tables."
+    }
+  ],
+  "optional_packs": [
+    {
+      "id": "display",
+      "label": "Display title pack",
+      "families": ["Smiley Sans"],
+      "use_when": "A cover or chapter title needs a distinctive Chinese display voice.",
+      "avoid_when": "Dense body text, classroom reading, or formal evidence pages."
+    },
+    {
+      "id": "courseware",
+      "label": "Courseware warmth pack",
+      "families": ["LXGW WenKai"],
+      "use_when": "The deck benefits from warmer handwriting-like Chinese without becoming casual.",
+      "avoid_when": "Strict enterprise reports, dense data slides, or narrow text boxes."
+    },
+    {
+      "id": "code",
+      "label": "Code and monospace pack",
+      "families": ["Sarasa Mono SC", "JetBrains Mono"],
+      "use_when": "The deck contains code, terminals, configuration snippets, or CJK/Latin aligned tables.",
+      "avoid_when": "Normal prose; do not use monospace as a decorative general-purpose font."
+    }
+  ],
   "fonts": [
     {
       "family": "Noto Sans CJK SC",
       "style": "Regular",
       "filename": "NotoSansCJKsc-Regular.otf",
-      "url": "https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf",
+      "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf",
+      "source": "notofonts/noto-cjk",
+      "license": "SIL Open Font License 1.1",
       "used_for": "Chinese body text and classroom-safe readable layouts."
+    },
+    {
+      "family": "Noto Sans CJK SC",
+      "style": "Medium",
+      "filename": "NotoSansCJKsc-Medium.otf",
+      "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Medium.otf",
+      "source": "notofonts/noto-cjk",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Chinese section headings, chips, and medium-emphasis labels."
     },
     {
       "family": "Noto Sans CJK SC",
       "style": "Bold",
       "filename": "NotoSansCJKsc-Bold.otf",
-      "url": "https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Bold.otf",
+      "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Bold.otf",
+      "source": "notofonts/noto-cjk",
+      "license": "SIL Open Font License 1.1",
       "used_for": "Chinese titles, claim headlines, and emphasis."
+    },
+    {
+      "family": "Noto Sans CJK SC",
+      "style": "Black",
+      "filename": "NotoSansCJKsc-Black.otf",
+      "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Black.otf",
+      "source": "notofonts/noto-cjk",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Large Chinese hero titles when strong contrast is needed."
+    },
+    {
+      "family": "Noto Serif CJK SC",
+      "style": "Regular",
+      "filename": "NotoSerifCJKsc-Regular.otf",
+      "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-Regular.otf",
+      "source": "notofonts/noto-cjk",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Chinese editorial headings, quote slides, and reading-oriented chapter pages."
+    },
+    {
+      "family": "Noto Serif CJK SC",
+      "style": "Bold",
+      "filename": "NotoSerifCJKsc-Bold.otf",
+      "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-Bold.otf",
+      "source": "notofonts/noto-cjk",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "High-contrast Chinese editorial titles and pull quotes."
+    },
+    {
+      "family": "Inter Variable",
+      "style": "Roman",
+      "filename": "InterVariable.ttf",
+      "url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+      "archive_url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+      "archive_member": "InterVariable.ttf",
+      "version": "4.1",
+      "source": "rsms/inter",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Modern Latin titles, product decks, interface labels, and large numbers."
+    },
+    {
+      "family": "Inter Variable",
+      "style": "Italic",
+      "filename": "InterVariable-Italic.ttf",
+      "url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+      "archive_url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+      "archive_member": "InterVariable-Italic.ttf",
+      "version": "4.1",
+      "source": "rsms/inter",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Latin italic emphasis, citations, and speaker-friendly callouts."
+    },
+    {
+      "family": "IBM Plex Sans",
+      "style": "Regular",
+      "filename": "IBMPlexSans-Regular.ttf",
+      "url": "https://raw.githubusercontent.com/IBM/plex/master/packages/plex-sans/fonts/complete/ttf/IBMPlexSans-Regular.ttf",
+      "source": "IBM/plex",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Stable Latin body text and technical captions."
+    },
+    {
+      "family": "IBM Plex Sans",
+      "style": "Italic",
+      "filename": "IBMPlexSans-Italic.ttf",
+      "url": "https://raw.githubusercontent.com/IBM/plex/master/packages/plex-sans/fonts/complete/ttf/IBMPlexSans-Italic.ttf",
+      "source": "IBM/plex",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Latin italic captions, citations, and annotation emphasis."
+    },
+    {
+      "family": "IBM Plex Sans",
+      "style": "Medium",
+      "filename": "IBMPlexSans-Medium.ttf",
+      "url": "https://raw.githubusercontent.com/IBM/plex/master/packages/plex-sans/fonts/complete/ttf/IBMPlexSans-Medium.ttf",
+      "source": "IBM/plex",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Latin subheads, UI labels, and medium-emphasis callouts."
+    },
+    {
+      "family": "IBM Plex Sans",
+      "style": "SemiBold",
+      "filename": "IBMPlexSans-SemiBold.ttf",
+      "url": "https://raw.githubusercontent.com/IBM/plex/master/packages/plex-sans/fonts/complete/ttf/IBMPlexSans-SemiBold.ttf",
+      "source": "IBM/plex",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Latin slide titles, metric labels, and technical section heads."
+    },
+    {
+      "family": "IBM Plex Sans",
+      "style": "Bold",
+      "filename": "IBMPlexSans-Bold.ttf",
+      "url": "https://raw.githubusercontent.com/IBM/plex/master/packages/plex-sans/fonts/complete/ttf/IBMPlexSans-Bold.ttf",
+      "source": "IBM/plex",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Latin emphasis, bold labels, and high-contrast title fragments."
+    },
+    {
+      "family": "Smiley Sans",
+      "style": "Oblique",
+      "filename": "SmileySans-Oblique.otf",
+      "url": "https://github.com/atelier-anchor/smiley-sans/releases/download/v2.0.1/smiley-sans-v2.0.1.zip",
+      "archive_url": "https://github.com/atelier-anchor/smiley-sans/releases/download/v2.0.1/smiley-sans-v2.0.1.zip",
+      "archive_member": "SmileySans-Oblique.otf",
+      "version": "2.0.1",
+      "pack": "display",
+      "source": "atelier-anchor/smiley-sans",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Distinctive Chinese cover titles, event slogans, and short high-impact display text."
+    },
+    {
+      "family": "LXGW WenKai",
+      "style": "Regular",
+      "filename": "LXGWWenKai-Regular.ttf",
+      "url": "https://github.com/lxgw/LxgwWenKai/releases/download/v1.522/LXGWWenKai-Regular.ttf",
+      "version": "1.522",
+      "pack": "courseware",
+      "source": "lxgw/LxgwWenKai",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Warm Chinese classroom body text, reading notes, and human-centered explanation slides."
+    },
+    {
+      "family": "LXGW WenKai",
+      "style": "Medium",
+      "filename": "LXGWWenKai-Medium.ttf",
+      "url": "https://github.com/lxgw/LxgwWenKai/releases/download/v1.522/LXGWWenKai-Medium.ttf",
+      "version": "1.522",
+      "pack": "courseware",
+      "source": "lxgw/LxgwWenKai",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Warm Chinese classroom titles, section labels, and medium emphasis."
+    },
+    {
+      "family": "Sarasa Mono SC",
+      "style": "Regular",
+      "filename": "SarasaMonoSC-Regular.ttf",
+      "url": "https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.39/SarasaMonoSC-TTF-1.0.39.7z",
+      "archive_url": "https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.39/SarasaMonoSC-TTF-1.0.39.7z",
+      "archive_format": "7z",
+      "archive_member": "SarasaMonoSC-Regular.ttf",
+      "version": "1.0.39",
+      "pack": "code",
+      "source": "be5invis/Sarasa-Gothic",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "CJK and Latin aligned code blocks, terminal text, configuration snippets, and tables."
+    },
+    {
+      "family": "Sarasa Mono SC",
+      "style": "Bold",
+      "filename": "SarasaMonoSC-Bold.ttf",
+      "url": "https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.39/SarasaMonoSC-TTF-1.0.39.7z",
+      "archive_url": "https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.39/SarasaMonoSC-TTF-1.0.39.7z",
+      "archive_format": "7z",
+      "archive_member": "SarasaMonoSC-Bold.ttf",
+      "version": "1.0.39",
+      "pack": "code",
+      "source": "be5invis/Sarasa-Gothic",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Bold emphasis inside code blocks, terminal prompts, and monospace labels."
+    },
+    {
+      "family": "JetBrains Mono",
+      "style": "Regular",
+      "filename": "JetBrainsMono-Regular.ttf",
+      "url": "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip",
+      "archive_url": "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip",
+      "archive_member": "fonts/ttf/JetBrainsMono-Regular.ttf",
+      "version": "2.304",
+      "pack": "code",
+      "source": "JetBrains/JetBrainsMono",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Latin code, CLI examples, and developer-oriented monospace labels."
+    },
+    {
+      "family": "JetBrains Mono",
+      "style": "Bold",
+      "filename": "JetBrainsMono-Bold.ttf",
+      "url": "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip",
+      "archive_url": "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip",
+      "archive_member": "fonts/ttf/JetBrainsMono-Bold.ttf",
+      "version": "2.304",
+      "pack": "code",
+      "source": "JetBrains/JetBrainsMono",
+      "license": "SIL Open Font License 1.1",
+      "used_for": "Bold Latin code emphasis, terminal prompts, and developer title fragments."
     }
   ],
   "install": "python3 scripts/bootstrap.py --download-fonts",
-  "note": "Font binaries are bundled for self-contained public installs and can be repaired with the download command."
+  "note": "Font binaries are bundled or downloadable for self-contained public installs. Core fonts are the default; optional packs add display, courseware, and code typography for specific slide roles."
 }

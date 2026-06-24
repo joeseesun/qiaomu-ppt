@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-06-21",
+  "notes": [
+    "Provider presets are execution contracts for scripts/run_image_generation.py. They are safe to inspect because secrets are referenced only by environment variable name.",
+    "Dry-runs never require API keys. Real calls require --execute and a configured key unless auth_scheme is none.",
+    "Generated images must be text-free visual assets for backgrounds, atmosphere, concepts, scenarios, objects, textures, or moodboards. Evidence images must come from source/user/web routes instead."
+  ],
+  "providers": {
+    "openai": {
+      "display_name": "OpenAI Images SDK",
+      "request_format": "openai-sdk",
+      "model": "gpt-image-2",
+      "api_key_env": "OPENAI_API_KEY",
+      "auth_scheme": "bearer",
+      "supports": [
+        "b64_json",
+        "url",
+        "response_format",
+        "quality",
+        "output_format"
+      ],
+      "recommended_for": [
+        "final-quality bitmap backgrounds",
+        "concept art",
+        "scenario images",
+        "object cutaways",
+        "texture and moodboard assets"
+      ]
+    },
+    "openai-compatible": {
+      "display_name": "OpenAI-Compatible HTTP Images",
+      "request_format": "openai-images-http",
+      "model": "gpt-image-2",
+      "base_url": "https://api.openai.com/v1",
+      "endpoint_path": "images/generations",
+      "api_key_env": "OPENAI_API_KEY",
+      "auth_scheme": "bearer",
+      "request_timeout_seconds": 300,
+      "supports": [
+        "data[0].b64_json",
+        "data[0].url",
+        "data[0].image_url"
+      ]
+    },
+    "jimeng-proxy": {
+      "display_name": "Qiaomu Jimeng Proxy",
+      "request_format": "openai-images-http",
+      "model": "jimeng",
+      "base_url": "https://api.qiaomu.ai/jimeng-auth/v1",
+      "endpoint_path": "images/generations",
+      "api_key_env": "QIAOMU_JIMENG_API_KEY",
+      "auth_scheme": "x-api-key",
+      "request_timeout_seconds": 300,
+      "supports": [
+        "OpenAI-compatible image generation response",
+        "data[0].url",
+        "data[0].b64_json"
+      ],
+      "operator_notes": [
+        "Use this preset only when the Qiaomu Jimeng proxy key is intentionally configured.",
+        "Do not store the key in project files, shell history snippets, reports, or generated decks."
+      ]
+    },
+    "hiapi-task": {
+      "display_name": "HiAPI Async Task Images",
+      "request_format": "async-task",
+      "model": "jimeng",
+      "base_url": "https://api.hiapi.com",
+      "submit_path": "/v1/tasks",
+      "status_path_template": "/v1/tasks/{task_id}",
+      "api_key_env": "HIAPI_API_KEY",
+      "auth_scheme": "bearer",
+      "request_timeout_seconds": 180,
+      "poll_interval_seconds": 3,
+      "poll_timeout_seconds": 900,
+      "done_statuses": [
+        "succeeded",
+        "success",
+        "completed",
+        "complete",
+        "done",
+        "finished"
+      ],
+      "failed_statuses": [
+        "failed",
+        "failure",
+        "error",
+        "cancelled",
+        "canceled",
+        "timeout"
+      ],
+      "payload_template": {
+        "model": "{model}",
+        "prompt": "{prompt}",
+        "size": "{size}",
+        "quality": "{quality}",
+        "response_format": "b64_json"
+      },
+      "operator_notes": [
+        "This preset encodes the async submit/poll shape. If the provider requires a different task_type or payload wrapper, override payload_template in a local provider config.",
+        "A completed task without a returned image is treated as failure, not success."
+      ]
+    }
+  }
+}

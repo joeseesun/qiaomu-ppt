@@ -1,0 +1,1626 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-06-20",
+  "source": {
+    "repo": "hugohe3/ppt-master",
+    "local_snapshot": "research/ppt-master@50f4b48",
+    "remote_observed": "origin/main@945b2d8 via git fetch; GitHub README checked 2026-06-20",
+    "boundary": "Qiaomu-owned abstractions of public case style grammar. No upstream templates, exact wording, image assets, prompts, or code are used at runtime."
+  },
+  "recommendation_contract": {
+    "purpose": "Add case-proven PPT style directions from ppt-master examples to qiaomu-ppt style recommendation.",
+    "usage": "Use as inspiration for style_brief.md, spec_lock.json, visual_asset_manifest.json, page_rhythm, page_layouts, and page_charts.",
+    "required_runtime_dependency": false
+  },
+  "styles": [
+    {
+      "id": "pptmaster-case-academic-blueprint",
+      "label": "PPT Master Case: Academic Blueprint",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_attention_is_all_you_need",
+        "source_category": "Paper Reading / Technical Blueprint",
+        "readme_summary": "Technical paper deck with source figures, formulas, diagrams, result tables, and a cool blueprint palette."
+      },
+      "ppt": {
+        "template_name": "Academic Blueprint Case Style",
+        "archetype": "developer_technical_evidence",
+        "archetype_label": "Developer Technical Evidence",
+        "qiaomu_visual_system": "Swiss Evidence",
+        "recommended_routes": [
+          "talk_deck",
+          "business_report",
+          "pptx_beautify"
+        ],
+        "density": "dense",
+        "best_for": [
+          "arXiv paper reading",
+          "Hugging Face paper interpretation",
+          "research seminar",
+          "technical architecture",
+          "algorithm explanation",
+          "formula and table backed argument"
+        ],
+        "avoid_for": [
+          "lifestyle brand deck",
+          "purely emotional keynote",
+          "image-only visual essay"
+        ],
+        "keywords": [
+          "paper",
+          "arxiv",
+          "huggingface",
+          "research",
+          "technical",
+          "blueprint",
+          "formula",
+          "table",
+          "architecture",
+          "attention",
+          "transformer",
+          "论文",
+          "论文解读",
+          "技术蓝图",
+          "公式",
+          "表格",
+          "架构图"
+        ],
+        "palette": {
+          "primary": "#1A365D",
+          "canvas": "#FFFFFF",
+          "swatches": [
+            {
+              "role": "blueprint-ink",
+              "hex": "#1A365D"
+            },
+            {
+              "role": "accent-blue",
+              "hex": "#3182CE"
+            },
+            {
+              "role": "accent-light",
+              "hex": "#63B3ED"
+            },
+            {
+              "role": "paper",
+              "hex": "#FFFFFF"
+            },
+            {
+              "role": "blueprint-tint",
+              "hex": "#EBF4FB"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Serif CJK SC / Georgia",
+          "body": "Noto Sans CJK SC / IBM Plex Sans",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "Microsoft YaHei / Aptos / Consolas",
+          "headline_treatment": "claim-first technical titles, roomy leading for multiline CJK, formulas never squeezed under titles"
+        },
+        "slide_patterns": [
+          "cover_blueprint",
+          "source_figure_rebuild",
+          "formula_focus",
+          "mechanism_block_diagram",
+          "comparison_table",
+          "result_chart_with_takeaway"
+        ],
+        "layout_rules": [
+          "Use page rhythm anchor, dense, and breathing. Dense pages may hold formulas and tables, but one proof object remains dominant.",
+          "Source paper figures should be rebuilt or annotated as editable foreground objects when practical.",
+          "No-crop policy for equations, tables, and source figures unless a crop is explicitly documented."
+        ],
+        "media_policy": "Use paper figures, extracted diagrams, formulas, and tables as evidence. Generated images may provide quiet blueprint atmosphere only and must not fake research evidence.",
+        "chart_policy": "Prefer native tables, result bars, architecture diagrams, formula callouts, and comparison columns. Split unreadable source tables across slides.",
+        "animation_hint": "Use step reveal for mechanism diagrams and formula decomposition; keep chart animation simple and speaker controlled.",
+        "image_asset_strategy": {
+          "image_rendering": "blueprint",
+          "image_palette_behavior": "cool-corporate",
+          "asset_density": "medium-high",
+          "required_manifest_fields": [
+            "source_figure",
+            "formula",
+            "table",
+            "diagram_reference",
+            "fit_mode",
+            "no_crop_reason"
+          ]
+        }
+      },
+      "description_summary": "A cool technical blueprint direction for paper-to-PPT decks where source figures, formulas, tables, and editable diagrams carry the argument.",
+      "recommendation_text": "Academic Blueprint paper arxiv Hugging Face research seminar technical blueprint formula table architecture attention transformer source figure diagram result chart 论文 论文解读 技术蓝图 公式 表格 架构图 TeX 图表"
+    },
+    {
+      "id": "pptmaster-case-data-journalism",
+      "label": "PPT Master Case: Data Journalism",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_global_ai_capital_2026",
+        "source_category": "Data Journalism / AI Capital Briefing",
+        "readme_summary": "Bloomberg/Economist-style data journalism with dense chart variety, dark editorial canvas, source captions, and direct labels."
+      },
+      "ppt": {
+        "template_name": "Data Journalism Case Style",
+        "archetype": "trust_finance_dashboard",
+        "archetype_label": "Trust Finance Dashboard",
+        "qiaomu_visual_system": "Swiss Evidence",
+        "recommended_routes": [
+          "business_report",
+          "talk_deck",
+          "pptx_beautify"
+        ],
+        "density": "dense",
+        "best_for": [
+          "market report",
+          "industry briefing",
+          "investment memo",
+          "data-backed trend deck",
+          "AI capital analysis",
+          "annual review"
+        ],
+        "avoid_for": [
+          "soft brand launch",
+          "courseware for young students",
+          "decks without reliable numbers"
+        ],
+        "keywords": [
+          "data journalism",
+          "Bloomberg",
+          "Economist",
+          "finance",
+          "market",
+          "capital",
+          "chart",
+          "dashboard",
+          "source line",
+          "数据新闻",
+          "彭博",
+          "经济学人",
+          "资本",
+          "图表",
+          "年度报告"
+        ],
+        "palette": {
+          "primary": "#E8E6E1",
+          "canvas": "#0E1116",
+          "swatches": [
+            {
+              "role": "canvas",
+              "hex": "#0E1116"
+            },
+            {
+              "role": "panel",
+              "hex": "#1A1F26"
+            },
+            {
+              "role": "paper-ink",
+              "hex": "#E8E6E1"
+            },
+            {
+              "role": "signal-red",
+              "hex": "#E63946"
+            },
+            {
+              "role": "signal-amber",
+              "hex": "#F4A261"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Serif CJK SC / Source Serif 4",
+          "body": "Noto Sans CJK SC / IBM Plex Sans",
+          "mono": "Sarasa Mono SC / IBM Plex Mono",
+          "ppt_fallback": "Microsoft YaHei / Cambria / Consolas",
+          "headline_treatment": "editorial claim titles paired with direct chart labels and source captions"
+        },
+        "slide_patterns": [
+          "kpi_cards",
+          "small_multiples",
+          "dumbbell_chart",
+          "bubble_chart",
+          "sankey_flow",
+          "pareto_chart",
+          "quadrant_matrix"
+        ],
+        "layout_rules": [
+          "Charts and numbers are the main visuals. Images should be rare, contextual, and cinematic.",
+          "Use hairlines, source captions, and direct labels. Avoid decorative chart chrome.",
+          "Keep each dense page to one analytical question, even when multiple micro charts appear."
+        ],
+        "media_policy": "Use source data, tables, market maps, brand icons, and rare atmosphere images. Never invent data to fill a chart.",
+        "chart_policy": "Use varied native charts: KPI cards, bar, dumbbell, bubble, donut, comparison table, Sankey, Pareto, dual-axis, hub-spoke, and quadrant. Direct label data and cite sources in notes or visible captions when requested.",
+        "animation_hint": "Reveal by analytical layer: headline, chart frame, highlighted series, implication.",
+        "image_asset_strategy": {
+          "image_rendering": "editorial",
+          "image_palette_behavior": "dark-cinematic",
+          "asset_density": "low-image-high-chart",
+          "required_manifest_fields": [
+            "data_source",
+            "chart_spec",
+            "source_caption",
+            "brand_icon",
+            "highlight_rule"
+          ]
+        }
+      },
+      "description_summary": "A dense Bloomberg/Economist direction for market, finance, and strategy decks where chart diversity and source discipline are the visual engine.",
+      "recommendation_text": "Data Journalism Bloomberg Economist finance market capital AI capital report chart dashboard micro chart source line annual review 数据新闻 彭博 经济学人 资本 年度报告 图表 市场"
+    },
+    {
+      "id": "pptmaster-case-architecture-editorial",
+      "label": "PPT Master Case: Architecture Editorial",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_pritzker_2026",
+        "source_category": "Architecture Editorial / Photo Essay",
+        "readme_summary": "Architecture editorial deck with image-heavy storytelling, calm stone palette, captions, and museum-catalog pacing."
+      },
+      "ppt": {
+        "template_name": "Architecture Editorial Case Style",
+        "archetype": "editorial_argument",
+        "archetype_label": "Editorial Argument",
+        "qiaomu_visual_system": "Launch Editorial",
+        "recommended_routes": [
+          "talk_deck",
+          "brand_release",
+          "pptx_beautify",
+          "html_preview"
+        ],
+        "density": "medium",
+        "best_for": [
+          "architecture presentation",
+          "culture and design talk",
+          "museum style deck",
+          "artist biography",
+          "place based storytelling",
+          "image-rich essay"
+        ],
+        "avoid_for": [
+          "spreadsheet-heavy report",
+          "paper decks requiring formulas",
+          "topics with no strong images"
+        ],
+        "keywords": [
+          "architecture",
+          "editorial",
+          "photo essay",
+          "Pritzker",
+          "museum",
+          "catalog",
+          "建筑",
+          "建筑摄影",
+          "普利兹克",
+          "策展",
+          "文化",
+          "人物传记"
+        ],
+        "palette": {
+          "primary": "#2C2A27",
+          "canvas": "#F3EFE8",
+          "swatches": [
+            {
+              "role": "warm-paper",
+              "hex": "#F3EFE8"
+            },
+            {
+              "role": "stone",
+              "hex": "#C8B8A6"
+            },
+            {
+              "role": "ink",
+              "hex": "#2C2A27"
+            },
+            {
+              "role": "caption",
+              "hex": "#726A60"
+            },
+            {
+              "role": "brass-accent",
+              "hex": "#A4743B"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Serif CJK SC / Cormorant Garamond",
+          "body": "Noto Sans CJK SC / Inter",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "Songti SC / Microsoft YaHei / Georgia",
+          "headline_treatment": "museum-catalog headlines with generous line height and precise captions"
+        },
+        "slide_patterns": [
+          "full_bleed_photo_claim",
+          "captioned_gallery",
+          "architect_profile",
+          "place_timeline",
+          "detail_macro",
+          "quote_with_photo"
+        ],
+        "layout_rules": [
+          "Let one strong image own the page when available. Do not place many small photos just to show abundance.",
+          "Use captions as evidence, not decoration.",
+          "Use quiet paper surfaces and restrained accents around photography."
+        ],
+        "media_policy": "Prioritize rights-clear architecture photography, source images, maps, sketches, and detail crops. Generated images may provide mood only when no factual image is required.",
+        "chart_policy": "Use timelines, map callouts, caption grids, and simple comparison tables. Avoid charting when a photograph plus caption is the proof.",
+        "animation_hint": "Use slow photo reveal, caption reveal, and chapter pacing; avoid flashy transitions.",
+        "image_asset_strategy": {
+          "image_rendering": "editorial",
+          "image_palette_behavior": "warm-stone",
+          "asset_density": "high-image-low-chart",
+          "required_manifest_fields": [
+            "image_source",
+            "rights_note",
+            "crop_focal_point",
+            "caption",
+            "layout_pattern"
+          ]
+        }
+      },
+      "description_summary": "A museum-catalog editorial direction for image-rich architecture, culture, biography, and design decks.",
+      "recommendation_text": "Architecture Editorial Pritzker museum catalog photo essay culture biography place storytelling 建筑 建筑摄影 普利兹克 策展 文化 人物传记 图片丰富"
+    },
+    {
+      "id": "pptmaster-case-swiss-grid",
+      "label": "PPT Master Case: Swiss Grid",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_swiss_grid_systems",
+        "source_category": "Swiss Typographic / Grid Primer",
+        "readme_summary": "Strict Swiss grid style with modular layout, monochrome type, red accent, and diagrammatic clarity."
+      },
+      "ppt": {
+        "template_name": "Swiss Grid Case Style",
+        "archetype": "minimal_precision",
+        "archetype_label": "Minimal Precision",
+        "qiaomu_visual_system": "Swiss Evidence",
+        "recommended_routes": [
+          "business_report",
+          "talk_deck",
+          "high_school_courseware",
+          "pptx_beautify"
+        ],
+        "density": "medium-dense",
+        "best_for": [
+          "grid systems",
+          "design education",
+          "methodology deck",
+          "technical framework",
+          "courseware needing clarity",
+          "old PPT cleanup"
+        ],
+        "avoid_for": [
+          "luxury cinematic image deck",
+          "youthful pop event",
+          "topics that need tactile handmade texture"
+        ],
+        "keywords": [
+          "Swiss",
+          "grid",
+          "typography",
+          "minimal",
+          "methodology",
+          "courseware",
+          "瑞士",
+          "网格",
+          "版式",
+          "极简",
+          "方法论",
+          "课件"
+        ],
+        "palette": {
+          "primary": "#111111",
+          "canvas": "#F7F7F2",
+          "swatches": [
+            {
+              "role": "paper",
+              "hex": "#F7F7F2"
+            },
+            {
+              "role": "ink",
+              "hex": "#111111"
+            },
+            {
+              "role": "muted",
+              "hex": "#777777"
+            },
+            {
+              "role": "grid",
+              "hex": "#D8D8D0"
+            },
+            {
+              "role": "red-accent",
+              "hex": "#D7262D"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Sans CJK SC / Helvetica Neue",
+          "body": "Noto Sans CJK SC / IBM Plex Sans",
+          "mono": "Sarasa Mono SC / IBM Plex Mono",
+          "ppt_fallback": "Microsoft YaHei / Arial / Consolas",
+          "headline_treatment": "asymmetric grid, direct claim, no decorative display tricks"
+        },
+        "slide_patterns": [
+          "modular_grid_cover",
+          "asymmetric_text_image",
+          "rule_based_diagram",
+          "numbered_method",
+          "comparison_matrix",
+          "grid_annotation"
+        ],
+        "layout_rules": [
+          "Declare columns, rows, margins, and baselines in spec_lock before rendering.",
+          "Use thin rules as functional alignment and table structure, not decoration.",
+          "Let red accent mark hierarchy or sequence only."
+        ],
+        "media_policy": "Use diagrams, annotated screenshots, source images, or simple geometric visualizations. Avoid atmosphere images unless they serve as evidence.",
+        "chart_policy": "Prefer clear tables, matrices, timelines, process diagrams, and directly labeled bar charts.",
+        "animation_hint": "Use reveal by grid cell, method step, or comparison row.",
+        "image_asset_strategy": {
+          "image_rendering": "minimalist-swiss",
+          "image_palette_behavior": "mono-ink",
+          "asset_density": "low-image-medium-chart",
+          "required_manifest_fields": [
+            "grid_role",
+            "alignment_rule",
+            "chart_spec",
+            "annotation_slot"
+          ]
+        }
+      },
+      "description_summary": "A disciplined Swiss grid direction for method, framework, education, and cleanup decks that need clarity before atmosphere.",
+      "recommendation_text": "Swiss grid typography minimal methodology courseware framework cleanup red accent modular grid 瑞士 网格 版式 极简 方法论 课件 可读"
+    },
+    {
+      "id": "pptmaster-case-glassmorphism-saas",
+      "label": "PPT Master Case: Glassmorphism SaaS",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_glassmorphism_demo",
+        "source_category": "Glassmorphism SaaS / AI Agent Launch",
+        "readme_summary": "Product launch style with frosted panels, gradient depth, UI screenshots, KPI panels, and AI-agent architecture."
+      },
+      "ppt": {
+        "template_name": "Glassmorphism SaaS Case Style",
+        "archetype": "developer_technical_evidence",
+        "archetype_label": "Developer Technical Evidence",
+        "qiaomu_visual_system": "Launch Editorial",
+        "recommended_routes": [
+          "brand_release",
+          "talk_deck",
+          "html_preview",
+          "pptx_beautify"
+        ],
+        "density": "medium",
+        "best_for": [
+          "AI SaaS launch",
+          "product demo deck",
+          "agent workflow",
+          "UI screenshot story",
+          "technical product pitch"
+        ],
+        "avoid_for": [
+          "print-like reports",
+          "strict LibreOffice-only output without fallback surfaces",
+          "dense academic tables"
+        ],
+        "keywords": [
+          "glassmorphism",
+          "frosted glass",
+          "SaaS",
+          "AI agent",
+          "product launch",
+          "UI screenshot",
+          "玻璃拟态",
+          "毛玻璃",
+          "产品发布",
+          "智能体",
+          "界面截图"
+        ],
+        "palette": {
+          "primary": "#7C5CFF",
+          "canvas": "#0B1020",
+          "swatches": [
+            {
+              "role": "midnight",
+              "hex": "#0B1020"
+            },
+            {
+              "role": "glass-panel",
+              "hex": "#1B2440"
+            },
+            {
+              "role": "violet",
+              "hex": "#7C5CFF"
+            },
+            {
+              "role": "cyan",
+              "hex": "#38D6FF"
+            },
+            {
+              "role": "soft-white",
+              "hex": "#F4F7FB"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Sans CJK SC / Inter Display",
+          "body": "Noto Sans CJK SC / Inter",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "Microsoft YaHei / Aptos / Consolas",
+          "headline_treatment": "large product claims with restrained glow, never tiny text inside glass cards"
+        },
+        "slide_patterns": [
+          "product_hero_glass",
+          "ui_screenshot_with_callouts",
+          "agent_workflow",
+          "floating_kpi_panel",
+          "architecture_stack",
+          "demo_sequence"
+        ],
+        "layout_rules": [
+          "Use glass panels sparingly and provide solid fallback surfaces for PPTX conversion.",
+          "Do not stack cards inside translucent cards.",
+          "Keep screenshots legible and annotate with editable callouts."
+        ],
+        "media_policy": "Use real product screenshots, UI flows, architecture diagrams, and generated atmosphere backgrounds. Generated images must not fake UI.",
+        "chart_policy": "Use KPI panels, timeline, funnel, product metric trends, and architecture maps. Charts must remain readable on dark translucent surfaces.",
+        "animation_hint": "Use subtle depth reveal for product surface, then callouts and workflow steps.",
+        "image_asset_strategy": {
+          "image_rendering": "glassmorphism",
+          "image_palette_behavior": "tech-neon",
+          "asset_density": "medium-image-medium-chart",
+          "required_manifest_fields": [
+            "screenshot_source",
+            "fallback_surface",
+            "glass_opacity",
+            "callout_anchor",
+            "contrast_check"
+          ]
+        }
+      },
+      "description_summary": "A polished AI SaaS product direction with controlled frosted depth, real UI screenshots, and editable technical proof objects.",
+      "recommendation_text": "Glassmorphism frosted glass SaaS AI agent product launch UI screenshot gradient KPI architecture 玻璃拟态 毛玻璃 产品发布 智能体 界面截图"
+    },
+    {
+      "id": "pptmaster-case-memphis-pop",
+      "label": "PPT Master Case: Memphis Pop",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_sugar_rush_memphis",
+        "source_category": "Memphis Pop / Event Launch",
+        "readme_summary": "Vivid flat Memphis launch deck with geometric motifs, playful hierarchy, event energy, and simple chart components."
+      },
+      "ppt": {
+        "template_name": "Memphis Pop Case Style",
+        "archetype": "playful_creative_canvas",
+        "archetype_label": "Playful Creative Canvas",
+        "qiaomu_visual_system": "Fast Preview",
+        "recommended_routes": [
+          "brand_release",
+          "talk_deck",
+          "html_preview"
+        ],
+        "density": "medium",
+        "best_for": [
+          "festival deck",
+          "youth brand launch",
+          "creative workshop",
+          "music or pop culture",
+          "social campaign",
+          "event guide"
+        ],
+        "avoid_for": [
+          "serious finance report",
+          "academic paper deck",
+          "enterprise compliance deck"
+        ],
+        "keywords": [
+          "Memphis",
+          "pop",
+          "festival",
+          "event",
+          "vivid",
+          "geometric",
+          "creative",
+          "孟菲斯",
+          "波普",
+          "活动",
+          "音乐节",
+          "年轻",
+          "活泼"
+        ],
+        "palette": {
+          "primary": "#FF4D6D",
+          "canvas": "#FFF7D6",
+          "swatches": [
+            {
+              "role": "cream",
+              "hex": "#FFF7D6"
+            },
+            {
+              "role": "hot-pink",
+              "hex": "#FF4D6D"
+            },
+            {
+              "role": "sun-yellow",
+              "hex": "#FFD166"
+            },
+            {
+              "role": "cyan",
+              "hex": "#06D6A0"
+            },
+            {
+              "role": "ink",
+              "hex": "#1A1A1A"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Smiley Sans / Noto Sans CJK SC",
+          "body": "Noto Sans CJK SC / Inter",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "Microsoft YaHei / Arial Rounded MT Bold / Arial",
+          "headline_treatment": "bold short titles with playful scale contrast, no cramped paragraphs"
+        },
+        "slide_patterns": [
+          "color_block_cover",
+          "event_schedule",
+          "icon_grid",
+          "ticket_value_cards",
+          "map_or_zone",
+          "closing_call_to_action"
+        ],
+        "layout_rules": [
+          "Use geometric motifs as controlled accents, not background clutter.",
+          "Keep body text short and large enough for event viewing.",
+          "One bright accent family per slide; avoid rainbow scatter."
+        ],
+        "media_policy": "Use event photos, posters, venue maps, badges, and generated flat motif packs. Keep text and schedules editable.",
+        "chart_policy": "Use simple timelines, icon grids, agenda lists, comparison cards, and attendance/funnel charts.",
+        "animation_hint": "Use snappy reveal for schedule and event moments; avoid excessive bounce.",
+        "image_asset_strategy": {
+          "image_rendering": "flat",
+          "image_palette_behavior": "vivid-launch",
+          "asset_density": "medium-image-medium-chart",
+          "required_manifest_fields": [
+            "motif_role",
+            "event_image_source",
+            "schedule_component",
+            "contrast_check"
+          ]
+        }
+      },
+      "description_summary": "A vivid Memphis Pop direction for youth, festival, culture, and event decks that need energy without losing editability.",
+      "recommendation_text": "Memphis pop festival event vivid geometric creative youth launch music culture 活泼 孟菲斯 波普 活动 音乐节 年轻 创意"
+    },
+    {
+      "id": "pptmaster-case-risograph-zine",
+      "label": "PPT Master Case: Risograph Zine",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_indie_bookstore_zine_guide",
+        "source_category": "Risograph Zine / Indie Bookstore Guide",
+        "readme_summary": "Handmade zine direction with duotone screen-print imagery, hard edges, collage rhythm, and guide-like components."
+      },
+      "ppt": {
+        "template_name": "Risograph Zine Case Style",
+        "archetype": "editorial_argument",
+        "archetype_label": "Editorial Argument",
+        "qiaomu_visual_system": "Launch Editorial",
+        "recommended_routes": [
+          "talk_deck",
+          "html_preview",
+          "pptx_beautify"
+        ],
+        "density": "medium-dense",
+        "best_for": [
+          "indie culture guide",
+          "bookstore deck",
+          "zine workshop",
+          "creator community",
+          "art book essay",
+          "local culture map"
+        ],
+        "avoid_for": [
+          "formal corporate board deck",
+          "luxury minimalist launch",
+          "datasets requiring many precise chart colors"
+        ],
+        "keywords": [
+          "risograph",
+          "riso",
+          "zine",
+          "indie bookstore",
+          "screen print",
+          "duotone",
+          "collage",
+          "手作",
+          "独立书店",
+          "小志",
+          "孔版印刷",
+          "双色",
+          "拼贴"
+        ],
+        "palette": {
+          "primary": "#1E4DBC",
+          "canvas": "#F5EFE0",
+          "swatches": [
+            {
+              "role": "paper",
+              "hex": "#F5EFE0"
+            },
+            {
+              "role": "riso-blue",
+              "hex": "#1E4DBC"
+            },
+            {
+              "role": "riso-pink",
+              "hex": "#FF5C8A"
+            },
+            {
+              "role": "riso-ochre",
+              "hex": "#E8A02E"
+            },
+            {
+              "role": "ink",
+              "hex": "#1A1A1A"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Smiley Sans / Noto Sans CJK SC / Impact",
+          "body": "Noto Sans CJK SC / Inter",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "Microsoft YaHei / Arial Black / Arial",
+          "headline_treatment": "poster-like hard-edge titles with generous line-height and tactile imperfections kept in image layers"
+        },
+        "slide_patterns": [
+          "zine_cover",
+          "agenda_list",
+          "timeline_strip",
+          "process_steps",
+          "city_triptych",
+          "labeled_cards",
+          "action_outro"
+        ],
+        "layout_rules": [
+          "Use hard edges and intentional offset shapes. Border radius should usually be 0.",
+          "Use one spot-color pairing per section; do not create uncontrolled rainbow zine pages.",
+          "Keep guide information, labels, and tables editable above texture layers."
+        ],
+        "media_policy": "Use duotone source photos, collage scans, risograph process images, maps, and generated screen-print textures. Do not bake real addresses, prices, schedules, or labels into generated images.",
+        "chart_policy": "Use guide components: agenda list, timeline, vertical list, numbered steps, icon grid, pillars, tables, and labeled cards.",
+        "animation_hint": "Use page-flip, stamp, or cut-paper reveal sparingly; keep reading order stable.",
+        "image_asset_strategy": {
+          "image_rendering": "screen-print",
+          "image_palette_behavior": "duotone",
+          "asset_density": "high-image-medium-chart",
+          "required_manifest_fields": [
+            "source_photo",
+            "duotone_pair",
+            "texture_layer",
+            "hard_edge_slot",
+            "editable_label"
+          ]
+        }
+      },
+      "description_summary": "A tactile Risograph zine direction for indie culture and guide decks, pairing rich image texture with editable lists, steps, maps, and labels.",
+      "recommendation_text": "Risograph riso zine indie bookstore screen print duotone collage handmade guide 手作 独立书店 小志 孔版印刷 双色 拼贴 图片丰富"
+    },
+    {
+      "id": "pptmaster-case-brutalist-newspaper",
+      "label": "PPT Master Case: Brutalist Newspaper",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_brutalist_ai_newspaper_2026",
+        "source_category": "Brutalist Newspaper / AI Annual",
+        "readme_summary": "Brutalist newspaper style with stark typography, mono-ink surfaces, red signals, columns, halftone assets, and editorial urgency."
+      },
+      "ppt": {
+        "template_name": "Brutalist Newspaper Case Style",
+        "archetype": "editorial_argument",
+        "archetype_label": "Editorial Argument",
+        "qiaomu_visual_system": "Swiss Evidence",
+        "recommended_routes": [
+          "business_report",
+          "talk_deck",
+          "pptx_beautify"
+        ],
+        "density": "dense",
+        "best_for": [
+          "annual report",
+          "critical essay",
+          "AI industry newspaper",
+          "media briefing",
+          "trend dossier",
+          "public-interest investigation"
+        ],
+        "avoid_for": [
+          "soft product demo",
+          "luxury brand launch",
+          "warm classroom decks"
+        ],
+        "keywords": [
+          "brutalist",
+          "newspaper",
+          "editorial",
+          "annual",
+          "halftone",
+          "mono ink",
+          "报章",
+          "粗野主义",
+          "年度观察",
+          "社论",
+          "调查",
+          "黑白红"
+        ],
+        "palette": {
+          "primary": "#111111",
+          "canvas": "#F4F1EA",
+          "swatches": [
+            {
+              "role": "newsprint",
+              "hex": "#F4F1EA"
+            },
+            {
+              "role": "ink",
+              "hex": "#111111"
+            },
+            {
+              "role": "muted",
+              "hex": "#6B655D"
+            },
+            {
+              "role": "rule",
+              "hex": "#C8C0B3"
+            },
+            {
+              "role": "red-signal",
+              "hex": "#C1121F"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Serif CJK SC / Source Serif 4",
+          "body": "Noto Sans CJK SC / IBM Plex Sans",
+          "mono": "Sarasa Mono SC / IBM Plex Mono",
+          "ppt_fallback": "Songti SC / Microsoft YaHei / Cambria / Consolas",
+          "headline_treatment": "stark newspaper headlines with disciplined columns and no decorative bevels"
+        },
+        "slide_patterns": [
+          "front_page_cover",
+          "two_column_briefing",
+          "quote_pullout",
+          "source_table",
+          "timeline_column",
+          "red_signal_chart",
+          "investigation_map"
+        ],
+        "layout_rules": [
+          "Use columns and rules as editorial structure. Do not make fake UI dashboards.",
+          "Keep red as a signal color only.",
+          "Use halftone or newsprint texture lightly and never under small body copy."
+        ],
+        "media_policy": "Use source screenshots, archival images, halftone portraits, tables, and document crops. Generated texture may be used as newsprint atmosphere only.",
+        "chart_policy": "Use annotated tables, timelines, slope charts, bar charts, and evidence boxes with clear source notes.",
+        "animation_hint": "Reveal as a newspaper investigation: headline, lead, evidence, implication.",
+        "image_asset_strategy": {
+          "image_rendering": "brutalist-newspaper",
+          "image_palette_behavior": "mono-ink-red-signal",
+          "asset_density": "medium-image-high-text-chart",
+          "required_manifest_fields": [
+            "source_clip",
+            "halftone_policy",
+            "column_role",
+            "source_note",
+            "red_signal_meaning"
+          ]
+        }
+      },
+      "description_summary": "A stark newspaper editorial direction for reports and trend dossiers that need urgency, columns, source clips, and disciplined red signals.",
+      "recommendation_text": "Brutalist newspaper editorial annual report AI industry halftone mono ink red signal investigation dossier 报章 粗野主义 年度观察 社论 调查 黑白红"
+    },
+    {
+      "id": "pptmaster-case-engineering-blueprint",
+      "label": "PPT Master Case: Engineering Blueprint",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_kubernetes_blueprint_2026; examples/ppt169_building_effective_agents; examples/ppt169_general_dark_tech_claude_code_auto_mode",
+        "source_category": "Engineering Blueprint / Dark Tech",
+        "readme_summary": "Developer and infrastructure decks with dense architecture diagrams, process flows, client-server maps, dark technical palettes, and editable SVG proof objects."
+      },
+      "ppt": {
+        "template_name": "Engineering Blueprint Case Style",
+        "archetype": "developer_technical_evidence",
+        "archetype_label": "Developer Technical Evidence",
+        "qiaomu_visual_system": "Swiss Evidence",
+        "recommended_routes": [
+          "talk_deck",
+          "business_report",
+          "pptx_beautify",
+          "brand_release"
+        ],
+        "density": "dense",
+        "best_for": [
+          "Kubernetes architecture",
+          "developer tool deck",
+          "AI agent engineering",
+          "Claude Code workflow",
+          "infrastructure explanation",
+          "technical product deep dive"
+        ],
+        "avoid_for": [
+          "culture essay without systems",
+          "soft lifestyle launch",
+          "image-led magazine story"
+        ],
+        "keywords": [
+          "engineering",
+          "blueprint",
+          "Kubernetes",
+          "Claude Code",
+          "agent",
+          "architecture",
+          "infrastructure",
+          "developer",
+          "系统架构",
+          "工程蓝图",
+          "技术架构",
+          "云原生",
+          "智能体工程"
+        ],
+        "palette": {
+          "primary": "#5BA3E0",
+          "canvas": "#0E2A47",
+          "swatches": [
+            {
+              "role": "deep-blueprint",
+              "hex": "#0E2A47"
+            },
+            {
+              "role": "blueprint-panel",
+              "hex": "#1A3A5C"
+            },
+            {
+              "role": "signal-blue",
+              "hex": "#5BA3E0"
+            },
+            {
+              "role": "amber-accent",
+              "hex": "#FFB627"
+            },
+            {
+              "role": "paper-text",
+              "hex": "#F0F4F8"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Sans CJK SC / IBM Plex Sans",
+          "body": "Noto Sans CJK SC / Inter",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "Microsoft YaHei / Arial / Consolas",
+          "headline_treatment": "precise technical claim titles; diagrams and code labels need more weight than decorative glow"
+        },
+        "slide_patterns": [
+          "architecture_map",
+          "hub_spoke",
+          "process_flow",
+          "client_server_flow",
+          "vertical_pillars",
+          "code_or_terminal_panel",
+          "risk_boundary_map"
+        ],
+        "layout_rules": [
+          "Architecture diagrams should declare node types, ports, and connector grammar before rendering.",
+          "Use dark blueprint surfaces only when labels stay readable at preview size.",
+          "Prefer native SVG diagrams over generated technical imagery."
+        ],
+        "media_policy": "Use real product screenshots, architecture sketches, terminal snippets, system diagrams, and source docs. Generated images may provide quiet dark technical atmosphere only.",
+        "chart_policy": "Use hub-spoke, process flow, client-server flow, vertical pillars, dependency maps, matrix tables, and latency/cost charts.",
+        "animation_hint": "Reveal architecture by layer, data path, or responsibility boundary.",
+        "image_asset_strategy": {
+          "image_rendering": "engineering-blueprint",
+          "image_palette_behavior": "dark-blueprint-amber-signal",
+          "asset_density": "low-image-high-diagram",
+          "required_manifest_fields": [
+            "diagram_spec",
+            "node_ports",
+            "connector_policy",
+            "source_doc",
+            "code_snippet",
+            "contrast_check"
+          ]
+        }
+      },
+      "description_summary": "A dense engineering blueprint direction for infrastructure, Kubernetes, AI agents, and developer-tool decks where diagrams are the proof object.",
+      "recommendation_text": "Engineering Blueprint Kubernetes Claude Code agent architecture infrastructure developer technical diagram process flow client server 系统架构 工程蓝图 技术架构 云原生 智能体工程"
+    },
+    {
+      "id": "pptmaster-case-top-consulting",
+      "label": "PPT Master Case: Top Consulting",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_kimsoong_loyalty_programme",
+        "source_category": "Top Consulting / Loyalty Strategy",
+        "readme_summary": "Consulting-style strategy deck with issue framing, customer profile, root cause, pillars, initiatives, and roadmap."
+      },
+      "ppt": {
+        "template_name": "Top Consulting Case Style",
+        "archetype": "trust_finance_dashboard",
+        "archetype_label": "Trust Finance Dashboard",
+        "qiaomu_visual_system": "Swiss Evidence",
+        "recommended_routes": [
+          "business_report",
+          "pptx_beautify",
+          "talk_deck"
+        ],
+        "density": "medium-dense",
+        "best_for": [
+          "strategy consulting",
+          "loyalty programme",
+          "business diagnosis",
+          "root-cause analysis",
+          "roadmap",
+          "executive recommendation"
+        ],
+        "avoid_for": [
+          "image-led culture essay",
+          "playful youth event",
+          "academic formula deck"
+        ],
+        "keywords": [
+          "consulting",
+          "strategy",
+          "root cause",
+          "roadmap",
+          "loyalty",
+          "customer profile",
+          "pillar",
+          "咨询",
+          "战略",
+          "根因",
+          "路线图",
+          "客户画像",
+          "忠诚度"
+        ],
+        "palette": {
+          "primary": "#1A3A5C",
+          "canvas": "#FFFFFF",
+          "swatches": [
+            {
+              "role": "executive-blue",
+              "hex": "#1A3A5C"
+            },
+            {
+              "role": "canvas",
+              "hex": "#FFFFFF"
+            },
+            {
+              "role": "surface",
+              "hex": "#F4F6F8"
+            },
+            {
+              "role": "gold-accent",
+              "hex": "#E8A838"
+            },
+            {
+              "role": "success-green",
+              "hex": "#2D8A4E"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Sans CJK SC / Helvetica Neue",
+          "body": "Noto Sans CJK SC / IBM Plex Sans",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "Microsoft YaHei / Arial / Consolas",
+          "headline_treatment": "executive claim titles, concise labels, no decorative ambiguity"
+        },
+        "slide_patterns": [
+          "critical_challenge",
+          "company_profile",
+          "customer_profile",
+          "priorities_gap",
+          "root_cause_tree",
+          "strategic_pillars",
+          "initiative_matrix",
+          "roadmap"
+        ],
+        "layout_rules": [
+          "Use pyramid/SCQA logic before choosing the consulting surface.",
+          "Make the recommendation traceable from challenge to root cause to initiatives.",
+          "Roadmap slides need time axis, owner or workstream, and success metric."
+        ],
+        "media_policy": "Use company context images, customer insight visuals, simple icons, and roadmap backgrounds. Do not use generic corporate stock photos as proof.",
+        "chart_policy": "Use gap charts, root-cause trees, strategic pillar diagrams, initiative matrices, customer profiles, and roadmap timelines.",
+        "animation_hint": "Reveal logic in consulting order: situation, complication, insight, recommendation.",
+        "image_asset_strategy": {
+          "image_rendering": "consulting-editorial",
+          "image_palette_behavior": "executive-blue-gold",
+          "asset_density": "low-image-medium-chart",
+          "required_manifest_fields": [
+            "business_source",
+            "metric",
+            "workstream",
+            "roadmap_axis",
+            "recommendation_link"
+          ]
+        }
+      },
+      "description_summary": "A sober top-consulting direction for business diagnosis, customer strategy, initiatives, and executive roadmap decks.",
+      "recommendation_text": "Top Consulting strategy root cause roadmap loyalty customer profile executive recommendation business diagnosis 咨询 战略 根因 路线图 客户画像 忠诚度"
+    },
+    {
+      "id": "pptmaster-case-luxury-editorial-digest",
+      "label": "PPT Master Case: Luxury Editorial Digest",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_fashion_weekly_digest; examples/ppt169_home_design_trends_2026",
+        "source_category": "Luxury / Fashion / Home Magazine Editorial",
+        "readme_summary": "Image-rich luxury editorial decks with dark premium surfaces, serif headlines, brand/product photography, and digest pacing."
+      },
+      "ppt": {
+        "template_name": "Luxury Editorial Digest Case Style",
+        "archetype": "editorial_argument",
+        "archetype_label": "Editorial Argument",
+        "qiaomu_visual_system": "Launch Editorial",
+        "recommended_routes": [
+          "talk_deck",
+          "brand_release",
+          "html_preview",
+          "pptx_beautify"
+        ],
+        "density": "medium-dense",
+        "best_for": [
+          "fashion weekly digest",
+          "luxury brand roundup",
+          "home design trends",
+          "lifestyle report",
+          "product lookbook",
+          "visual magazine deck"
+        ],
+        "avoid_for": [
+          "hard data finance report",
+          "classroom courseware",
+          "paper decks needing formulas"
+        ],
+        "keywords": [
+          "luxury",
+          "fashion",
+          "home design",
+          "editorial",
+          "lookbook",
+          "trend digest",
+          "家居",
+          "时尚",
+          "奢华",
+          "美学周鉴",
+          "趋势",
+          "生活方式"
+        ],
+        "palette": {
+          "primary": "#C9A96E",
+          "canvas": "#0A0A0A",
+          "swatches": [
+            {
+              "role": "black-canvas",
+              "hex": "#0A0A0A"
+            },
+            {
+              "role": "warm-charcoal",
+              "hex": "#1A1714"
+            },
+            {
+              "role": "champagne",
+              "hex": "#C9A96E"
+            },
+            {
+              "role": "soft-gold",
+              "hex": "#E8D5B5"
+            },
+            {
+              "role": "warm-text",
+              "hex": "#F5F0EB"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Serif CJK SC / Georgia",
+          "body": "Noto Sans CJK SC / Inter",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "SimSun / Microsoft YaHei / Georgia",
+          "headline_treatment": "magazine-serif headlines with generous leading and restrained gold accents"
+        },
+        "slide_patterns": [
+          "cover_image_hero",
+          "brand_spread",
+          "product_gallery",
+          "trend_grid",
+          "material_detail",
+          "lookbook_caption",
+          "chapter_opener"
+        ],
+        "layout_rules": [
+          "Product or lifestyle imagery must be the main visual evidence.",
+          "Use serif editorial hierarchy, but keep captions and labels readable.",
+          "Avoid using gold as a blanket theme; reserve it for hierarchy and premium signals."
+        ],
+        "media_policy": "Use rights-clear fashion, home, product, material, event, or lookbook images. Generated images can provide moodboard texture, not fake brand/product evidence.",
+        "chart_policy": "Use trend grids, material matrices, editorial ranking lists, galleries, and captioned comparison spreads rather than dense quantitative charts.",
+        "animation_hint": "Use magazine pacing: hero image, caption, detail, editorial takeaway.",
+        "image_asset_strategy": {
+          "image_rendering": "luxury-editorial",
+          "image_palette_behavior": "dark-champagne-warm-text",
+          "asset_density": "high-image-low-chart",
+          "required_manifest_fields": [
+            "image_source",
+            "rights_note",
+            "crop_focal_point",
+            "caption",
+            "brand_or_product_context"
+          ]
+        }
+      },
+      "description_summary": "An image-rich luxury magazine direction for fashion, home design, lifestyle, and trend digest decks.",
+      "recommendation_text": "Luxury Editorial Digest fashion home design lookbook trend magazine lifestyle premium champagne 家居 时尚 奢华 美学周鉴 趋势 生活方式 图片丰富"
+    },
+    {
+      "id": "pptmaster-case-eastern-culture-narrative",
+      "label": "PPT Master Case: Eastern Culture Narrative",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_liziqi_plant_dye_colors; examples/ppt169_cangzhuo",
+        "source_category": "Eastern Culture / Craft Narrative",
+        "readme_summary": "Chinese cultural storytelling with plant-dye palettes, craft imagery, poetic color tokens, ink-paper surfaces, and restrained traditional typography."
+      },
+      "ppt": {
+        "template_name": "Eastern Culture Narrative Case Style",
+        "archetype": "editorial_argument",
+        "archetype_label": "Editorial Argument",
+        "qiaomu_visual_system": "Launch Editorial",
+        "recommended_routes": [
+          "talk_deck",
+          "high_school_courseware",
+          "html_preview",
+          "pptx_beautify"
+        ],
+        "density": "medium",
+        "best_for": [
+          "Chinese culture",
+          "intangible heritage",
+          "craft process",
+          "plant dye",
+          "classical aesthetics",
+          "literature/culture talk"
+        ],
+        "avoid_for": [
+          "neon tech launch",
+          "strict finance dashboard",
+          "highly quantitative data report"
+        ],
+        "keywords": [
+          "Eastern",
+          "Chinese culture",
+          "plant dye",
+          "craft",
+          "heritage",
+          "ink",
+          "poetic color",
+          "东方",
+          "中国文化",
+          "植物染",
+          "非遗",
+          "手作",
+          "水墨",
+          "传统色",
+          "李子柒",
+          "藏拙"
+        ],
+        "palette": {
+          "primary": "#6B9AAE",
+          "canvas": "#F7F2E8",
+          "swatches": [
+            {
+              "role": "rice-paper",
+              "hex": "#F7F2E8"
+            },
+            {
+              "role": "mist-blue",
+              "hex": "#6B9AAE"
+            },
+            {
+              "role": "plant-gold",
+              "hex": "#C99E62"
+            },
+            {
+              "role": "leaf-green",
+              "hex": "#6F8F75"
+            },
+            {
+              "role": "cinnabar",
+              "hex": "#B04A5C"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Serif CJK SC / KaiTi / STKaiti",
+          "body": "Noto Sans CJK SC / PingFang SC",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "KaiTi / STKaiti / Microsoft YaHei",
+          "headline_treatment": "poetic but readable Chinese titles; preserve line-height and avoid cramped calligraphy blocks"
+        },
+        "slide_patterns": [
+          "cultural_cover",
+          "craft_process",
+          "color_token_grid",
+          "artifact_decode",
+          "poetic_quote",
+          "image_caption_spread",
+          "heritage_timeline"
+        ],
+        "layout_rules": [
+          "Use cultural color tokens as semantic evidence, not arbitrary decoration.",
+          "Craft/process slides should show material, action, transformation, and cultural meaning.",
+          "Traditional typography must stay readable in projection and PPTX export."
+        ],
+        "media_policy": "Use source images of artifacts, craft process, plants, textile, paper, ceramics, places, and manuscripts. Generated imagery may provide paper/ink atmosphere only.",
+        "chart_policy": "Use color-token grids, process steps, artifact decomposition, timelines, quote spreads, and comparison tables.",
+        "animation_hint": "Reveal cultural meaning from object to process to metaphor.",
+        "image_asset_strategy": {
+          "image_rendering": "eastern-cultural-editorial",
+          "image_palette_behavior": "rice-paper-plant-dye-cinnabar",
+          "asset_density": "high-image-medium-diagram",
+          "required_manifest_fields": [
+            "cultural_source",
+            "image_source",
+            "color_token",
+            "craft_step",
+            "rights_note",
+            "caption"
+          ]
+        }
+      },
+      "description_summary": "A Chinese cultural narrative direction for craft, heritage, plant dye, literature, and poetic object-based decks.",
+      "recommendation_text": "Eastern Chinese culture plant dye craft heritage ink poetic color intangible heritage 李子柒 藏拙 东方 中国文化 植物染 非遗 手作 水墨 传统色"
+    },
+    {
+      "id": "pptmaster-case-image-text-showcase",
+      "label": "PPT Master Case: Image-Text Layout Showcase",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_image_text_showcase",
+        "source_category": "Image-Text Layout Showcase",
+        "readme_summary": "Twenty image-text composition patterns including left/right image, full bleed, Z flow, grid collage, circle radial, diagonal split, papercut, montage, and poster layouts."
+      },
+      "ppt": {
+        "template_name": "Image-Text Layout Showcase Case Style",
+        "archetype": "editorial_argument",
+        "archetype_label": "Editorial Argument",
+        "qiaomu_visual_system": "Launch Editorial",
+        "recommended_routes": [
+          "talk_deck",
+          "html_preview",
+          "pptx_beautify",
+          "brand_release"
+        ],
+        "density": "medium",
+        "best_for": [
+          "image-text mixed deck",
+          "layout exploration",
+          "visual essay",
+          "portfolio",
+          "style preview",
+          "social reading deck"
+        ],
+        "avoid_for": [
+          "text-only policy report",
+          "dense spreadsheet deck",
+          "paper deck where source figures must stay no-crop"
+        ],
+        "keywords": [
+          "image text",
+          "layout",
+          "showcase",
+          "collage",
+          "gallery",
+          "poster",
+          "图文混排",
+          "图片排版",
+          "版式展示",
+          "拼贴",
+          "作品集",
+          "视觉散文"
+        ],
+        "palette": {
+          "primary": "#7C6FF7",
+          "canvas": "#0F1117",
+          "swatches": [
+            {
+              "role": "dark-gallery",
+              "hex": "#0F1117"
+            },
+            {
+              "role": "panel",
+              "hex": "#1A1D2E"
+            },
+            {
+              "role": "violet",
+              "hex": "#7C6FF7"
+            },
+            {
+              "role": "amber",
+              "hex": "#F5A623"
+            },
+            {
+              "role": "mint",
+              "hex": "#4ECDC4"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Serif CJK SC / Georgia",
+          "body": "Noto Sans CJK SC / Inter",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "Microsoft YaHei / Georgia / Arial",
+          "headline_treatment": "image-led editorial titles; each layout must declare image role and text role before rendering"
+        },
+        "slide_patterns": [
+          "left_image_right_text",
+          "right_bleed_image",
+          "top_image_three_columns",
+          "background_image_floating_text",
+          "z_flow",
+          "nine_grid",
+          "circle_radial",
+          "papercut_layers",
+          "diagonal_split",
+          "montage_collage",
+          "poster_vertical"
+        ],
+        "layout_rules": [
+          "Use this as a layout vocabulary, not as one deck style copied page by page.",
+          "Every image needs slot, crop focal point, text-safe area, and caption policy.",
+          "Avoid using more than two expressive image treatments in one ordinary production deck unless it is a layout showcase."
+        ],
+        "media_policy": "Use source images, generated concept images, or rights-clear visuals; text remains editable and outside baked image content.",
+        "chart_policy": "Use sparingly. This style is primarily about image-text composition; diagrams/charts should be foreground SVG objects when needed.",
+        "animation_hint": "Reveal image, title, caption, and annotation in reading order.",
+        "image_asset_strategy": {
+          "image_rendering": "editorial-showcase",
+          "image_palette_behavior": "image-led-controlled-accent",
+          "asset_density": "high-image-layout-library",
+          "required_manifest_fields": [
+            "layout_pattern",
+            "image_slot",
+            "crop_focal_point",
+            "text_safe_area",
+            "caption",
+            "fit_mode"
+          ]
+        }
+      },
+      "description_summary": "A layout-vocabulary direction for image-text decks, useful when the main challenge is composition variety and image containment.",
+      "recommendation_text": "Image Text Layout Showcase collage gallery poster visual essay portfolio image slot crop focal point 图文混排 图片排版 版式展示 拼贴 作品集 视觉散文"
+    },
+    {
+      "id": "pptmaster-case-urban-renewal-editorial",
+      "label": "PPT Master Case: Urban Renewal Editorial",
+      "source": {
+        "repo": "hugohe3/ppt-master",
+        "path": "examples/ppt169_high_rise_renewal; examples/ppt169_lin_huiyin_architect; examples/ppt169_lin_huiyin_architect_revised",
+        "source_category": "Urban Renewal / Architecture Humanities / Museum Exhibition",
+        "readme_summary": "Architecture and urban humanities decks with before/after imagery, timelines, heritage context, museum exhibition pacing, and social-problem framing."
+      },
+      "ppt": {
+        "template_name": "Urban Renewal Editorial Case Style",
+        "archetype": "editorial_argument",
+        "archetype_label": "Editorial Argument",
+        "qiaomu_visual_system": "Launch Editorial",
+        "recommended_routes": [
+          "talk_deck",
+          "business_report",
+          "high_school_courseware",
+          "pptx_beautify"
+        ],
+        "density": "medium-dense",
+        "best_for": [
+          "urban renewal",
+          "architecture humanities",
+          "museum exhibition",
+          "biography",
+          "heritage preservation",
+          "before-after case study"
+        ],
+        "avoid_for": [
+          "pure SaaS product launch",
+          "financial dashboard",
+          "playful event guide"
+        ],
+        "keywords": [
+          "urban renewal",
+          "architecture",
+          "museum",
+          "heritage",
+          "before after",
+          "biography",
+          "城市更新",
+          "建筑人文",
+          "展陈",
+          "林徽因",
+          "高层住宅",
+          "遗产保护",
+          "前后对比"
+        ],
+        "palette": {
+          "primary": "#2B3A4A",
+          "canvas": "#F5F2EC",
+          "swatches": [
+            {
+              "role": "paper",
+              "hex": "#F5F2EC"
+            },
+            {
+              "role": "navy-ink",
+              "hex": "#2B3A4A"
+            },
+            {
+              "role": "urban-gray",
+              "hex": "#5A6B7A"
+            },
+            {
+              "role": "warning-rust",
+              "hex": "#C2410C"
+            },
+            {
+              "role": "regeneration-green",
+              "hex": "#6B7A4F"
+            }
+          ]
+        },
+        "typography": {
+          "display": "Noto Serif CJK SC / Georgia / KaiTi",
+          "body": "Noto Sans CJK SC / Inter",
+          "mono": "Sarasa Mono SC / JetBrains Mono",
+          "ppt_fallback": "Microsoft YaHei / KaiTi / Georgia",
+          "headline_treatment": "humanities claim titles with precise captions and before/after evidence labels"
+        },
+        "slide_patterns": [
+          "before_after_spread",
+          "case_timeline",
+          "place_map",
+          "heritage_quote",
+          "problem_kpi",
+          "museum_object_label",
+          "biography_arc",
+          "policy_option_matrix"
+        ],
+        "layout_rules": [
+          "Before/after images need matched framing and honest labels.",
+          "Humanities biography slides should connect person, place, work, and historical constraint.",
+          "Museum/exhibition pacing can be quiet, but each page still needs a claim or object focus."
+        ],
+        "media_policy": "Use source images of buildings, archives, maps, portraits, before/after comparisons, and exhibition objects. Generated imagery may only provide atmosphere or concept background.",
+        "chart_policy": "Use timelines, before/after comparisons, maps, policy option matrices, case tables, and problem KPI pages.",
+        "animation_hint": "Reveal before/after, timeline, and case evidence in a documentary rhythm.",
+        "image_asset_strategy": {
+          "image_rendering": "architecture-humanities-editorial",
+          "image_palette_behavior": "paper-navy-rust-regeneration",
+          "asset_density": "high-image-medium-chart",
+          "required_manifest_fields": [
+            "image_source",
+            "before_after_pair",
+            "place",
+            "date",
+            "caption",
+            "rights_note"
+          ]
+        }
+      },
+      "description_summary": "An architecture-humanities direction for urban renewal, museum exhibition, biography, heritage, and before/after case decks.",
+      "recommendation_text": "Urban renewal architecture museum heritage before after biography exhibition Lin Huiyin city case 城市更新 建筑人文 展陈 林徽因 高层住宅 遗产保护 前后对比"
+    }
+  ]
+}

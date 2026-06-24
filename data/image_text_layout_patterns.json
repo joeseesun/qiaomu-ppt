@@ -1,0 +1,1296 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-06-20",
+  "source": {
+    "type": "user_research_attachment",
+    "title": "PPT image-text layout research reference",
+    "boundary": "This is a practical synthesis from public template ecosystems, presentation design guidance, web/editorial layouts, and consulting decks. It is not an authoritative popularity ranking."
+  },
+  "global_rules": {
+    "canvas": {
+      "aspect_ratio": "16:9",
+      "powerpoint_widescreen_in": "13.333 x 7.5",
+      "safe_margin_in": "0.45-0.7",
+      "grid": "12 columns",
+      "common_column_ratios": [
+        "5:7",
+        "6:6",
+        "4:8",
+        "3:9"
+      ],
+      "spacing_pt": [
+        8,
+        16,
+        24,
+        32,
+        48
+      ],
+      "bleed_policy": "Images may bleed to the slide edge; all live text must stay inside the safe area."
+    },
+    "typography": {
+      "speaking_deck_pt": {
+        "cover_title": "56-80",
+        "page_title": "40-56",
+        "subtitle": "28-36",
+        "body": "24-30",
+        "label": "18-22",
+        "footnote": "avoid; minimum 14"
+      },
+      "reading_report_pt": {
+        "cover_title": "44-64",
+        "page_title": "32-44",
+        "subtitle": "24-32",
+        "body": "18-24",
+        "label": "14-18",
+        "footnote": "10-12 only for reading decks"
+      },
+      "line_length": {
+        "title_cjk_chars": "6-18",
+        "title_en_words": "4-10",
+        "body_cjk_chars_per_line": "14-24",
+        "body_en_chars_per_line": "35-55",
+        "bullet": "one line preferred"
+      },
+      "line_height": {
+        "title": "1.05-1.15",
+        "body_cjk": "1.20-1.40",
+        "body_en": "1.25-1.50"
+      },
+      "font_roles": {
+        "business": {
+          "zh": "Microsoft YaHei, DengXian, Source Han Sans, Alibaba PuHuiTi",
+          "latin": "Aptos, Arial, Helvetica"
+        },
+        "tech_saas": {
+          "zh": "Source Han Sans, HarmonyOS Sans, MiSans",
+          "latin": "Aptos, Inter, Roboto"
+        },
+        "luxury_magazine": {
+          "zh": "Source Han Serif, Noto Serif CJK, FangZheng ShuSong-style serif",
+          "latin": "Aptos, Georgia, DM Serif"
+        },
+        "consumer_event": {
+          "zh": "bold sans, rounded sans, display title fonts",
+          "latin": "Display Sans, Condensed Sans"
+        }
+      }
+    },
+    "text_over_image": {
+      "contrast_ratio": {
+        "normal_text": "4.5:1",
+        "large_text": "3:1"
+      },
+      "approved_methods": [
+        "full_scrim",
+        "gradient_scrim",
+        "solid_or_translucent_text_block",
+        "copy_space",
+        "local_blur"
+      ],
+      "warnings": [
+        "Do not place thin type over busy photos.",
+        "Do not assume darkening the whole image is enough; inspect the local text area."
+      ]
+    },
+    "execution_rules": [
+      "Write the slide conclusion first, then choose the layout.",
+      "An image should have exactly one role: background, evidence, emotion, product, person, or step.",
+      "Use at most three visible text levels: title, body, label.",
+      "Use at most one first visual focus: large image, large number, or large title.",
+      "Keep crop logic consistent within an image group.",
+      "Keep text inside the safe area; images may bleed.",
+      "Measure or visually verify text-over-image contrast.",
+      "Do not use meaningless decorative images.",
+      "Projected decks should keep key visible text at 24pt or larger.",
+      "Run a squint test: the first focus must be the intended message."
+    ]
+  },
+  "master_groups": [
+    {
+      "id": "hero_image",
+      "label_zh": "Hero 大图组",
+      "pattern_ids": [
+        "ITL03",
+        "ITL04",
+        "ITL05",
+        "ITL06",
+        "ITL11"
+      ],
+      "job": "Covers, chapter turns, emotional context, and high-impact openings."
+    },
+    {
+      "id": "split",
+      "label_zh": "Split 分屏组",
+      "pattern_ids": [
+        "ITL01",
+        "ITL02",
+        "ITL08",
+        "ITL10"
+      ],
+      "job": "Stable business, explanation, and conclusion-first evidence pages."
+    },
+    {
+      "id": "editorial",
+      "label_zh": "Editorial 编辑组",
+      "pattern_ids": [
+        "ITL09",
+        "ITL12",
+        "ITL15"
+      ],
+      "job": "Magazine-like narrative, cases, quotes, photo essays, and moodboards."
+    },
+    {
+      "id": "product",
+      "label_zh": "Product 产品组",
+      "pattern_ids": [
+        "ITL17",
+        "ITL18",
+        "ITL19"
+      ],
+      "job": "Product breakdowns, screenshots, feature demos, and sales one-pagers."
+    },
+    {
+      "id": "evidence",
+      "label_zh": "Evidence 证据组",
+      "pattern_ids": [
+        "ITL13",
+        "ITL14",
+        "ITL16",
+        "ITL20"
+      ],
+      "job": "Before/after, multi-scene evidence, timelines, journeys, and data insight."
+    }
+  ],
+  "selection_table": [
+    {
+      "goal": "稳妥商务汇报",
+      "query_terms": [
+        "business report",
+        "executive",
+        "商务汇报",
+        "管理层",
+        "稳妥"
+      ],
+      "pattern_ids": [
+        "ITL01",
+        "ITL02",
+        "ITL07",
+        "ITL10"
+      ]
+    },
+    {
+      "goal": "高级感封面",
+      "query_terms": [
+        "cover",
+        "premium",
+        "luxury",
+        "高级感",
+        "封面"
+      ],
+      "pattern_ids": [
+        "ITL03",
+        "ITL04",
+        "ITL08",
+        "ITL11"
+      ]
+    },
+    {
+      "goal": "产品介绍",
+      "query_terms": [
+        "product",
+        "feature",
+        "demo",
+        "产品介绍",
+        "功能"
+      ],
+      "pattern_ids": [
+        "ITL01",
+        "ITL17",
+        "ITL18",
+        "ITL19"
+      ]
+    },
+    {
+      "goal": "用户故事/案例",
+      "query_terms": [
+        "case",
+        "customer",
+        "story",
+        "用户故事",
+        "客户案例"
+      ],
+      "pattern_ids": [
+        "ITL07",
+        "ITL09",
+        "ITL12",
+        "ITL18"
+      ]
+    },
+    {
+      "goal": "对比表达",
+      "query_terms": [
+        "before after",
+        "compare",
+        "contrast",
+        "对比",
+        "前后"
+      ],
+      "pattern_ids": [
+        "ITL13"
+      ]
+    },
+    {
+      "goal": "多场景展示",
+      "query_terms": [
+        "multi scene",
+        "gallery",
+        "portfolio",
+        "多场景",
+        "作品集"
+      ],
+      "pattern_ids": [
+        "ITL14",
+        "ITL15"
+      ]
+    },
+    {
+      "goal": "流程/旅程",
+      "query_terms": [
+        "timeline",
+        "journey",
+        "process",
+        "流程",
+        "旅程"
+      ],
+      "pattern_ids": [
+        "ITL16"
+      ]
+    },
+    {
+      "goal": "数据洞察",
+      "query_terms": [
+        "data",
+        "insight",
+        "evidence",
+        "数据洞察",
+        "图表"
+      ],
+      "pattern_ids": [
+        "ITL20"
+      ]
+    },
+    {
+      "goal": "品牌/创意提案",
+      "query_terms": [
+        "brand",
+        "creative",
+        "moodboard",
+        "品牌",
+        "创意提案"
+      ],
+      "pattern_ids": [
+        "ITL04",
+        "ITL11",
+        "ITL15"
+      ]
+    },
+    {
+      "goal": "教学/说明文档",
+      "query_terms": [
+        "courseware",
+        "tutorial",
+        "explain",
+        "教学",
+        "说明文档"
+      ],
+      "pattern_ids": [
+        "ITL09",
+        "ITL16",
+        "ITL18"
+      ]
+    }
+  ],
+  "patterns": [
+    {
+      "id": "ITL01",
+      "name_zh": "经典左右二分",
+      "name_en": "Text Left / Image Right",
+      "master_group": "split",
+      "structure": "Text uses 45-50% of the canvas and image uses 50-55%, usually full height.",
+      "use_for": [
+        "产品介绍",
+        "人物介绍",
+        "问题解释",
+        "章节正文"
+      ],
+      "font_size": {
+        "title_pt": "40-52",
+        "body_pt": "22-26"
+      },
+      "image_role": [
+        "evidence",
+        "product",
+        "person"
+      ],
+      "rules": [
+        "Left text should be one title plus no more than three bullets.",
+        "Right image should use full-height crop when possible.",
+        "Do not crop the subject into the edge."
+      ],
+      "avoid": [
+        "dense paragraphs in the text half",
+        "generic stock image with no proof role"
+      ],
+      "layout_pattern_mappings": [
+        "L05",
+        "L03"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "business_report",
+        "talk_deck",
+        "pptx_beautify"
+      ],
+      "query_terms": [
+        "split",
+        "product",
+        "profile",
+        "explain",
+        "左右二分",
+        "产品介绍",
+        "人物介绍"
+      ]
+    },
+    {
+      "id": "ITL02",
+      "name_zh": "非对称主图分屏",
+      "name_en": "Asymmetric 40/60 or 35/65 Split",
+      "master_group": "split",
+      "structure": "Text uses 35-40%; image uses 60-65% and becomes the visual protagonist.",
+      "use_for": [
+        "品牌故事",
+        "趋势判断",
+        "情绪型报告",
+        "产品宣传"
+      ],
+      "font_size": {
+        "title_pt": "44-60",
+        "body_pt": "20-24"
+      },
+      "image_role": [
+        "emotion",
+        "product",
+        "scene"
+      ],
+      "rules": [
+        "Image is the protagonist; text should be a judgment sentence.",
+        "Narrow text rail should stay within 5-7 lines.",
+        "Use a consistent edge or gutter across the deck."
+      ],
+      "avoid": [
+        "filling the narrow rail with body copy",
+        "making image and text equally loud"
+      ],
+      "layout_pattern_mappings": [
+        "L05",
+        "L04"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "business_report",
+        "talk_deck"
+      ],
+      "query_terms": [
+        "asymmetric",
+        "brand story",
+        "trend",
+        "情绪",
+        "非对称",
+        "主图"
+      ]
+    },
+    {
+      "id": "ITL03",
+      "name_zh": "全屏大图 + 大标题",
+      "name_en": "Full-Bleed Image + Big Title",
+      "master_group": "hero_image",
+      "structure": "A full-bleed image covers the canvas; title sits in left-bottom, left-center, or center safe area.",
+      "use_for": [
+        "封面",
+        "章节页",
+        "情绪页",
+        "演讲开场"
+      ],
+      "font_size": {
+        "title_pt": "56-80",
+        "subtitle_pt": "20-28"
+      },
+      "image_role": [
+        "background",
+        "emotion",
+        "scene"
+      ],
+      "rules": [
+        "Title should stay under 12 Chinese characters or 8 English words where possible.",
+        "Use vignette, gradient, or local scrim for text safety.",
+        "Use high-resolution images and avoid upscaling beyond source quality."
+      ],
+      "avoid": [
+        "busy image under title",
+        "dark blurred stock-like background when inspection matters"
+      ],
+      "layout_pattern_mappings": [
+        "L04",
+        "L01"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "talk_deck",
+        "html_preview"
+      ],
+      "query_terms": [
+        "cover",
+        "hero",
+        "full bleed",
+        "chapter",
+        "封面",
+        "全屏大图",
+        "大标题"
+      ]
+    },
+    {
+      "id": "ITL04",
+      "name_zh": "留白摄影 + 文本落位",
+      "name_en": "Copy-Space Photography",
+      "master_group": "hero_image",
+      "structure": "Use a photo with natural negative space; place text in the copy-space third.",
+      "use_for": [
+        "高端品牌",
+        "咨询封面",
+        "人物专题",
+        "生活方式"
+      ],
+      "font_size": {
+        "title_pt": "46-64",
+        "body_pt": "20-24"
+      },
+      "image_role": [
+        "emotion",
+        "person",
+        "scene"
+      ],
+      "rules": [
+        "Do not place text over the subject.",
+        "Use rule-of-thirds placement.",
+        "Prefer natural copy space over heavy scrims for a cleaner premium look."
+      ],
+      "avoid": [
+        "forcing text into a photo with no quiet area",
+        "covering faces, hands, or product core"
+      ],
+      "layout_pattern_mappings": [
+        "L04",
+        "L01"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "talk_deck"
+      ],
+      "query_terms": [
+        "copy space",
+        "luxury",
+        "editorial",
+        "lifestyle",
+        "留白摄影",
+        "高级"
+      ]
+    },
+    {
+      "id": "ITL05",
+      "name_zh": "渐变遮罩图文叠加",
+      "name_en": "Gradient Scrim Text Overlay",
+      "master_group": "hero_image",
+      "structure": "Full or partial image with a black, white, or brand-color gradient scrim behind text.",
+      "use_for": [
+        "复杂图片压文字",
+        "封面",
+        "章节页",
+        "案例开场"
+      ],
+      "font_size": {
+        "title_pt": "44-64",
+        "body_pt": "20-26"
+      },
+      "image_role": [
+        "background",
+        "emotion",
+        "scene"
+      ],
+      "rules": [
+        "Gradient should spread from the text zone outward.",
+        "Text region should usually have at least 35% dark overlay for dark scrims.",
+        "Use white gradient plus dark text on very light images."
+      ],
+      "avoid": [
+        "thin type over photos",
+        "global darkening that makes the image muddy"
+      ],
+      "layout_pattern_mappings": [
+        "L04"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "business_report",
+        "talk_deck",
+        "html_preview"
+      ],
+      "query_terms": [
+        "scrim",
+        "gradient overlay",
+        "text over image",
+        "渐变遮罩",
+        "压图文字"
+      ]
+    },
+    {
+      "id": "ITL06",
+      "name_zh": "色块/高亮条压图",
+      "name_en": "Color Bar Over Image",
+      "master_group": "hero_image",
+      "structure": "Image with a solid or translucent text bar sized to the headline.",
+      "use_for": [
+        "活动页",
+        "新闻标题",
+        "案例封面",
+        "短结论页"
+      ],
+      "font_size": {
+        "title_pt": "36-52",
+        "label_pt": "18-22"
+      },
+      "image_role": [
+        "background",
+        "scene",
+        "evidence"
+      ],
+      "rules": [
+        "Text bar width should follow the copy, not fill the whole slide by default.",
+        "Use 24-40pt horizontal padding.",
+        "Keep the bar as a readability device, not a decorative ribbon."
+      ],
+      "avoid": [
+        "full-screen opaque slabs",
+        "multiple competing bars"
+      ],
+      "layout_pattern_mappings": [
+        "L04",
+        "L01"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "business_report",
+        "talk_deck"
+      ],
+      "query_terms": [
+        "color bar",
+        "headline",
+        "case cover",
+        "色块",
+        "高亮条",
+        "新闻标题"
+      ]
+    },
+    {
+      "id": "ITL07",
+      "name_zh": "悬浮文字卡片 + 背景图",
+      "name_en": "Floating Text Card Over Background",
+      "master_group": "split",
+      "structure": "A large background image with one foreground light or dark card carrying text.",
+      "use_for": [
+        "企业介绍",
+        "客户案例",
+        "方案亮点",
+        "产品价值"
+      ],
+      "font_size": {
+        "title_pt": "32-44",
+        "body_pt": "20-24"
+      },
+      "image_role": [
+        "background",
+        "scene",
+        "case_context"
+      ],
+      "rules": [
+        "Card should occupy roughly 30-45% of the canvas.",
+        "Use 24-40pt internal padding.",
+        "Use restrained radius; default 8-12pt unless the style demands softer cards."
+      ],
+      "avoid": [
+        "many cards over one image",
+        "dashboard-like card soup",
+        "nested cards"
+      ],
+      "layout_pattern_mappings": [
+        "L04",
+        "L07"
+      ],
+      "recommended_routes": [
+        "business_report",
+        "brand_release",
+        "pptx_beautify"
+      ],
+      "query_terms": [
+        "floating card",
+        "case",
+        "enterprise",
+        "悬浮卡片",
+        "客户案例",
+        "方案亮点"
+      ]
+    },
+    {
+      "id": "ITL08",
+      "name_zh": "纵向侧栏 + 主图",
+      "name_en": "Vertical Sidebar + Main Image",
+      "master_group": "split",
+      "structure": "A 20-30% fixed side rail carries title/meta; the remaining canvas carries the main image.",
+      "use_for": [
+        "章节页",
+        "作品集",
+        "系列报告",
+        "品牌规范"
+      ],
+      "font_size": {
+        "title_pt": "38-56",
+        "label_pt": "14-18"
+      },
+      "image_role": [
+        "background",
+        "evidence",
+        "portfolio"
+      ],
+      "rules": [
+        "Keep side rail color and placement consistent as a master-system signal.",
+        "Use rail metadata sparingly: section, index, date, or source.",
+        "Let the image own the rest of the canvas."
+      ],
+      "avoid": [
+        "changing rail side, width, and color randomly",
+        "overloading the sidebar with paragraphs"
+      ],
+      "layout_pattern_mappings": [
+        "L07",
+        "L05"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "business_report",
+        "talk_deck"
+      ],
+      "query_terms": [
+        "sidebar",
+        "series",
+        "portfolio",
+        "章节",
+        "侧栏",
+        "品牌规范"
+      ]
+    },
+    {
+      "id": "ITL09",
+      "name_zh": "上图下文",
+      "name_en": "Editorial Caption Layout",
+      "master_group": "editorial",
+      "structure": "Top 55-65% image, bottom 35-45% text analysis and caption.",
+      "use_for": [
+        "研究报告",
+        "新闻解读",
+        "案例复盘",
+        "教育类"
+      ],
+      "font_size": {
+        "title_pt": "32-44",
+        "body_pt": "18-24",
+        "caption_pt": "14-16"
+      },
+      "image_role": [
+        "scene",
+        "evidence",
+        "case_context"
+      ],
+      "rules": [
+        "Image provides context; text provides analysis.",
+        "Bottom text can use two columns for a magazine feel.",
+        "Caption should stay visually close to the image."
+      ],
+      "avoid": [
+        "caption floating far from image",
+        "image with no relation to the analysis"
+      ],
+      "layout_pattern_mappings": [
+        "L03",
+        "L05"
+      ],
+      "recommended_routes": [
+        "business_report",
+        "high_school_courseware",
+        "talk_deck"
+      ],
+      "query_terms": [
+        "caption",
+        "editorial",
+        "research report",
+        "case",
+        "上图下文",
+        "新闻解读",
+        "图注"
+      ]
+    },
+    {
+      "id": "ITL10",
+      "name_zh": "上标题下主图",
+      "name_en": "Conclusion Title + Main Image",
+      "master_group": "split",
+      "structure": "Top 25-35% conclusion title zone; bottom 65-75% main image/evidence zone.",
+      "use_for": [
+        "结论先行页",
+        "研究发现",
+        "视觉证据页",
+        "汇报正文"
+      ],
+      "font_size": {
+        "title_pt": "44-60",
+        "support_pt": "20-24"
+      },
+      "image_role": [
+        "evidence",
+        "screenshot",
+        "chart"
+      ],
+      "rules": [
+        "Title must be a full judgment sentence, not a category label.",
+        "The image or chart is the proof.",
+        "Use this pattern when executive readers need the answer before the evidence."
+      ],
+      "avoid": [
+        "generic title like Overview or 背景",
+        "shrinking the proof object below readable size"
+      ],
+      "layout_pattern_mappings": [
+        "L03",
+        "L20"
+      ],
+      "recommended_routes": [
+        "business_report",
+        "talk_deck",
+        "high_school_courseware"
+      ],
+      "query_terms": [
+        "conclusion first",
+        "research finding",
+        "evidence",
+        "上标题下主图",
+        "结论先行"
+      ]
+    },
+    {
+      "id": "ITL11",
+      "name_zh": "杂志封面式大字压图",
+      "name_en": "Magazine Cover Typography Over Image",
+      "master_group": "hero_image",
+      "structure": "Person or product image with very large display typography interacting with the subject.",
+      "use_for": [
+        "品牌",
+        "消费品",
+        "活动主视觉",
+        "年度报告封面"
+      ],
+      "font_size": {
+        "title_pt": "72-120",
+        "subtitle_pt": "16-22"
+      },
+      "image_role": [
+        "person",
+        "product",
+        "brand"
+      ],
+      "rules": [
+        "Title may break across lines and span the image.",
+        "Do not cover face, product core, or identifying details.",
+        "Use only when image quality and typeface personality are strong."
+      ],
+      "avoid": [
+        "information-heavy pages",
+        "low-resolution image",
+        "font without editorial character"
+      ],
+      "layout_pattern_mappings": [
+        "L04",
+        "L01"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "talk_deck",
+        "html_preview"
+      ],
+      "query_terms": [
+        "magazine cover",
+        "big type",
+        "fashion",
+        "年度报告封面",
+        "杂志封面",
+        "大字压图"
+      ]
+    },
+    {
+      "id": "ITL12",
+      "name_zh": "金句/证言 + 人物图",
+      "name_en": "Quote/Testimonial + Portrait",
+      "master_group": "editorial",
+      "structure": "One side carries a portrait or scene; the other side carries a large pull quote.",
+      "use_for": [
+        "客户证言",
+        "用户洞察",
+        "CEO 观点",
+        "研究访谈"
+      ],
+      "font_size": {
+        "quote_pt": "36-56",
+        "attribution_pt": "16-20"
+      },
+      "image_role": [
+        "person",
+        "case_context"
+      ],
+      "rules": [
+        "Quote should be no more than two lines where possible.",
+        "Portrait gaze should ideally face the quote.",
+        "Attribution should be clear but secondary."
+      ],
+      "avoid": [
+        "long quote blocks",
+        "portrait looking away from the message",
+        "fake testimonials"
+      ],
+      "layout_pattern_mappings": [
+        "L34",
+        "L05"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "business_report",
+        "talk_deck"
+      ],
+      "query_terms": [
+        "quote",
+        "testimonial",
+        "interview",
+        "CEO",
+        "金句",
+        "证言",
+        "人物图"
+      ]
+    },
+    {
+      "id": "ITL13",
+      "name_zh": "Before / After 对比",
+      "name_en": "Before / After Comparison",
+      "master_group": "evidence",
+      "structure": "Two matched images side by side with a conclusion at the top or center.",
+      "use_for": [
+        "改版前后",
+        "增长前后",
+        "方案对比",
+        "问题/解决方案"
+      ],
+      "font_size": {
+        "title_pt": "32-44",
+        "label_pt": "18-22"
+      },
+      "image_role": [
+        "evidence",
+        "comparison"
+      ],
+      "rules": [
+        "Use identical aspect ratios and matching label positions.",
+        "Use arrows, circles, or callouts only for the differences that matter.",
+        "Declare the contrast axis in the title or subtitle."
+      ],
+      "avoid": [
+        "comparing images with unrelated visual styles",
+        "unlabeled two-column comparison"
+      ],
+      "layout_pattern_mappings": [
+        "L10",
+        "L21",
+        "L08"
+      ],
+      "recommended_routes": [
+        "business_report",
+        "pptx_beautify",
+        "talk_deck"
+      ],
+      "query_terms": [
+        "before after",
+        "comparison",
+        "old new",
+        "改版前后",
+        "前后对比",
+        "方案对比"
+      ]
+    },
+    {
+      "id": "ITL14",
+      "name_zh": "三图卡片",
+      "name_en": "Three Image Cards",
+      "master_group": "evidence",
+      "structure": "Three equal-width image cards, each with title and one-line explanation.",
+      "use_for": [
+        "三大功能",
+        "三类用户",
+        "三种场景",
+        "三项成果"
+      ],
+      "font_size": {
+        "page_title_pt": "34-46",
+        "card_title_pt": "20-26",
+        "description_pt": "16-20"
+      },
+      "image_role": [
+        "scenario",
+        "evidence",
+        "gallery"
+      ],
+      "rules": [
+        "All three images must share aspect ratio, crop logic, and tonal treatment.",
+        "Each card should carry one idea.",
+        "Use when the number three is real, not arbitrary."
+      ],
+      "avoid": [
+        "turning every slide into three cards",
+        "mismatched crop ratios"
+      ],
+      "layout_pattern_mappings": [
+        "L06",
+        "L22"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "business_report",
+        "high_school_courseware"
+      ],
+      "query_terms": [
+        "three cards",
+        "three features",
+        "scenario",
+        "三图",
+        "三大功能",
+        "三类用户"
+      ]
+    },
+    {
+      "id": "ITL15",
+      "name_zh": "多图拼贴 / Moodboard",
+      "name_en": "Multi-Image Collage / Moodboard",
+      "master_group": "editorial",
+      "structure": "2x2, 3x2, or masonry collage with one dominant image and a title.",
+      "use_for": [
+        "品牌风格",
+        "用户场景",
+        "空间设计",
+        "活动回顾",
+        "趋势调研"
+      ],
+      "font_size": {
+        "title_pt": "36-52",
+        "label_pt": "12-16"
+      },
+      "image_role": [
+        "moodboard",
+        "scenario",
+        "portfolio"
+      ],
+      "rules": [
+        "There must be one largest primary image.",
+        "Supporting images should share tone and crop logic.",
+        "Use collage to express a field, mood, or scene family, not random decoration."
+      ],
+      "avoid": [
+        "randomly stacked images",
+        "all images same visual weight",
+        "labels too small to read"
+      ],
+      "layout_pattern_mappings": [
+        "L22",
+        "L04"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "talk_deck",
+        "html_preview"
+      ],
+      "query_terms": [
+        "moodboard",
+        "collage",
+        "gallery",
+        "trend",
+        "拼贴",
+        "品牌风格",
+        "多图"
+      ]
+    },
+    {
+      "id": "ITL16",
+      "name_zh": "时间线图文",
+      "name_en": "Image Timeline",
+      "master_group": "evidence",
+      "structure": "Horizontal or vertical timeline; each node carries a small image, title, and short description.",
+      "use_for": [
+        "项目进度",
+        "用户旅程",
+        "发展历程",
+        "流程介绍"
+      ],
+      "font_size": {
+        "title_pt": "34-46",
+        "node_title_pt": "18-22",
+        "description_pt": "14-18"
+      },
+      "image_role": [
+        "step",
+        "milestone",
+        "journey"
+      ],
+      "rules": [
+        "3-5 nodes are the safest range.",
+        "All node images should share aspect ratio.",
+        "Split into multiple slides when more than five nodes are needed."
+      ],
+      "avoid": [
+        "timeline used for non-sequential content",
+        "tiny unreadable node text"
+      ],
+      "layout_pattern_mappings": [
+        "L15",
+        "L13"
+      ],
+      "recommended_routes": [
+        "business_report",
+        "high_school_courseware",
+        "talk_deck"
+      ],
+      "query_terms": [
+        "timeline",
+        "journey",
+        "process",
+        "milestone",
+        "时间线",
+        "用户旅程",
+        "流程"
+      ]
+    },
+    {
+      "id": "ITL17",
+      "name_zh": "中心物体 + 环绕标注",
+      "name_en": "Central Object + Callouts",
+      "master_group": "product",
+      "structure": "A product, building, system diagram, or person sits in the center; callouts surround it.",
+      "use_for": [
+        "产品拆解",
+        "技术架构",
+        "空间说明",
+        "功能解释"
+      ],
+      "font_size": {
+        "title_pt": "32-44",
+        "callout_pt": "16-20"
+      },
+      "image_role": [
+        "product",
+        "object",
+        "system"
+      ],
+      "rules": [
+        "Center object should occupy 40-55% of the canvas.",
+        "Callout lines must not cross.",
+        "Each callout should stay within two lines."
+      ],
+      "avoid": [
+        "crossing leader lines",
+        "too many callouts",
+        "labels covering the object core"
+      ],
+      "layout_pattern_mappings": [
+        "L24",
+        "L33"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "business_report",
+        "high_school_courseware",
+        "talk_deck"
+      ],
+      "query_terms": [
+        "callout",
+        "product breakdown",
+        "architecture",
+        "中心物体",
+        "环绕标注",
+        "功能解释"
+      ]
+    },
+    {
+      "id": "ITL18",
+      "name_zh": "截图 + 步骤注释",
+      "name_en": "Screenshot + Step Annotations",
+      "master_group": "product",
+      "structure": "A large cropped screenshot occupies 65-80%; numbered dots, arrows, or zoom boxes explain 3-5 points.",
+      "use_for": [
+        "SaaS 产品",
+        "操作流程",
+        "后台系统",
+        "App 功能介绍"
+      ],
+      "font_size": {
+        "title_pt": "32-44",
+        "step_label_pt": "16-20"
+      },
+      "image_role": [
+        "screenshot",
+        "step",
+        "evidence"
+      ],
+      "rules": [
+        "Crop away irrelevant browser/app chrome first.",
+        "Keep only 3-5 annotations.",
+        "Use local zooms when the full screenshot would become unreadable."
+      ],
+      "avoid": [
+        "full webpage shrunk to unreadable size",
+        "annotation clutter",
+        "arrows crossing text"
+      ],
+      "layout_pattern_mappings": [
+        "L33",
+        "L07",
+        "L03"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "business_report",
+        "high_school_courseware",
+        "pptx_beautify"
+      ],
+      "query_terms": [
+        "screenshot",
+        "annotation",
+        "SaaS",
+        "app demo",
+        "截图",
+        "步骤注释",
+        "功能演示"
+      ]
+    },
+    {
+      "id": "ITL19",
+      "name_zh": "产品主图 + 参数/卖点栏",
+      "name_en": "Product Hero + Spec/Benefit Rail",
+      "master_group": "product",
+      "structure": "Large product cutout/render plus a left or right rail of specs, benefits, and key numbers.",
+      "use_for": [
+        "新品发布",
+        "解决方案页",
+        "销售材料"
+      ],
+      "font_size": {
+        "title_pt": "44-64",
+        "core_number_pt": "48-80",
+        "spec_pt": "18-24"
+      },
+      "image_role": [
+        "product",
+        "hero_object"
+      ],
+      "rules": [
+        "Product image should occupy at least 45% of slide width.",
+        "Benefit/spec rail should contain no more than four items.",
+        "Align the rail strictly."
+      ],
+      "avoid": [
+        "specs scattered around the slide",
+        "small product image with many badges"
+      ],
+      "layout_pattern_mappings": [
+        "L02",
+        "L07",
+        "L03"
+      ],
+      "recommended_routes": [
+        "brand_release",
+        "business_report"
+      ],
+      "query_terms": [
+        "product hero",
+        "spec",
+        "benefit rail",
+        "launch",
+        "产品主图",
+        "参数",
+        "卖点栏"
+      ]
+    },
+    {
+      "id": "ITL20",
+      "name_zh": "数据/证据 + 情境图",
+      "name_en": "Data/Evidence + Context Image",
+      "master_group": "evidence",
+      "structure": "A core number or chart is paired with a supporting photo/screenshot and one conclusion.",
+      "use_for": [
+        "商业汇报",
+        "市场洞察",
+        "研究发现",
+        "影响力展示"
+      ],
+      "font_size": {
+        "core_number_pt": "54-90",
+        "conclusion_title_pt": "32-44",
+        "support_pt": "16-20"
+      },
+      "image_role": [
+        "context",
+        "evidence",
+        "screenshot"
+      ],
+      "rules": [
+        "Data is the protagonist; the image only supplies context.",
+        "Chart labels should stay at least 16-18pt for projected decks.",
+        "Use one conclusion sentence, not a list of generic implications."
+      ],
+      "avoid": [
+        "image stealing attention from the number/chart",
+        "unreadable chart labels",
+        "data with no source note in sidecar artifacts"
+      ],
+      "layout_pattern_mappings": [
+        "L20",
+        "L19",
+        "L03"
+      ],
+      "recommended_routes": [
+        "business_report",
+        "talk_deck"
+      ],
+      "query_terms": [
+        "data",
+        "chart",
+        "evidence",
+        "insight",
+        "market",
+        "数据洞察",
+        "商业汇报",
+        "情境图"
+      ]
+    }
+  ]
+}
