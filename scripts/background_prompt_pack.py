@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a 3-5 item atmosphere-only background prompt pack."""
+"""Create a five-item atmosphere-only background prompt pack."""
 
 from __future__ import annotations
 
@@ -11,9 +11,9 @@ from pathlib import Path
 
 ROLES = [
     ("cover_atmosphere", "quiet opening atmosphere with soft depth and no layout objects"),
-    ("dark_gradient", "dark atmospheric color wash for evidence slides"),
-    ("light_gradient", "light paper-like color wash for dense readable slides"),
-    ("abstract_texture", "neutral abstract texture with subtle material depth"),
+    ("dark_evidence", "dark atmospheric color wash for high-impact evidence slides"),
+    ("light_evidence", "light paper-like color wash for dense readable evidence slides"),
+    ("diagram_focus", "neutral abstract depth for architecture or process slides"),
     ("closing_atmosphere", "quiet closing atmosphere with subtle momentum"),
 ]
 
@@ -53,7 +53,10 @@ def build_prompt(subject: str, route: str, role: str, role_goal: str, accent: st
     return (
         f"Create a quiet 16:9 presentation background for a {route} deck about {subject}. "
         f"Role: {role} - {role_goal}. "
-        f"Use only atmosphere: color fields, soft gradients, diffuse glow, subtle grain, and restrained abstract decoration. "
+        "The image must support the deck content, not act as generic decoration. "
+        f"Semantic anchor: use concrete objects, spaces, materials, era cues, or mechanisms connected to {subject}; "
+        "avoid style-only wallpaper and random futuristic linework. "
+        f"Use only atmosphere: color fields, soft gradients, diffuse glow, subtle grain, and restrained topic-specific material. "
         f"Use a neutral base and one restrained {accent} accent only. "
         "Do not create slide structure. No boxes, rectangles, cards, panels, frames, windows, placeholders, "
         "chart areas, image slots, UI containers, text blocks, labels, diagrams, mockups, screenshots, logos, or icons. "
@@ -69,6 +72,9 @@ def create_pack(subject: str, route: str, accent: str, count: int) -> dict:
         prompts.append(
             {
                 "role": role,
+                "content_link": f"Deck-level {role} background supporting {subject}; refine per slide before final-quality use.",
+                "background_duty": role_goal,
+                "semantic_anchor": f"Concrete source/topic material tied to {subject}, not generic abstract decoration.",
                 "size": "16:9",
                 "recommended_pixels": "1920x1080",
                 "prompt": build_prompt(subject, route, role, role_goal, accent),
@@ -87,7 +93,7 @@ def create_pack(subject: str, route: str, accent: str, count: int) -> dict:
             "accent": accent,
         },
         "prompts": prompts,
-        "use_policy": "Generate these with Codex image generation when available; save outputs under assets/backgrounds/ and record paths in visual_contract.json. These images are atmosphere-only; all slide elements remain editable foreground objects.",
+        "use_policy": "Generate these backgrounds with Codex image generation when available; save outputs under assets/backgrounds/ and record paths in visual_contract.json. Select by slide role: cover/closing atmosphere for statement pages, dark evidence for benchmark proof, light evidence for dense charts, and diagram focus for architecture/process pages. For final-quality decks, refine each selected image with slide-level content_link, background_duty, and semantic_anchor before generation. These images are atmosphere-only; all slide elements remain editable foreground objects.",
         "fallback_policy": "If image generation is unavailable, use neutral solid/gradient surfaces only; do not replace with boxes, panels, decorative lines, grids, or fake layout containers.",
     }
 
@@ -97,7 +103,7 @@ def main() -> None:
     parser.add_argument("--subject", required=True, help="Deck subject or theme.")
     parser.add_argument("--route", default="talk_deck", help="Deck route, such as brand_release or talk_deck.")
     parser.add_argument("--accent", default="cyan", help="Single accent color name, such as cyan or red.")
-    parser.add_argument("--count", type=int, default=5, help="Number of prompts, clamped to 3-5.")
+    parser.add_argument("--count", type=int, default=5, help="Number of prompts; default 5, clamped to 3-5.")
     parser.add_argument("--output", "-o", help="Write JSON prompt pack to this path.")
     args = parser.parse_args()
 

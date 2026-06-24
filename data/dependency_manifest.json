@@ -4,14 +4,71 @@
   "python": {
     "minimum": "3.10",
     "requirements": "requirements.txt",
-    "install": "python3 scripts/bootstrap.py --install-python"
+    "core_packages": [
+      {
+        "package": "python-pptx",
+        "used_for": "Low-complexity fallback editable PPTX generation, native PPTX package assembly support, and visible-text QA in scripts/pptx_from_slide_plan.py, scripts/svg_to_pptx.py, and scripts/pptx_text_check.py."
+      },
+      {
+        "package": "Pillow",
+        "used_for": "Thumbnail contact-sheet generation in scripts/pptx_preview.py, scripts/svg_preview.py, and image utilities."
+      },
+      {
+        "package": "playwright",
+        "used_for": "Browser-accurate SVG screenshot previews in scripts/svg_preview.py, formal HTML screenshot QA in scripts/export_bundle.py, and optional JS-heavy source capture."
+      },
+      {
+        "package": "openai",
+        "used_for": "Optional explicit real image generation in scripts/run_image_generation.py when the operator provides an API key environment variable. Dry-run planning does not require a key."
+      }
+    ],
+    "install": "python3 scripts/bootstrap.py --install-python",
+    "optional_enhancements": [
+      {
+        "package": "markitdown",
+        "used_for": "Stronger Office document conversion, image OCR when configured, and mixed-source intake in scripts/source_to_markdown.py.",
+        "install": "python3 -m pip install markitdown"
+      },
+      {
+        "package": "cairosvg",
+        "used_for": "Optional high-quality SVG-to-PNG fallback images for Office compatibility mode in scripts/svg_to_pptx.py.",
+        "install": "python3 -m pip install cairosvg"
+      },
+      {
+        "package": "svglib reportlab",
+        "used_for": "Optional fallback SVG-to-PNG renderer when CairoSVG is unavailable.",
+        "install": "python3 -m pip install svglib reportlab"
+      },
+      {
+        "package": "wechat-article-to-markdown",
+        "used_for": "Optional WeChat public-account article extraction with Markdown output and local image downloads when generic URL extraction is weak.",
+        "install": "uv tool install wechat-article-to-markdown or pipx install wechat-article-to-markdown"
+      },
+      {
+        "package": "crawl4ai aiohttp",
+        "used_for": "Optional route for WeChat article crawling projects that need rendered pages, MicroMessenger UA, and hotlink-safe image downloads.",
+        "install": "python3 -m pip install crawl4ai aiohttp && crawl4ai-setup"
+      }
+    ]
   },
   "external_tools": [
     {
-      "name": "LibreOffice",
+      "name": "Node.js",
       "required": false,
+      "commands": ["node", "npm", "npx"],
+      "used_for": "Optional CSS/Canvas/WebGL procedural background rendering for HTML previews or static raster export.",
+      "macos_install": "brew install node",
+      "ubuntu_install": "sudo apt-get install nodejs npm"
+    },
+    {
+      "name": "LibreOffice",
+      "required": true,
       "commands": ["soffice", "libreoffice"],
       "used_for": "PPTX to PDF/image preview conversion and native export checks when PowerPoint/Keynote are unavailable.",
+      "homepage": "https://www.libreoffice.org/",
+      "download_url": "https://www.libreoffice.org/download/",
+      "official_download_note": "Use this official LibreOffice download page when Homebrew/apt is unavailable or an agent cannot install system packages.",
+      "agent_install_policy": "Agent may run the declared package-manager install command after the user asks to set up qiaomu-ppt dependencies. Prefer package managers over direct DMG/manual downloads.",
       "macos_install": "brew install --cask libreoffice",
       "ubuntu_install": "sudo apt-get install libreoffice"
     },
@@ -37,17 +94,58 @@
       "commands": ["playwright"],
       "used_for": "Optional login/JS-heavy page capture when direct URL ingestion is blocked.",
       "install": "python3 -m pip install playwright && python3 -m playwright install chromium"
+    },
+    {
+      "name": "Keynote",
+      "required": false,
+      "commands": ["osascript"],
+      "used_for": "Optional macOS Keynote import/save verification, .key delivery through scripts/export_bundle.py, Keynote 09 fallback export, and staged failure diagnosis plus minimal PPTX baseline control through scripts/keynote_probe.py.",
+      "macos_install": "Install Keynote from the Mac App Store.",
+      "agent_install_policy": "Agent may attempt AppleScript automation only when Keynote.app is installed. If automation is blocked, times out, or cannot refresh a stale .key package to be at least as fresh as the current PPTX, record Keynote as failed or missing evidence in export_manifest.json."
+    },
+    {
+      "name": "Archive extractor",
+      "required": false,
+      "commands": ["bsdtar", "7zz", "7z"],
+      "used_for": "Optional repair downloads for 7z-packaged font families such as Sarasa Gothic.",
+      "macos_install": "brew install libarchive or brew install p7zip",
+      "ubuntu_install": "sudo apt-get install libarchive-tools or sudo apt-get install p7zip-full"
     }
   ],
   "fonts": {
     "manifest": "data/font_manifest.json",
     "download": "python3 scripts/bootstrap.py --download-fonts",
-    "note": "Font binaries are not committed by default to keep the repository small; they are declared and downloadable."
+    "note": "The curated PPT font kit is declared in the manifest and can be bundled or repaired with the download command."
+  },
+  "optional_procedural_background_engines": {
+    "self_contained_default": "scripts/procedural_background_pack.py generates deterministic SVG assets without Node.js.",
+    "html_preview_candidates": [
+      "CSS gradients and filters",
+      "canvas-sketch",
+      "p5.js",
+      "Pts.js",
+      "Paper.js",
+      "Two.js",
+      "Zdog",
+      "Simplex-noise",
+      "Noise.js",
+      "GLSL Canvas",
+      "Regl",
+      "OGL",
+      "Curtains.js",
+      "Motion Canvas",
+      "Theatre.js",
+      "Anime.js"
+    ],
+    "policy": "Optional JS libraries are allowed for project-specific HTML previews, but public qiaomu-ppt output must still degrade to deterministic SVG/Python backgrounds."
   },
   "degradation_policy": [
     "If Python URL packages are missing, run scripts/bootstrap.py --install-python or use direct Markdown/local files.",
-    "If LibreOffice is missing, do not claim PPTX-to-PDF preview verification.",
+    "If image generation is unavailable, run scripts/procedural_background_pack.py and record procedural_fallback_policy in visual_contract.json.",
+    "If Node.js is missing, use deterministic SVG/Python procedural backgrounds instead of Canvas/WebGL.",
+    "If LibreOffice is missing, run scripts/bootstrap.py --install-system and rerun scripts/bootstrap.py --check before claiming PPTX-to-PDF preview verification.",
     "If Poppler is missing, use pypdf fallback for PDF text extraction and mark layout fidelity as missing evidence.",
-    "If fonts are missing, use system CJK fonts and record typography as missing evidence for exact rendering."
+    "If fonts are missing, use system CJK and Latin fonts and record typography as missing evidence for exact rendering.",
+    "If Keynote.app or AppleScript automation is unavailable, still deliver PPTX/PDF/HTML where possible and record the Keynote gap in export_manifest.json."
   ]
 }

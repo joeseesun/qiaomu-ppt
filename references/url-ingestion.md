@@ -9,6 +9,11 @@ Use this when the user says something like:
 
 The workflow is inspired by `qiaomu-markdown-proxy`, but this skill is self-contained and does not depend on that external skill at runtime.
 
+For mixed source packets, Feishu exports, EPUB books, Office files, folders, ZIP
+archives, or image/OCR sources, use [source-intake-method.md](source-intake-method.md)
+and `scripts/source_to_markdown.py` instead. This file documents the lightweight
+URL/PDF path.
+
 ## Route
 
 1. Detect URLs before planning.
@@ -31,7 +36,7 @@ python3 <skill>/scripts/url_to_markdown.py "<url>" --output-dir <project>/source
 | remote PDF | downloads and extracts text with `pdftotext` or `pypdf` when available | keep PDF path in manifest |
 | local PDF | extract text with `pdftotext` or `pypdf` | path is recorded |
 | WeChat / login pages | try general route, then mark missing evidence if blocked | do not pretend login-only content was fetched |
-| Feishu/Lark docs | require user-provided exported content or credentials | do not publish private credentials |
+| Feishu/Lark docs | use `source_to_markdown.py` with exported files, or an authenticated connector route | do not pretend private docs were fetched from a bare link |
 
 ## Source Manifest
 

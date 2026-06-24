@@ -6,18 +6,20 @@
     "copy",
     "courseware",
     "editable",
+    "paper",
     "ppt",
     "qiaomu",
     "skill",
     "speaker",
     "style",
     "url",
+    "wechat",
     "workflow"
   ],
   "missing_description_concepts": [],
   "summary": {
-    "total": 16,
-    "passed": 16,
+    "total": 18,
+    "passed": 18,
     "false_positive": 0,
     "false_negative": 0,
     "pass_rate": 1.0
@@ -148,6 +150,33 @@
           "url"
         ],
         "negative_pattern": null
+      },
+      {
+        "prompt": "把这篇 Hugging Face paper 做成 PPT，先从 arXiv TeX 里提取图表。",
+        "family": "paper_to_ppt",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "paper",
+          "ppt"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "根据这个微信公众号链接做一份 PPT，文章图片也要抓取。",
+        "family": "wechat_article_to_ppt",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.6,
+        "matched_concepts": [
+          "ppt",
+          "url",
+          "wechat"
+        ],
+        "negative_pattern": null
       }
     ],
     "should_not_trigger": [
@@ -167,11 +196,12 @@
         "expected_trigger": false,
         "predicted_trigger": false,
         "passed": true,
-        "score": 0.2,
+        "score": 0.4,
         "matched_concepts": [
-          "ppt"
+          "ppt",
+          "wechat"
         ],
-        "negative_pattern": null
+        "negative_pattern": "不需要 ppt"
       },
       {
         "prompt": "给我生成一张小红书封面图，不做 PPT。",
@@ -223,7 +253,7 @@
           "skill",
           "url"
         ],
-        "negative_pattern": "不需要 pptx"
+        "negative_pattern": "不需要 ppt"
       },
       {
         "prompt": "用 humanize-ppt 先做演讲体检，不要生成幻灯片。",

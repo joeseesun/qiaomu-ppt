@@ -1,0 +1,4342 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-06-20",
+  "source": {
+    "repo": "hugohe3/ppt-master",
+    "examples_dir": "research/ppt-master/examples",
+    "examples_json": "research/ppt-master/examples/examples.json",
+    "online_gallery": "https://hugohe3.github.io/ppt-master/index.html",
+    "online_examples_json": "https://hugohe3.github.io/ppt-master/examples/examples.json",
+    "boundary": "Learning catalog only. Do not copy upstream templates, images, exact wording, or code into Qiaomu-generated decks."
+  },
+  "upstream_stats": {
+    "examples": 21,
+    "pages": 280,
+    "templates": 21
+  },
+  "catalog_stats": {
+    "projects": 21,
+    "slides": 280,
+    "svg_final_files": 280,
+    "image_files": 260,
+    "export_files": 21,
+    "notes_files": 301,
+    "style_counts": {
+      "Academic Blueprint": 1,
+      "Blueprint Technical": 1,
+      "Brutalist Newspaper": 1,
+      "Architecture Editorial": 1,
+      "Bloomberg Editorial": 1,
+      "Swiss Typographic": 1,
+      "Glassmorphism SaaS": 1,
+      "Memphis / Pop": 1,
+      "Risograph Zine": 1,
+      "Engineering Blueprint": 1,
+      "Editorial Magazine": 1,
+      "Chinese Ink Aesthetic": 1,
+      "Editorial Showcase": 1,
+      "General + Dark Tech": 2,
+      "Luxury Editorial": 1,
+      "Magazine Editorial": 1,
+      "Top Consulting": 1,
+      "建筑人文纪念": 1,
+      "博物馆展陈风": 1,
+      "东方文化叙事": 1
+    },
+    "learning_tag_counts": {
+      "chart-rich": 8,
+      "technical-evidence": 5,
+      "magazine-editorial": 11,
+      "report-and-data": 4,
+      "architecture-and-humanities": 4,
+      "image-rich": 6,
+      "expressive-culture": 4,
+      "eastern-cultural-narrative": 2,
+      "layout-pattern-showcase": 1
+    }
+  },
+  "projects": [
+    {
+      "id": "ppt169_attention_is_all_you_need",
+      "title": "Attention Is All You Need",
+      "description": "Transformer 原论文深读 — 学术技术蓝图风，结构图 + 表格 + 公式 + 自定义动画旁白版导出",
+      "style": "technical",
+      "style_name": "Academic Blueprint",
+      "tags": [
+        "Paper Reading",
+        "Transformer",
+        "Technical Blueprint"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_attention_is_all_you_need",
+      "qiaomu_learning_tags": [
+        "chart-rich",
+        "technical-evidence"
+      ],
+      "slide_count": 16,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "Attention Is All You Need"
+        },
+        {
+          "file": "02_why_it_matters.svg",
+          "title": "why it matters",
+          "desc": "A simpler model, better results, less training"
+        },
+        {
+          "file": "03_sequence_evolution.svg",
+          "title": "sequence evolution",
+          "desc": "From recurrent chains to attention mesh"
+        },
+        {
+          "file": "04_rnn_cnn_limits.svg",
+          "title": "rnn cnn limits",
+          "desc": "Sequential bottleneck, path length, memory ceiling"
+        },
+        {
+          "file": "05_architecture_overview.svg",
+          "title": "architecture overview",
+          "desc": "Figure 1 Transformer architecture"
+        },
+        {
+          "file": "06_encoder_decoder.svg",
+          "title": "encoder decoder",
+          "desc": "Encoder stack vs decoder stack"
+        },
+        {
+          "file": "07_scaled_dot_product.svg",
+          "title": "scaled dot-product",
+          "desc": "The attention equation"
+        },
+        {
+          "file": "08_multi_head_attention.svg",
+          "title": "multi-head attention",
+          "desc": "Eight parallel attention heads"
+        },
+        {
+          "file": "09_three_uses.svg",
+          "title": "three uses",
+          "desc": "Encoder self, decoder masked, cross attention"
+        },
+        {
+          "file": "10_ffn_residual_layernorm.svg",
+          "title": "ffn residual layernorm",
+          "desc": "The supporting layer components"
+        },
+        {
+          "file": "11_positional_encoding.svg",
+          "title": "positional encoding",
+          "desc": "Sinusoidal order injection"
+        },
+        {
+          "file": "12_complexity_table.svg",
+          "title": "complexity table",
+          "desc": "Why constant path length matters"
+        },
+        {
+          "file": "13_training_setup.svg",
+          "title": "training setup",
+          "desc": "Hardware, schedule, optimizer, regularization"
+        },
+        {
+          "file": "14_results.svg",
+          "title": "results",
+          "desc": "WMT14 BLEU and training cost"
+        },
+        {
+          "file": "15_ablations.svg",
+          "title": "ablations",
+          "desc": "Five takeaways from the variation study"
+        },
+        {
+          "file": "16_conclusion.svg",
+          "title": "conclusion",
+          "desc": "One paper, a generation of models"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_attention_is_all_you_need/README.md",
+        "design_spec": "examples/ppt169_attention_is_all_you_need/design_spec.md",
+        "spec_lock": "examples/ppt169_attention_is_all_you_need/spec_lock.md",
+        "animations": "examples/ppt169_attention_is_all_you_need/animations.json",
+        "image_analysis": "examples/ppt169_attention_is_all_you_need/image_analysis.csv",
+        "svg_final_dir": "examples/ppt169_attention_is_all_you_need/svg_final",
+        "images_dir": "examples/ppt169_attention_is_all_you_need/images",
+        "exports": [
+          "examples/ppt169_attention_is_all_you_need/exports/attention_is_all_you_need_narrated.pptx"
+        ],
+        "notes_dir": "examples/ppt169_attention_is_all_you_need/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 16,
+        "image_files": 11,
+        "export_files": 1,
+        "notes_files": 17,
+        "spec_image_refs": 11
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#FFFFFF",
+          "bg_secondary": "#F5F7FA",
+          "primary": "#1A365D",
+          "accent": "#3182CE",
+          "secondary_accent": "#63B3ED",
+          "text": "#1A202C",
+          "text_secondary": "#4A5568",
+          "text_tertiary": "#A0AEC0",
+          "border": "#E2E8F0",
+          "accent_tint": "#EBF4FB",
+          "success": "#2F855A",
+          "warning": "#C53030",
+          "image_rendering": "blueprint",
+          "image_palette": "cool-corporate"
+        },
+        "image_rendering": "blueprint",
+        "image_palette": "cool-corporate",
+        "typography": {
+          "title_family": "Georgia, \"Microsoft YaHei\", serif",
+          "body_family": "Arial, \"Microsoft YaHei\", \"PingFang SC\", sans-serif",
+          "font_family": "Arial, \"Microsoft YaHei\", \"PingFang SC\", sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-outline",
+        "icon_inventory_count": 16,
+        "page_rhythm_counts": {
+          "anchor": 2,
+          "dense": 12,
+          "breathing": 2
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "dense",
+          "P03": "breathing",
+          "P04": "dense",
+          "P05": "dense",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "dense",
+          "P10": "dense",
+          "P11": "breathing",
+          "P12": "dense",
+          "P13": "dense",
+          "P14": "dense",
+          "P15": "dense",
+          "P16": "anchor"
+        },
+        "page_chart_counts": {
+          "kpi_cards": 2,
+          "vertical_pillars": 2,
+          "comparison_columns": 1,
+          "module_composition": 1,
+          "basic_table": 2,
+          "vertical_list": 1
+        },
+        "page_charts": {
+          "P02": "kpi_cards",
+          "P04": "vertical_pillars",
+          "P06": "comparison_columns",
+          "P09": "vertical_pillars",
+          "P10": "module_composition",
+          "P12": "basic_table",
+          "P13": "kpi_cards",
+          "P14": "basic_table",
+          "P15": "vertical_list"
+        },
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text — write as raw Unicode; XML reserved chars `& < > \" '` escaped as `&amp; &lt; &gt; &quot; &apos;`"
+        ]
+      },
+      "design_spec_headings": [
+        "attention_is_all_you_need — Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "AI Image Strategy",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Size Hierarchy",
+        "Formula Rendering Policy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library (combine or break as content demands)",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: Opening",
+        "Slide 01 — Cover",
+        "Slide 02 — Why this paper matters"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        "object animation sidecar"
+      ]
+    },
+    {
+      "id": "ppt169_lora_hu_2021",
+      "title": "LoRA Hu 2021",
+      "description": "LoRA 论文解读 — 冷静技术蓝图风，结构图 + 表格 + KPI 卡片 + 自定义动画旁白版导出",
+      "style": "technical",
+      "style_name": "Blueprint Technical",
+      "tags": [
+        "Paper Reading",
+        "LLM",
+        "Technical Blueprint"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_lora_hu_2021",
+      "qiaomu_learning_tags": [
+        "chart-rich",
+        "technical-evidence"
+      ],
+      "slide_count": 15,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "LoRA: 大模型的低秩适配"
+        },
+        {
+          "file": "02_agenda.svg",
+          "title": "agenda",
+          "desc": "本次讲什么"
+        },
+        {
+          "file": "03_problem.svg",
+          "title": "problem",
+          "desc": "模型越大, 全量微调越不可行"
+        },
+        {
+          "file": "04_limitations.svg",
+          "title": "limitations",
+          "desc": "为什么现有高效适配方法不够好"
+        },
+        {
+          "file": "05_insight.svg",
+          "title": "low-rank insight",
+          "desc": "权重更新其实低秩"
+        },
+        {
+          "file": "06_method.svg",
+          "title": "method",
+          "desc": "冻结 W0, 注入低秩 BA"
+        },
+        {
+          "file": "07_implementation.svg",
+          "title": "implementation",
+          "desc": "一个常数 alpha, 一次部署合并"
+        },
+        {
+          "file": "08_transformer.svg",
+          "title": "transformer",
+          "desc": "只适配注意力权重"
+        },
+        {
+          "file": "09_advantages.svg",
+          "title": "advantages",
+          "desc": "LoRA 的四个关键优势"
+        },
+        {
+          "file": "10_latency.svg",
+          "title": "latency",
+          "desc": "Adapter 增延迟, LoRA 不增"
+        },
+        {
+          "file": "11_setup.svg",
+          "title": "setup",
+          "desc": "覆盖 NLU 到 NLG 的四类模型"
+        },
+        {
+          "file": "12_glue.svg",
+          "title": "glue",
+          "desc": "更少参数, 持平或更优"
+        },
+        {
+          "file": "13_gpt3.svg",
+          "title": "gpt-3",
+          "desc": "在 175B 尺度上仍然成立"
+        },
+        {
+          "file": "14_understanding.svg",
+          "title": "understanding",
+          "desc": "该适配谁? 秩要多大?"
+        },
+        {
+          "file": "15_conclusion.svg",
+          "title": "conclusion",
+          "desc": "结论与影响"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_lora_hu_2021/README.md",
+        "design_spec": "examples/ppt169_lora_hu_2021/design_spec.md",
+        "spec_lock": "examples/ppt169_lora_hu_2021/spec_lock.md",
+        "animations": "examples/ppt169_lora_hu_2021/animations.json",
+        "image_analysis": "examples/ppt169_lora_hu_2021/image_analysis.csv",
+        "svg_final_dir": "examples/ppt169_lora_hu_2021/svg_final",
+        "images_dir": "examples/ppt169_lora_hu_2021/images",
+        "exports": [
+          "examples/ppt169_lora_hu_2021/exports/lora_hu_2021.pptx"
+        ],
+        "notes_dir": "examples/ppt169_lora_hu_2021/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 15,
+        "image_files": 10,
+        "export_files": 1,
+        "notes_files": 16,
+        "spec_image_refs": 10
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#FFFFFF",
+          "secondary_bg": "#F4F7FA",
+          "primary": "#1B3A5C",
+          "accent": "#E8743B",
+          "secondary_accent": "#3E7CB1",
+          "text": "#1D2733",
+          "text_secondary": "#5B6776",
+          "text_tertiary": "#8A94A1",
+          "border": "#D8DEE6",
+          "success": "#2E7D32",
+          "warning": "#C62828",
+          "tint_primary": "#EAF0F6",
+          "tint_accent": "#FBF0E9",
+          "tint_success": "#EAF6EE",
+          "accent_light": "#EE9461",
+          "secondary_accent_light": "#5C97C7",
+          "cover_dark": "#0F2238",
+          "cover_text": "#CBD8E6",
+          "cover_text_muted": "#9FB2C6",
+          "image_rendering": "blueprint",
+          "image_palette": "cool-corporate"
+        },
+        "image_rendering": "blueprint",
+        "image_palette": "cool-corporate",
+        "typography": {
+          "title_family": null,
+          "body_family": null,
+          "font_family": "\"Microsoft YaHei\", Arial, sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-outline",
+        "icon_inventory_count": 22,
+        "page_rhythm_counts": {
+          "anchor": 3,
+          "breathing": 3,
+          "dense": 9
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "anchor",
+          "P03": "breathing",
+          "P04": "dense",
+          "P05": "breathing",
+          "P06": "breathing",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "dense",
+          "P10": "dense",
+          "P11": "dense",
+          "P12": "dense",
+          "P13": "dense",
+          "P14": "dense",
+          "P15": "anchor"
+        },
+        "page_chart_counts": {
+          "agenda_list": 1,
+          "vertical_list": 2,
+          "icon_grid": 1,
+          "grouped_bar_chart": 1,
+          "basic_table": 2,
+          "consulting_table": 1,
+          "kpi_cards": 1
+        },
+        "page_charts": {
+          "P02": "agenda_list",
+          "P04": "vertical_list",
+          "P09": "icon_grid",
+          "P10": "grouped_bar_chart",
+          "P11": "basic_table",
+          "P12": "consulting_table",
+          "P13": "kpi_cards",
+          "P14": "basic_table",
+          "P15": "vertical_list"
+        },
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text (`&nbsp;`, `&mdash;`, `&copy;` …) — write raw Unicode; escape `& < > \" '` as `&amp; &lt; &gt; &quot; &apos;`"
+        ]
+      },
+      "design_spec_headings": [
+        "LoRA: Low-Rank Adaptation of Large Language Models - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "AI Image Strategy",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library(按信息权重组合)",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 引入与问题",
+        "Slide 01 - Cover",
+        "Slide 02 - 演示路线"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        "object animation sidecar"
+      ]
+    },
+    {
+      "id": "ppt169_brutalist_ai_newspaper_2026",
+      "title": "Brutalist AI Newspaper 2026",
+      "description": "AI 行业 2026 年报 — Brutalist 报章风格，满版小字 + 数据网格 + halftone 黑白图 + 单点红",
+      "style": "editorial",
+      "style_name": "Brutalist Newspaper",
+      "tags": [
+        "Brutalist",
+        "Newspaper",
+        "Annual Report"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_brutalist_ai_newspaper_2026",
+      "qiaomu_learning_tags": [
+        "chart-rich",
+        "magazine-editorial",
+        "report-and-data",
+        "technical-evidence"
+      ],
+      "slide_count": 10,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "cover"
+        },
+        {
+          "file": "02_issue_at_a_glance.svg",
+          "title": "issue at a glance",
+          "desc": "issue at a glance"
+        },
+        {
+          "file": "03_revenue_league.svg",
+          "title": "revenue league",
+          "desc": "revenue league"
+        },
+        {
+          "file": "04_arpu_divide.svg",
+          "title": "arpu divide",
+          "desc": "arpu divide"
+        },
+        {
+          "file": "05_training_cost.svg",
+          "title": "training cost",
+          "desc": "training cost"
+        },
+        {
+          "file": "06_inference_watts.svg",
+          "title": "inference watts",
+          "desc": "inference watts"
+        },
+        {
+          "file": "07_benchmarks_saturated.svg",
+          "title": "benchmarks saturated",
+          "desc": "benchmarks saturated"
+        },
+        {
+          "file": "08_three_rulebooks.svg",
+          "title": "three rulebooks",
+          "desc": "three rulebooks"
+        },
+        {
+          "file": "09_timeline.svg",
+          "title": "timeline",
+          "desc": "timeline"
+        },
+        {
+          "file": "10_closing_read.svg",
+          "title": "closing read",
+          "desc": "closing read"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_brutalist_ai_newspaper_2026/README.md",
+        "design_spec": "examples/ppt169_brutalist_ai_newspaper_2026/design_spec.md",
+        "spec_lock": "examples/ppt169_brutalist_ai_newspaper_2026/spec_lock.md",
+        "animations": null,
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_brutalist_ai_newspaper_2026/svg_final",
+        "images_dir": "examples/ppt169_brutalist_ai_newspaper_2026/images",
+        "exports": [
+          "examples/ppt169_brutalist_ai_newspaper_2026/exports/brutalist_ai_newspaper_2026.pptx"
+        ],
+        "notes_dir": "examples/ppt169_brutalist_ai_newspaper_2026/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 10,
+        "image_files": 5,
+        "export_files": 1,
+        "notes_files": 11,
+        "spec_image_refs": 5
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#FFFFFF",
+          "bg_paper": "#F4F1EA",
+          "primary": "#111111",
+          "accent": "#C8102E",
+          "secondary_accent": "#3A3A3A",
+          "text": "#111111",
+          "text_secondary": "#3A3A3A",
+          "text_tertiary": "#6B6B6B",
+          "border": "#000000",
+          "success": "#1A6E3A",
+          "warning": "#A02014",
+          "image_rendering": "editorial",
+          "image_palette": "mono-ink"
+        },
+        "image_rendering": "editorial",
+        "image_palette": "mono-ink",
+        "typography": {
+          "title_family": "Impact, \"Arial Black\", SimHei, sans-serif",
+          "body_family": "\"Times New Roman\", SimSun, serif",
+          "font_family": "\"Times New Roman\", SimSun, serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": null,
+        "icon_inventory_count": 0,
+        "page_rhythm_counts": {
+          "anchor": 1,
+          "dense": 8,
+          "breathing": 1
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "dense",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "dense",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "dense",
+          "P10": "breathing"
+        },
+        "page_chart_counts": {
+          "kpi_cards": 1,
+          "horizontal_bar_chart": 1,
+          "dumbbell_chart": 2,
+          "line_chart": 1,
+          "bar_chart": 1,
+          "comparison_table": 1,
+          "timeline": 1
+        },
+        "page_charts": {
+          "P02": "kpi_cards",
+          "P03": "horizontal_bar_chart",
+          "P04": "dumbbell_chart",
+          "P05": "line_chart",
+          "P06": "bar_chart",
+          "P07": "dumbbell_chart",
+          "P08": "comparison_table",
+          "P09": "timeline"
+        },
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text (`&nbsp;`, `&mdash;`, `&copy;`, `&ndash;`, `&reg;`, `&hellip;`, `&bull;` …) — write as raw Unicode (`—`, `©`, `→`, NBSP, etc.); XML reserved chars `& < > \" '` must be escaped as `&amp; &lt; &gt; &quot; &apos;`"
+        ]
+      },
+      "design_spec_headings": [
+        "ppt169_ai_industry_2026 — Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "AI Image Strategy",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: Masthead",
+        "Slide 01 - Cover (Masthead)",
+        "Part 2: Front Page",
+        "Slide 02 - Issue at a Glance",
+        "Part 3: Lead Story",
+        "Slide 03 - Story I: Revenue League Q1 2026"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_pritzker_2026",
+      "title": "Pritzker 2026",
+      "description": "2026 普利兹克建筑奖深度阅读 — 建筑摄影主导 + 编辑设计",
+      "style": "editorial",
+      "style_name": "Architecture Editorial",
+      "tags": [
+        "Architecture",
+        "Editorial",
+        "Reading Club"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_pritzker_2026",
+      "qiaomu_learning_tags": [
+        "architecture-and-humanities",
+        "image-rich",
+        "magazine-editorial"
+      ],
+      "slide_count": 11,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "cover"
+        },
+        {
+          "file": "02_overview.svg",
+          "title": "overview",
+          "desc": "overview"
+        },
+        {
+          "file": "03_ando.svg",
+          "title": "ando",
+          "desc": "ando"
+        },
+        {
+          "file": "04_chipperfield.svg",
+          "title": "chipperfield",
+          "desc": "chipperfield"
+        },
+        {
+          "file": "05_zaha.svg",
+          "title": "zaha",
+          "desc": "zaha"
+        },
+        {
+          "file": "06_foster.svg",
+          "title": "foster",
+          "desc": "foster"
+        },
+        {
+          "file": "07_oma_sanaa.svg",
+          "title": "oma sanaa",
+          "desc": "oma sanaa"
+        },
+        {
+          "file": "08_zumthor.svg",
+          "title": "zumthor",
+          "desc": "zumthor"
+        },
+        {
+          "file": "09_gehry.svg",
+          "title": "gehry",
+          "desc": "gehry"
+        },
+        {
+          "file": "10_kere.svg",
+          "title": "kere",
+          "desc": "kere"
+        },
+        {
+          "file": "11_epilogue.svg",
+          "title": "epilogue",
+          "desc": "epilogue"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_pritzker_2026/README.md",
+        "design_spec": "examples/ppt169_pritzker_2026/design_spec.md",
+        "spec_lock": "examples/ppt169_pritzker_2026/spec_lock.md",
+        "animations": "examples/ppt169_pritzker_2026/animations.json",
+        "image_analysis": "examples/ppt169_pritzker_2026/image_analysis.csv",
+        "svg_final_dir": "examples/ppt169_pritzker_2026/svg_final",
+        "images_dir": "examples/ppt169_pritzker_2026/images",
+        "exports": [
+          "examples/ppt169_pritzker_2026/exports/pritzker_2026.pptx"
+        ],
+        "notes_dir": "examples/ppt169_pritzker_2026/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 11,
+        "image_files": 25,
+        "export_files": 1,
+        "notes_files": 12,
+        "spec_image_refs": 24
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#F5F2EC",
+          "secondary_bg": "#EDE8DE",
+          "primary": "#1C1C1C",
+          "accent": "#B8935A",
+          "text": "#1C1C1C",
+          "text_secondary": "#5C5852",
+          "text_tertiary": "#8B8680",
+          "border": "#D4CFC4",
+          "accent_light": "#E8C788",
+          "scrim": "#0A0A0A"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": "Georgia, \"Microsoft YaHei\", \"PingFang SC\", serif",
+          "body_family": "\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif",
+          "font_family": "\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-outline",
+        "icon_inventory_count": 4,
+        "page_rhythm_counts": {
+          "anchor": 3,
+          "dense": 4,
+          "breathing": 4
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "anchor",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "breathing",
+          "P06": "breathing",
+          "P07": "dense",
+          "P08": "breathing",
+          "P09": "breathing",
+          "P10": "dense",
+          "P11": "anchor"
+        },
+        "page_chart_counts": {},
+        "page_charts": {},
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text — write as raw Unicode"
+        ]
+      },
+      "design_spec_headings": [
+        "pritzker_2026_test_20260516 - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 开篇",
+        "Slide 01 - 封面",
+        "Slide 02 - 8 位大师总览",
+        "Part 2: 8 座新作逐一深耕",
+        "Slide 03 - 01 安藤忠雄 · 苏州 H+ 美术馆"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        "object animation sidecar"
+      ]
+    },
+    {
+      "id": "ppt169_global_ai_capital_2026",
+      "title": "Global AI Capital 2026",
+      "description": "全球 AI 资本流向年度观察 — Bloomberg / Economist 信息图风",
+      "style": "consulting",
+      "style_name": "Bloomberg Editorial",
+      "tags": [
+        "Data Journalism",
+        "Finance",
+        "Annual Review"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_global_ai_capital_2026",
+      "qiaomu_learning_tags": [
+        "chart-rich",
+        "magazine-editorial",
+        "report-and-data"
+      ],
+      "slide_count": 20,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "cover"
+        },
+        {
+          "file": "02_editor_note.svg",
+          "title": "editor note",
+          "desc": "editor note"
+        },
+        {
+          "file": "03_contents.svg",
+          "title": "contents",
+          "desc": "contents"
+        },
+        {
+          "file": "04_q1_vc_landscape.svg",
+          "title": "q1 vc landscape",
+          "desc": "q1 vc landscape"
+        },
+        {
+          "file": "05_hyperscaler_capex.svg",
+          "title": "hyperscaler capex",
+          "desc": "hyperscaler capex"
+        },
+        {
+          "file": "06_big_three_valuation_leap.svg",
+          "title": "big three valuation leap",
+          "desc": "big three valuation leap"
+        },
+        {
+          "file": "07_valuation_vs_revenue_bubble.svg",
+          "title": "valuation vs revenue bubble",
+          "desc": "valuation vs revenue bubble"
+        },
+        {
+          "file": "08_openai_investor_donut.svg",
+          "title": "openai investor donut",
+          "desc": "openai investor donut"
+        },
+        {
+          "file": "09_big_three_comparison.svg",
+          "title": "big three comparison",
+          "desc": "big three comparison"
+        },
+        {
+          "file": "10_china_five_ranking.svg",
+          "title": "china five ranking",
+          "desc": "china five ranking"
+        },
+        {
+          "file": "11_us_china_dual_track.svg",
+          "title": "us china dual track",
+          "desc": "us china dual track"
+        },
+        {
+          "file": "12_second_tier.svg",
+          "title": "second tier",
+          "desc": "second tier"
+        },
+        {
+          "file": "13_chapter_nvidia.svg",
+          "title": "chapter nvidia",
+          "desc": "chapter nvidia"
+        },
+        {
+          "file": "14_nvidia_sankey.svg",
+          "title": "nvidia sankey",
+          "desc": "nvidia sankey"
+        },
+        {
+          "file": "15_nvidia_pareto.svg",
+          "title": "nvidia pareto",
+          "desc": "nvidia pareto"
+        },
+        {
+          "file": "16_stargate_hub.svg",
+          "title": "stargate hub",
+          "desc": "stargate hub"
+        },
+        {
+          "file": "17_chapter_bubble.svg",
+          "title": "chapter bubble",
+          "desc": "chapter bubble"
+        },
+        {
+          "file": "18_capex_vs_revenue.svg",
+          "title": "capex vs revenue",
+          "desc": "capex vs revenue"
+        },
+        {
+          "file": "19_four_risks_quadrant.svg",
+          "title": "four risks quadrant",
+          "desc": "four risks quadrant"
+        },
+        {
+          "file": "20_closing.svg",
+          "title": "closing",
+          "desc": "closing"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_global_ai_capital_2026/README.md",
+        "design_spec": "examples/ppt169_global_ai_capital_2026/design_spec.md",
+        "spec_lock": "examples/ppt169_global_ai_capital_2026/spec_lock.md",
+        "animations": "examples/ppt169_global_ai_capital_2026/animations.json",
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_global_ai_capital_2026/svg_final",
+        "images_dir": "examples/ppt169_global_ai_capital_2026/images",
+        "exports": [
+          "examples/ppt169_global_ai_capital_2026/exports/global_ai_capital_2026.pptx"
+        ],
+        "notes_dir": "examples/ppt169_global_ai_capital_2026/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 20,
+        "image_files": 3,
+        "export_files": 1,
+        "notes_files": 21,
+        "spec_image_refs": 3
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#0E1116",
+          "secondary_bg": "#1A1F26",
+          "primary": "#E8E6E1",
+          "accent": "#E63946",
+          "secondary_accent": "#F4A261",
+          "text": "#C9C5BE",
+          "text_secondary": "#8A857E",
+          "text_tertiary": "#5C5852",
+          "border": "#2A2F36",
+          "success": "#52B788",
+          "warning": "#E63946",
+          "image_rendering": "editorial",
+          "image_palette": "dark-cinematic"
+        },
+        "image_rendering": "editorial",
+        "image_palette": "dark-cinematic",
+        "typography": {
+          "title_family": "Cambria, \"Microsoft YaHei\", serif",
+          "body_family": "\"Microsoft YaHei\", Arial, sans-serif",
+          "font_family": "\"Microsoft YaHei\", Arial, sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-outline",
+        "icon_inventory_count": 18,
+        "page_rhythm_counts": {
+          "anchor": 3,
+          "breathing": 3,
+          "dense": 14
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "breathing",
+          "P03": "anchor",
+          "P04": "dense",
+          "P05": "dense",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "dense",
+          "P10": "dense",
+          "P11": "dense",
+          "P12": "dense",
+          "P13": "breathing",
+          "P14": "dense",
+          "P15": "dense",
+          "P16": "dense",
+          "P17": "breathing",
+          "P18": "dense",
+          "P19": "dense",
+          "P20": "anchor"
+        },
+        "page_chart_counts": {
+          "kpi_cards": 1,
+          "bar_chart": 1,
+          "dumbbell_chart": 1,
+          "bubble_chart": 1,
+          "donut_chart": 1,
+          "horizontal_bar_chart": 1,
+          "comparison_table": 1,
+          "sankey_chart": 1,
+          "pareto_chart": 1,
+          "hub_spoke": 1,
+          "dual_axis_line_chart": 1,
+          "quadrant_text_bullets": 1
+        },
+        "page_charts": {
+          "P04": "kpi_cards",
+          "P05": "bar_chart",
+          "P06": "dumbbell_chart",
+          "P07": "bubble_chart",
+          "P08": "donut_chart",
+          "P10": "horizontal_bar_chart",
+          "P11": "comparison_table",
+          "P14": "sankey_chart",
+          "P15": "pareto_chart",
+          "P16": "hub_spoke",
+          "P18": "dual_axis_line_chart",
+          "P19": "quadrant_text_bullets"
+        },
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text (`&nbsp;`, `&mdash;`, `&copy;`, `&ndash;`, `&reg;`, `&hellip;`, `&bull;` …) — write as raw Unicode (`—`, `©`, `→`, NBSP, etc.); XML reserved chars `& < > \" '` must be escaped as `&amp; &lt; &gt; &quot; &apos;`"
+        ]
+      },
+      "design_spec_headings": [
+        "global_ai_capital_2026 - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "AI Image Strategy",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 0: 开场（封面 + 导语 + 目录）",
+        "Slide 01 - 封面",
+        "Slide 02 - 编辑导语",
+        "Slide 03 - 目录"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        "object animation sidecar"
+      ]
+    },
+    {
+      "id": "ppt169_swiss_grid_systems",
+      "title": "Swiss Grid Systems",
+      "description": "瑞士国际主义设计史 lecture — Müller-Brockmann 致敬",
+      "style": "creative",
+      "style_name": "Swiss Typographic",
+      "tags": [
+        "Swiss Style",
+        "Typography",
+        "Design History"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_swiss_grid_systems",
+      "qiaomu_learning_tags": [
+        "chart-rich"
+      ],
+      "slide_count": 14,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "cover"
+        },
+        {
+          "file": "02_quote.svg",
+          "title": "quote",
+          "desc": "quote"
+        },
+        {
+          "file": "03_origin.svg",
+          "title": "origin",
+          "desc": "origin"
+        },
+        {
+          "file": "04_principles.svg",
+          "title": "principles",
+          "desc": "principles"
+        },
+        {
+          "file": "05_figures.svg",
+          "title": "figures",
+          "desc": "figures"
+        },
+        {
+          "file": "06_brockmann.svg",
+          "title": "brockmann",
+          "desc": "brockmann"
+        },
+        {
+          "file": "07_typefaces.svg",
+          "title": "typefaces",
+          "desc": "typefaces"
+        },
+        {
+          "file": "08_grid_types.svg",
+          "title": "grid types",
+          "desc": "grid types"
+        },
+        {
+          "file": "09_modular.svg",
+          "title": "modular",
+          "desc": "modular"
+        },
+        {
+          "file": "10_negative_space.svg",
+          "title": "negative space",
+          "desc": "negative space"
+        },
+        {
+          "file": "11_outputs.svg",
+          "title": "outputs",
+          "desc": "outputs"
+        },
+        {
+          "file": "12_digital_era.svg",
+          "title": "digital era",
+          "desc": "digital era"
+        },
+        {
+          "file": "13_brands.svg",
+          "title": "brands",
+          "desc": "brands"
+        },
+        {
+          "file": "14_closing.svg",
+          "title": "closing",
+          "desc": "closing"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_swiss_grid_systems/README.md",
+        "design_spec": "examples/ppt169_swiss_grid_systems/design_spec.md",
+        "spec_lock": "examples/ppt169_swiss_grid_systems/spec_lock.md",
+        "animations": "examples/ppt169_swiss_grid_systems/animations.json",
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_swiss_grid_systems/svg_final",
+        "images_dir": "examples/ppt169_swiss_grid_systems/images",
+        "exports": [
+          "examples/ppt169_swiss_grid_systems/exports/swiss_grid_systems.pptx"
+        ],
+        "notes_dir": "examples/ppt169_swiss_grid_systems/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 14,
+        "image_files": 3,
+        "export_files": 1,
+        "notes_files": 15,
+        "spec_image_refs": 3
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#FFFFFF",
+          "secondary_bg": "#F4F4F4",
+          "primary": "#1A1A1A",
+          "accent": "#D9251D",
+          "secondary_accent": "#1A4FA0",
+          "text": "#1A1A1A",
+          "text_secondary": "#666666",
+          "text_tertiary": "#999999",
+          "border": "#E8E8E8",
+          "image_rendering": "minimalist-swiss",
+          "image_palette": "mono-ink"
+        },
+        "image_rendering": "minimalist-swiss",
+        "image_palette": "mono-ink",
+        "typography": {
+          "title_family": "\"Arial Black\", \"Microsoft YaHei\", sans-serif",
+          "body_family": "Arial, \"Microsoft YaHei\", sans-serif",
+          "font_family": "Arial, \"Microsoft YaHei\", sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-outline",
+        "icon_inventory_count": 2,
+        "page_rhythm_counts": {
+          "anchor": 2,
+          "breathing": 3,
+          "dense": 9
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "breathing",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "dense",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "anchor",
+          "P10": "breathing",
+          "P11": "dense",
+          "P12": "dense",
+          "P13": "dense",
+          "P14": "breathing"
+        },
+        "page_chart_counts": {
+          "timeline": 2,
+          "vertical_list": 1,
+          "team_roster": 1,
+          "comparison_columns": 1,
+          "quadrant_text_bullets": 1,
+          "icon_grid": 2,
+          "numbered_steps": 1
+        },
+        "page_charts": {
+          "P03": "timeline",
+          "P04": "vertical_list",
+          "P05": "team_roster",
+          "P06": "timeline",
+          "P07": "comparison_columns",
+          "P08": "quadrant_text_bullets",
+          "P11": "icon_grid",
+          "P12": "numbered_steps",
+          "P13": "icon_grid"
+        },
+        "forbidden_count": 8,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text — write as raw Unicode; XML reserved chars must be escaped as `&amp; &lt; &gt; &quot; &apos;`",
+          "Rounded corners (rx > 0) — except inside `simple-icons` brand glyphs",
+          "Linear/radial gradients — pure flat color only",
+          "Drop shadows / filter effects"
+        ]
+      },
+      "design_spec_headings": [
+        "swiss_grid_systems — Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "AI Image Strategy",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 引入",
+        "Slide 01 - 封面",
+        "Slide 02 - 引言",
+        "Part 2: 历史与原则"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        "object animation sidecar"
+      ]
+    },
+    {
+      "id": "ppt169_glassmorphism_demo",
+      "title": "Glassmorphism Demo",
+      "description": "AI 产品发布 — 毛玻璃质感的现代 SaaS 视觉语言",
+      "style": "general",
+      "style_name": "Glassmorphism SaaS",
+      "tags": [
+        "SaaS",
+        "Modern",
+        "Product Launch"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_glassmorphism_demo",
+      "qiaomu_learning_tags": [
+        "chart-rich"
+      ],
+      "slide_count": 12,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "cover"
+        },
+        {
+          "file": "02_hero_demo_to_prod.svg",
+          "title": "hero demo to prod",
+          "desc": "hero demo to prod"
+        },
+        {
+          "file": "03_three_pains.svg",
+          "title": "three pains",
+          "desc": "three pains"
+        },
+        {
+          "file": "04_agent_architecture.svg",
+          "title": "agent architecture",
+          "desc": "agent architecture"
+        },
+        {
+          "file": "05_three_modes.svg",
+          "title": "three modes",
+          "desc": "three modes"
+        },
+        {
+          "file": "06_tool_orchestration.svg",
+          "title": "tool orchestration",
+          "desc": "tool orchestration"
+        },
+        {
+          "file": "07_context_engineering.svg",
+          "title": "context engineering",
+          "desc": "context engineering"
+        },
+        {
+          "file": "08_kpi_dashboard.svg",
+          "title": "kpi dashboard",
+          "desc": "kpi dashboard"
+        },
+        {
+          "file": "09_metrics_trend.svg",
+          "title": "metrics trend",
+          "desc": "metrics trend"
+        },
+        {
+          "file": "10_failure_modes.svg",
+          "title": "failure modes",
+          "desc": "failure modes"
+        },
+        {
+          "file": "11_roadmap.svg",
+          "title": "roadmap",
+          "desc": "roadmap"
+        },
+        {
+          "file": "12_cta_closing.svg",
+          "title": "cta closing",
+          "desc": "cta closing"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_glassmorphism_demo/README.md",
+        "design_spec": "examples/ppt169_glassmorphism_demo/design_spec.md",
+        "spec_lock": "examples/ppt169_glassmorphism_demo/spec_lock.md",
+        "animations": "examples/ppt169_glassmorphism_demo/animations.json",
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_glassmorphism_demo/svg_final",
+        "images_dir": "examples/ppt169_glassmorphism_demo/images",
+        "exports": [
+          "examples/ppt169_glassmorphism_demo/exports/glassmorphism_demo.pptx"
+        ],
+        "notes_dir": "examples/ppt169_glassmorphism_demo/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 12,
+        "image_files": 8,
+        "export_files": 1,
+        "notes_files": 13,
+        "spec_image_refs": 8
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#0A0E27",
+          "bg_secondary": "#1A2150",
+          "primary": "#5B8DEF",
+          "accent": "#A26BFA",
+          "secondary_accent": "#3DDDFC",
+          "text": "#E8ECFF",
+          "text_secondary": "#A8B0D0",
+          "text_tertiary": "#6B7299",
+          "border": "#2E3672",
+          "success": "#4ADE80",
+          "warning": "#FB7185",
+          "amber": "#F59E0B",
+          "glass_highlight": "#FFFFFF",
+          "image_rendering": "glassmorphism",
+          "image_palette": "tech-neon"
+        },
+        "image_rendering": "glassmorphism",
+        "image_palette": "tech-neon",
+        "typography": {
+          "title_family": "\"Microsoft YaHei\", \"PingFang SC\", sans-serif",
+          "body_family": "\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif",
+          "font_family": "\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "phosphor-duotone",
+        "icon_inventory_count": 28,
+        "page_rhythm_counts": {
+          "anchor": 1,
+          "breathing": 2,
+          "dense": 9
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "breathing",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "dense",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "dense",
+          "P10": "dense",
+          "P11": "dense",
+          "P12": "breathing"
+        },
+        "page_chart_counts": {
+          "vertical_pillars": 1,
+          "layered_architecture": 1,
+          "comparison_columns": 1,
+          "numbered_steps": 1,
+          "hub_spoke": 1,
+          "kpi_cards": 1,
+          "line_chart": 1,
+          "quadrant_text_bullets": 1,
+          "roadmap_vertical": 1
+        },
+        "page_charts": {
+          "P03": "vertical_pillars",
+          "P04": "layered_architecture",
+          "P05": "comparison_columns",
+          "P06": "numbered_steps",
+          "P07": "hub_spoke",
+          "P08": "kpi_cards",
+          "P09": "line_chart",
+          "P10": "quadrant_text_bullets",
+          "P11": "roadmap_vertical"
+        },
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text — write raw Unicode; XML reserved chars escape as `&amp; &lt; &gt; &quot; &apos;`"
+        ]
+      },
+      "design_spec_headings": [
+        "glassmorphism_demo - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "AI Image Strategy",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 开场",
+        "Slide 01 - Cover",
+        "Slide 02 - Hero / Section opener \"从 Demo 到生产\"",
+        "Part 2: 现状与基础"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        "object animation sidecar"
+      ]
+    },
+    {
+      "id": "ppt169_sugar_rush_memphis",
+      "title": "Sugar Rush Memphis",
+      "description": "虚构音乐节年度手册 — Memphis 设计运动 + 流行流派 mash-up",
+      "style": "creative",
+      "style_name": "Memphis / Pop",
+      "tags": [
+        "Memphis Design",
+        "Music Festival",
+        "Pop"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_sugar_rush_memphis",
+      "qiaomu_learning_tags": [
+        "chart-rich",
+        "expressive-culture",
+        "report-and-data"
+      ],
+      "slide_count": 14,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "cover"
+        },
+        {
+          "file": "02_what.svg",
+          "title": "what",
+          "desc": "what"
+        },
+        {
+          "file": "03_numbers.svg",
+          "title": "numbers",
+          "desc": "numbers"
+        },
+        {
+          "file": "04_principles.svg",
+          "title": "principles",
+          "desc": "principles"
+        },
+        {
+          "file": "05_who.svg",
+          "title": "who",
+          "desc": "who"
+        },
+        {
+          "file": "06_headliners.svg",
+          "title": "headliners",
+          "desc": "headliners"
+        },
+        {
+          "file": "07_flavors.svg",
+          "title": "flavors",
+          "desc": "flavors"
+        },
+        {
+          "file": "08_where.svg",
+          "title": "where",
+          "desc": "where"
+        },
+        {
+          "file": "09_stages.svg",
+          "title": "stages",
+          "desc": "stages"
+        },
+        {
+          "file": "10_schedule.svg",
+          "title": "schedule",
+          "desc": "schedule"
+        },
+        {
+          "file": "11_vibes.svg",
+          "title": "vibes",
+          "desc": "vibes"
+        },
+        {
+          "file": "12_beyond.svg",
+          "title": "beyond",
+          "desc": "beyond"
+        },
+        {
+          "file": "13_tickets.svg",
+          "title": "tickets",
+          "desc": "tickets"
+        },
+        {
+          "file": "14_closing.svg",
+          "title": "closing",
+          "desc": "closing"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_sugar_rush_memphis/README.md",
+        "design_spec": "examples/ppt169_sugar_rush_memphis/design_spec.md",
+        "spec_lock": "examples/ppt169_sugar_rush_memphis/spec_lock.md",
+        "animations": "examples/ppt169_sugar_rush_memphis/animations.json",
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_sugar_rush_memphis/svg_final",
+        "images_dir": "examples/ppt169_sugar_rush_memphis/images",
+        "exports": [
+          "examples/ppt169_sugar_rush_memphis/exports/sugar_rush_memphis.pptx"
+        ],
+        "notes_dir": "examples/ppt169_sugar_rush_memphis/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 14,
+        "image_files": 9,
+        "export_files": 1,
+        "notes_files": 15,
+        "spec_image_refs": 9
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#FFF8EE",
+          "bg_secondary": "#FFE9C7",
+          "primary": "#FF3DA5",
+          "accent": "#00B8D9",
+          "secondary_accent": "#FFD93D",
+          "tertiary_accent": "#00C896",
+          "quaternary_accent": "#FF6B4A",
+          "text": "#1A1A2E",
+          "text_secondary": "#5C5C7A",
+          "border": "#1A1A2E",
+          "success": "#00C896",
+          "warning": "#FF6B4A",
+          "image_rendering": "flat",
+          "image_palette": "vivid-launch"
+        },
+        "image_rendering": "flat",
+        "image_palette": "vivid-launch",
+        "typography": {
+          "title_family": "Impact, \"Arial Black\", \"Microsoft YaHei\", sans-serif",
+          "body_family": "Arial, \"Microsoft YaHei\", \"PingFang SC\", sans-serif",
+          "font_family": "Arial, \"Microsoft YaHei\", \"PingFang SC\", sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "chunk-filled",
+        "icon_inventory_count": 17,
+        "page_rhythm_counts": {
+          "anchor": 2,
+          "breathing": 4,
+          "dense": 8
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "breathing",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "breathing",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "breathing",
+          "P09": "dense",
+          "P10": "dense",
+          "P11": "breathing",
+          "P12": "dense",
+          "P13": "dense",
+          "P14": "anchor"
+        },
+        "page_chart_counts": {
+          "kpi_cards": 1,
+          "vertical_pillars": 1,
+          "icon_grid": 1,
+          "quadrant_text_bullets": 1,
+          "hub_spoke": 1,
+          "timeline": 1,
+          "comparison_columns": 2
+        },
+        "page_charts": {
+          "P03": "kpi_cards",
+          "P04": "vertical_pillars",
+          "P06": "icon_grid",
+          "P07": "quadrant_text_bullets",
+          "P09": "hub_spoke",
+          "P10": "timeline",
+          "P12": "comparison_columns",
+          "P13": "comparison_columns"
+        },
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text (`&nbsp;`, `&mdash;`, `&copy;`, `&ndash;`, `&reg;`, `&hellip;`, `&bull;` …) — write as raw Unicode (`—`, `©`, `→`, NBSP, etc.); XML reserved chars `& < > \" '` must be escaped as `&amp; &lt; &gt; &quot; &apos;`. See shared-standards.md §1.0"
+        ]
+      },
+      "design_spec_headings": [
+        "sugar_rush_memphis - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "AI Image Strategy",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Memphis 装饰碎片（每页可叠加 1-3 个）",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: WHAT — 是什么",
+        "Slide 01 - Cover"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        "object animation sidecar"
+      ]
+    },
+    {
+      "id": "ppt169_indie_bookstore_zine_guide",
+      "title": "Indie Bookstore Zine Guide",
+      "description": "独立书店 zine 入门指南 — Risograph 印刷工艺 + DIY 海报美学",
+      "style": "creative",
+      "style_name": "Risograph Zine",
+      "tags": [
+        "Zine",
+        "Risograph",
+        "DIY"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_indie_bookstore_zine_guide",
+      "qiaomu_learning_tags": [
+        "chart-rich",
+        "expressive-culture"
+      ],
+      "slide_count": 18,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "cover"
+        },
+        {
+          "file": "02_toc.svg",
+          "title": "toc",
+          "desc": "toc"
+        },
+        {
+          "file": "03_zine_what.svg",
+          "title": "zine what",
+          "desc": "zine what"
+        },
+        {
+          "file": "04_zine_history.svg",
+          "title": "zine history",
+          "desc": "zine history"
+        },
+        {
+          "file": "05_risograph_origin.svg",
+          "title": "risograph origin",
+          "desc": "risograph origin"
+        },
+        {
+          "file": "06_risograph_process.svg",
+          "title": "risograph process",
+          "desc": "risograph process"
+        },
+        {
+          "file": "07_zine_folding.svg",
+          "title": "zine folding",
+          "desc": "zine folding"
+        },
+        {
+          "file": "08_zine_content_types.svg",
+          "title": "zine content types",
+          "desc": "zine content types"
+        },
+        {
+          "file": "09_jimbocho.svg",
+          "title": "jimbocho",
+          "desc": "jimbocho"
+        },
+        {
+          "file": "10_three_cities.svg",
+          "title": "three cities",
+          "desc": "three cities"
+        },
+        {
+          "file": "11_berlin.svg",
+          "title": "berlin",
+          "desc": "berlin"
+        },
+        {
+          "file": "12_china_bookstore_map.svg",
+          "title": "china bookstore map",
+          "desc": "china bookstore map"
+        },
+        {
+          "file": "13_china_art_book_fair.svg",
+          "title": "china art book fair",
+          "desc": "china art book fair"
+        },
+        {
+          "file": "14_how_to_browse.svg",
+          "title": "how to browse",
+          "desc": "how to browse"
+        },
+        {
+          "file": "15_how_to_collect.svg",
+          "title": "how to collect",
+          "desc": "how to collect"
+        },
+        {
+          "file": "16_action_checklist.svg",
+          "title": "action checklist",
+          "desc": "action checklist"
+        },
+        {
+          "file": "17_sources.svg",
+          "title": "sources",
+          "desc": "sources"
+        },
+        {
+          "file": "18_outro.svg",
+          "title": "outro",
+          "desc": "outro"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_indie_bookstore_zine_guide/README.md",
+        "design_spec": "examples/ppt169_indie_bookstore_zine_guide/design_spec.md",
+        "spec_lock": "examples/ppt169_indie_bookstore_zine_guide/spec_lock.md",
+        "animations": "examples/ppt169_indie_bookstore_zine_guide/animations.json",
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_indie_bookstore_zine_guide/svg_final",
+        "images_dir": "examples/ppt169_indie_bookstore_zine_guide/images",
+        "exports": [
+          "examples/ppt169_indie_bookstore_zine_guide/exports/indie_bookstore_zine_guide.pptx"
+        ],
+        "notes_dir": "examples/ppt169_indie_bookstore_zine_guide/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 18,
+        "image_files": 10,
+        "export_files": 1,
+        "notes_files": 19,
+        "spec_image_refs": 10
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#F5EFE0",
+          "secondary_bg": "#EAE2CC",
+          "primary": "#1E4DBC",
+          "accent": "#FF5C8A",
+          "secondary_accent": "#E8A02E",
+          "text": "#1A1A1A",
+          "text_secondary": "#5A5A5A",
+          "text_tertiary": "#8C8275",
+          "border": "#1A1A1A",
+          "image_rendering": "screen-print",
+          "image_palette": "duotone"
+        },
+        "image_rendering": "screen-print",
+        "image_palette": "duotone",
+        "typography": {
+          "title_family": "Impact, 'Arial Black', 'Microsoft YaHei', sans-serif",
+          "body_family": "'Microsoft YaHei', 'PingFang SC', Arial, sans-serif",
+          "font_family": "'Microsoft YaHei', 'PingFang SC', Arial, sans-serif",
+          "code_family": "Consolas, 'Courier New', monospace"
+        },
+        "icon_library": "chunk-filled",
+        "icon_inventory_count": 29,
+        "page_rhythm_counts": {
+          "anchor": 4,
+          "breathing": 4,
+          "dense": 10
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "anchor",
+          "P03": "breathing",
+          "P04": "dense",
+          "P05": "dense",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "breathing",
+          "P10": "dense",
+          "P11": "breathing",
+          "P12": "dense",
+          "P13": "dense",
+          "P14": "dense",
+          "P15": "dense",
+          "P16": "breathing",
+          "P17": "anchor",
+          "P18": "anchor"
+        },
+        "page_chart_counts": {
+          "agenda_list": 1,
+          "timeline": 1,
+          "vertical_list": 3,
+          "numbered_steps": 3,
+          "icon_grid": 1,
+          "vertical_pillars": 1,
+          "basic_table": 1,
+          "labeled_card": 1
+        },
+        "page_charts": {
+          "P02": "agenda_list",
+          "P04": "timeline",
+          "P05": "vertical_list",
+          "P06": "numbered_steps",
+          "P07": "numbered_steps",
+          "P08": "icon_grid",
+          "P10": "vertical_pillars",
+          "P12": "basic_table",
+          "P13": "labeled_card",
+          "P14": "vertical_list",
+          "P15": "vertical_list",
+          "P16": "numbered_steps"
+        },
+        "forbidden_count": 6,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text (`&nbsp;`, `&mdash;`, `&copy;`, `&ndash;`, `&reg;`, `&hellip;`, `&bull;` …) — write as raw Unicode (`—`, `©`, `→`, NBSP, etc.); XML reserved chars `& < > \" '` must be escaped as `&amp; &lt; &gt; &quot; &apos;`",
+          "Card border-radius > 0 (Risograph 美学 = 硬边、无圆角)"
+        ]
+      },
+      "design_spec_headings": [
+        "ppt169_indie_bookstore_zine_guide_20260517 - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "AI Image Strategy",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 开篇",
+        "Slide 01 - Cover 封面",
+        "Slide 02 - 目录"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        "object animation sidecar"
+      ]
+    },
+    {
+      "id": "ppt169_kubernetes_blueprint_2026",
+      "title": "Kubernetes Blueprint 2026",
+      "description": "Kubernetes 集群架构 10 页讲解 — 工程蓝图等距技术图风",
+      "style": "general",
+      "style_name": "Engineering Blueprint",
+      "tags": [
+        "Blueprint",
+        "Kubernetes",
+        "Technical Drawing"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_kubernetes_blueprint_2026",
+      "qiaomu_learning_tags": [
+        "architecture-and-humanities",
+        "magazine-editorial",
+        "technical-evidence"
+      ],
+      "slide_count": 10,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "cover"
+        },
+        {
+          "file": "02_two_planes.svg",
+          "title": "two planes",
+          "desc": "two planes"
+        },
+        {
+          "file": "03_control_plane.svg",
+          "title": "control plane",
+          "desc": "control plane"
+        },
+        {
+          "file": "04_worker_node.svg",
+          "title": "worker node",
+          "desc": "worker node"
+        },
+        {
+          "file": "05_pod_lifecycle.svg",
+          "title": "pod lifecycle",
+          "desc": "pod lifecycle"
+        },
+        {
+          "file": "06_service_types.svg",
+          "title": "service types",
+          "desc": "service types"
+        },
+        {
+          "file": "07_storage.svg",
+          "title": "storage",
+          "desc": "storage"
+        },
+        {
+          "file": "08_ha_topology.svg",
+          "title": "ha topology",
+          "desc": "ha topology"
+        },
+        {
+          "file": "09_api_spine.svg",
+          "title": "api spine",
+          "desc": "api spine"
+        },
+        {
+          "file": "10_takeaways.svg",
+          "title": "takeaways",
+          "desc": "takeaways"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_kubernetes_blueprint_2026/README.md",
+        "design_spec": "examples/ppt169_kubernetes_blueprint_2026/design_spec.md",
+        "spec_lock": "examples/ppt169_kubernetes_blueprint_2026/spec_lock.md",
+        "animations": "examples/ppt169_kubernetes_blueprint_2026/animations.json",
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_kubernetes_blueprint_2026/svg_final",
+        "images_dir": null,
+        "exports": [
+          "examples/ppt169_kubernetes_blueprint_2026/exports/kubernetes_blueprint_2026.pptx"
+        ],
+        "notes_dir": "examples/ppt169_kubernetes_blueprint_2026/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 10,
+        "image_files": 0,
+        "export_files": 1,
+        "notes_files": 11,
+        "spec_image_refs": 0
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#0E2A47",
+          "bg_secondary": "#1A3A5C",
+          "primary": "#5BA3E0",
+          "accent": "#FFB627",
+          "secondary_accent": "#3E7AB8",
+          "text": "#F0F4F8",
+          "text_secondary": "#A0B8D0",
+          "text_tertiary": "#6B85A3",
+          "border": "#2D4A6B",
+          "success": "#7FD99F",
+          "warning": "#FF6B6B"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": null,
+          "body_family": null,
+          "font_family": "Arial, \"Microsoft YaHei\", sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-outline",
+        "icon_inventory_count": 15,
+        "page_rhythm_counts": {
+          "anchor": 4,
+          "dense": 5,
+          "breathing": 1
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "dense",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "anchor",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "anchor",
+          "P09": "anchor",
+          "P10": "breathing"
+        },
+        "page_chart_counts": {
+          "hub_spoke": 1,
+          "process_flow": 1,
+          "vertical_pillars": 1,
+          "client_server_flow": 1
+        },
+        "page_charts": {
+          "P03": "hub_spoke",
+          "P05": "process_flow",
+          "P06": "vertical_pillars",
+          "P09": "client_server_flow"
+        },
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text (`&nbsp;`, `&mdash;`, `&copy;` …); raw Unicode only; XML reserved chars escaped as `&amp; &lt; &gt; &quot; &apos;`"
+        ]
+      },
+      "design_spec_headings": [
+        "ppt169_kubernetes_blueprint - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library (this deck uses)",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: Setting the frame",
+        "Slide 01 — Cover",
+        "Slide 02 — Two planes: control vs data",
+        "Part 2: Component anatomy"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        null,
+        "speaker notes",
+        "object animation sidecar"
+      ]
+    },
+    {
+      "id": "ppt169_high_rise_renewal",
+      "title": "高层住宅“主动再生”",
+      "description": "从悉尼到中国 — 高层住宅老化的再生议题，编辑杂志风",
+      "style": "editorial",
+      "style_name": "Editorial Magazine",
+      "tags": [
+        "Urban Renewal",
+        "Editorial",
+        "Architecture"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_high_rise_renewal",
+      "qiaomu_learning_tags": [
+        "expressive-culture",
+        "image-rich",
+        "magazine-editorial"
+      ],
+      "slide_count": 15,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "cover"
+        },
+        {
+          "file": "02_agenda.svg",
+          "title": "agenda",
+          "desc": "agenda"
+        },
+        {
+          "file": "03_warning_fire.svg",
+          "title": "warning fire",
+          "desc": "warning fire"
+        },
+        {
+          "file": "04_aging_highrise.svg",
+          "title": "aging highrise",
+          "desc": "aging highrise"
+        },
+        {
+          "file": "05_pruitt_igoe.svg",
+          "title": "pruitt igoe",
+          "desc": "pruitt igoe"
+        },
+        {
+          "file": "06_chapter_II.svg",
+          "title": "chapter II",
+          "desc": "chapter II"
+        },
+        {
+          "file": "07_quay_quarter.svg",
+          "title": "quay quarter",
+          "desc": "quay quarter"
+        },
+        {
+          "file": "08_eco_data.svg",
+          "title": "eco data",
+          "desc": "eco data"
+        },
+        {
+          "file": "09_shenzhen_mvrdv.svg",
+          "title": "shenzhen mvrdv",
+          "desc": "shenzhen mvrdv"
+        },
+        {
+          "file": "10_shanghai_edition.svg",
+          "title": "shanghai edition",
+          "desc": "shanghai edition"
+        },
+        {
+          "file": "11_one_wall_street.svg",
+          "title": "one wall street",
+          "desc": "one wall street"
+        },
+        {
+          "file": "12_chapter_IV.svg",
+          "title": "chapter IV",
+          "desc": "chapter IV"
+        },
+        {
+          "file": "13_pilot_cases.svg",
+          "title": "pilot cases",
+          "desc": "pilot cases"
+        },
+        {
+          "file": "14_real_difficulty.svg",
+          "title": "real difficulty",
+          "desc": "real difficulty"
+        },
+        {
+          "file": "15_ending.svg",
+          "title": "ending",
+          "desc": "ending"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_high_rise_renewal/README.md",
+        "design_spec": "examples/ppt169_high_rise_renewal/design_spec.md",
+        "spec_lock": "examples/ppt169_high_rise_renewal/spec_lock.md",
+        "animations": null,
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_high_rise_renewal/svg_final",
+        "images_dir": "examples/ppt169_high_rise_renewal/images",
+        "exports": [
+          "examples/ppt169_high_rise_renewal/exports/high_rise_renewal.pptx"
+        ],
+        "notes_dir": "examples/ppt169_high_rise_renewal/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 15,
+        "image_files": 25,
+        "export_files": 1,
+        "notes_files": 16,
+        "spec_image_refs": 25
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#F5F2EC",
+          "bg_secondary": "#EBE6DC",
+          "primary": "#2B3A4A",
+          "secondary_accent": "#5A6B7A",
+          "accent_warning": "#C2410C",
+          "accent_regen": "#6B7A4F",
+          "accent_heritage": "#8B7355",
+          "text": "#2B3A4A",
+          "text_secondary": "#5A6B7A",
+          "text_tertiary": "#8A8275",
+          "border": "#D6CFC0",
+          "on_dark_text": "#F5F2EC",
+          "on_dark_text_secondary": "#D6CFC0",
+          "on_dark_text_tertiary": "#A8B0B8",
+          "card_white": "#FFFFFF",
+          "accent_regen_light": "#A8C575",
+          "bg_dark_navy": "#1A2530",
+          "bg_dark_charcoal": "#1A1A1A",
+          "bg_dark_olive": "#1F2A1F"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": "Georgia, KaiTi, serif",
+          "body_family": "\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif",
+          "font_family": "\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-outline",
+        "icon_inventory_count": 12,
+        "page_rhythm_counts": {
+          "anchor": 5,
+          "dense": 8,
+          "breathing": 2
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "anchor",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "dense",
+          "P06": "anchor",
+          "P07": "dense",
+          "P08": "breathing",
+          "P09": "dense",
+          "P10": "dense",
+          "P11": "dense",
+          "P12": "anchor",
+          "P13": "dense",
+          "P14": "breathing",
+          "P15": "anchor"
+        },
+        "page_chart_counts": {
+          "agenda_list": 1,
+          "numbered_steps": 1
+        },
+        "page_charts": {
+          "P02": "agenda_list",
+          "P15": "numbered_steps"
+        },
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text"
+        ]
+      },
+      "design_spec_headings": [
+        "高层住宅\"主动再生\" - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 引子 — 从一场火灾说起",
+        "Slide 01 - Cover",
+        "Slide 02 - Agenda",
+        "Part 2: 警钟 — 高层老龄化与消防困局",
+        "Slide 03 - 香港火灾敲响警钟"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_cangzhuo",
+      "title": "藏拙",
+      "description": "《男人最顶级的城府：藏拙》读书分享 — 新中式水墨留白",
+      "style": "creative",
+      "style_name": "Chinese Ink Aesthetic",
+      "tags": [
+        "Chinese Aesthetic",
+        "Editorial",
+        "Cultural"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_cangzhuo",
+      "qiaomu_learning_tags": [
+        "eastern-cultural-narrative"
+      ],
+      "slide_count": 14,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "cover",
+          "desc": "cover"
+        },
+        {
+          "file": "02_引子.svg",
+          "title": "引子",
+          "desc": "引子"
+        },
+        {
+          "file": "03_烧烤摊故事.svg",
+          "title": "烧烤摊故事",
+          "desc": "烧烤摊故事"
+        },
+        {
+          "file": "04_什么是藏拙.svg",
+          "title": "什么是藏拙",
+          "desc": "什么是藏拙"
+        },
+        {
+          "file": "05_木秀于林.svg",
+          "title": "木秀于林",
+          "desc": "木秀于林"
+        },
+        {
+          "file": "06_年轻人最易犯的错.svg",
+          "title": "年轻人最易犯的错",
+          "desc": "年轻人最易犯的错"
+        },
+        {
+          "file": "07_会藏拙的人怎么做.svg",
+          "title": "会藏拙的人怎么做",
+          "desc": "会藏拙的人怎么做"
+        },
+        {
+          "file": "08_韩信.svg",
+          "title": "韩信",
+          "desc": "韩信"
+        },
+        {
+          "file": "09_藏拙的高明.svg",
+          "title": "藏拙的高明",
+          "desc": "藏拙的高明"
+        },
+        {
+          "file": "10_潜龙勿用.svg",
+          "title": "潜龙勿用",
+          "desc": "潜龙勿用"
+        },
+        {
+          "file": "11_藏拙不等于消极避世.svg",
+          "title": "藏拙不等于消极避世",
+          "desc": "藏拙不等于消极避世"
+        },
+        {
+          "file": "12_曾国藩.svg",
+          "title": "曾国藩",
+          "desc": "曾国藩"
+        },
+        {
+          "file": "13_藏住四件事.svg",
+          "title": "藏住四件事",
+          "desc": "藏住四件事"
+        },
+        {
+          "file": "14_结语.svg",
+          "title": "结语",
+          "desc": "结语"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_cangzhuo/README.md",
+        "design_spec": "examples/ppt169_cangzhuo/design_spec.md",
+        "spec_lock": "examples/ppt169_cangzhuo/spec_lock.md",
+        "animations": null,
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_cangzhuo/svg_final",
+        "images_dir": "examples/ppt169_cangzhuo/images",
+        "exports": [
+          "examples/ppt169_cangzhuo/exports/cangzhuo.pptx"
+        ],
+        "notes_dir": "examples/ppt169_cangzhuo/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 14,
+        "image_files": 6,
+        "export_files": 1,
+        "notes_files": 15,
+        "spec_image_refs": 6
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#F5F1E8",
+          "secondary_bg": "#EFEAD9",
+          "primary": "#1A1A1A",
+          "accent": "#A52A2A",
+          "text": "#1A1A1A",
+          "text_secondary": "#5C5852",
+          "text_tertiary": "#8B8680",
+          "border": "#C8C0AE",
+          "image_rendering": "ink-notes",
+          "image_palette": "mono-ink"
+        },
+        "image_rendering": "ink-notes",
+        "image_palette": "mono-ink",
+        "typography": {
+          "title_family": "KaiTi, Georgia, serif",
+          "body_family": "\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif",
+          "font_family": "\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-outline",
+        "icon_inventory_count": 8,
+        "page_rhythm_counts": {
+          "anchor": 4,
+          "breathing": 3,
+          "dense": 7
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "breathing",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "breathing",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "anchor",
+          "P09": "dense",
+          "P10": "breathing",
+          "P11": "dense",
+          "P12": "anchor",
+          "P13": "dense",
+          "P14": "anchor"
+        },
+        "page_chart_counts": {
+          "pros_cons_chart": 1,
+          "vertical_list": 1
+        },
+        "page_charts": {
+          "P11": "pros_cons_chart",
+          "P13": "vertical_list"
+        },
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text — write as raw Unicode; XML reserved chars escaped as `&amp; &lt; &gt; &quot; &apos;`"
+        ]
+      },
+      "design_spec_headings": [
+        "藏拙 - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "AI Image Strategy",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library (combine or break as content demands)",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 开篇",
+        "Slide 01 — Cover",
+        "Slide 02 — 引子",
+        "Part 2: 看见问题"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_image_text_showcase",
+      "title": "Image-Text Showcase",
+      "description": "20种图文组合范式展示 — 每页不同 rendering × palette × 布局",
+      "style": "creative",
+      "style_name": "Editorial Showcase",
+      "tags": [
+        "Image-Text",
+        "Layout Patterns",
+        "Visual Reference"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_image_text_showcase",
+      "qiaomu_learning_tags": [
+        "image-rich",
+        "layout-pattern-showcase",
+        "magazine-editorial"
+      ],
+      "slide_count": 20,
+      "slide_files": [
+        {
+          "file": "01_封面.svg",
+          "title": "封面",
+          "desc": "封面"
+        },
+        {
+          "file": "02_目录.svg",
+          "title": "目录",
+          "desc": "目录"
+        },
+        {
+          "file": "03_左图右文.svg",
+          "title": "左图右文",
+          "desc": "左图右文"
+        },
+        {
+          "file": "04_右图出血.svg",
+          "title": "右图出血",
+          "desc": "右图出血"
+        },
+        {
+          "file": "05_顶图三栏.svg",
+          "title": "顶图三栏",
+          "desc": "顶图三栏"
+        },
+        {
+          "file": "06_底图浮文.svg",
+          "title": "底图浮文",
+          "desc": "底图浮文"
+        },
+        {
+          "file": "07_Z型蛇形.svg",
+          "title": "Z型蛇形",
+          "desc": "Z型蛇形"
+        },
+        {
+          "file": "08_九宫格混排.svg",
+          "title": "九宫格混排",
+          "desc": "九宫格混排"
+        },
+        {
+          "file": "09_圆形放射.svg",
+          "title": "圆形放射",
+          "desc": "圆形放射"
+        },
+        {
+          "file": "10_底纹密铺.svg",
+          "title": "底纹密铺",
+          "desc": "底纹密铺"
+        },
+        {
+          "file": "11_剪纸分层.svg",
+          "title": "剪纸分层",
+          "desc": "剪纸分层"
+        },
+        {
+          "file": "12_竖版杂志.svg",
+          "title": "竖版杂志",
+          "desc": "竖版杂志"
+        },
+        {
+          "file": "13_对角线分割.svg",
+          "title": "对角线分割",
+          "desc": "对角线分割"
+        },
+        {
+          "file": "14_褪色底图大字.svg",
+          "title": "褪色底图大字",
+          "desc": "褪色底图大字"
+        },
+        {
+          "file": "15_上文下图.svg",
+          "title": "上文下图",
+          "desc": "上文下图"
+        },
+        {
+          "file": "16_中心放射标注.svg",
+          "title": "中心放射标注",
+          "desc": "中心放射标注"
+        },
+        {
+          "file": "17_横条贯穿.svg",
+          "title": "横条贯穿",
+          "desc": "横条贯穿"
+        },
+        {
+          "file": "18_多边形填缝.svg",
+          "title": "多边形填缝",
+          "desc": "多边形填缝"
+        },
+        {
+          "file": "19_蒙太奇拼贴.svg",
+          "title": "蒙太奇拼贴",
+          "desc": "蒙太奇拼贴"
+        },
+        {
+          "file": "20_黑板收场.svg",
+          "title": "黑板收场",
+          "desc": "黑板收场"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_image_text_showcase/README.md",
+        "design_spec": "examples/ppt169_image_text_showcase/design_spec.md",
+        "spec_lock": "examples/ppt169_image_text_showcase/spec_lock.md",
+        "animations": null,
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_image_text_showcase/svg_final",
+        "images_dir": "examples/ppt169_image_text_showcase/images",
+        "exports": [
+          "examples/ppt169_image_text_showcase/exports/image-text-showcase.pptx"
+        ],
+        "notes_dir": "examples/ppt169_image_text_showcase/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 20,
+        "image_files": 22,
+        "export_files": 1,
+        "notes_files": 21,
+        "spec_image_refs": 22
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#0F1117",
+          "secondary_bg": "#1A1D2E",
+          "primary": "#7C6FF7",
+          "accent": "#F5A623",
+          "secondary_accent": "#4ECDC4",
+          "text": "#E8E8F0",
+          "text_secondary": "#9090A0",
+          "text_tertiary": "#5A5A72",
+          "border": "#2A2D3E"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": "Georgia, \"Microsoft YaHei\", serif",
+          "body_family": "Arial, \"Microsoft YaHei\", \"PingFang SC\", sans-serif",
+          "font_family": null,
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-outline",
+        "icon_inventory_count": 8,
+        "page_rhythm_counts": {
+          "anchor": 3,
+          "breathing": 14,
+          "dense": 3
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "anchor",
+          "P03": "breathing",
+          "P04": "breathing",
+          "P05": "breathing",
+          "P06": "breathing",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "breathing",
+          "P10": "dense",
+          "P11": "breathing",
+          "P12": "breathing",
+          "P13": "breathing",
+          "P14": "breathing",
+          "P15": "breathing",
+          "P16": "breathing",
+          "P17": "breathing",
+          "P18": "breathing",
+          "P19": "breathing",
+          "P20": "anchor"
+        },
+        "page_chart_counts": {},
+        "page_charts": {},
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`",
+          "`<g opacity>` (set opacity on each child individually)",
+          "HTML named entities in text — write raw Unicode; XML reserved chars use &amp; &lt; &gt; &quot; &apos;"
+        ]
+      },
+      "design_spec_headings": [
+        "Image-Text Showcase — Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "AI Image Strategy",
+        "IV. Typography System",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 封面与导航",
+        "Slide 01 — 封面",
+        "Slide 02 — 目录",
+        "Part 2: 图文组合样本",
+        "Slide 03 — 左1/3竖图 + 右文字主体",
+        "Slide 04 — 右图左文，图出血至右边缘",
+        "Slide 05 — 顶部全幅图 + 底部三栏文字",
+        "Slide 06 — 底部全幅图 + 顶部标题 + 中段文字"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_building_effective_agents",
+      "title": "Building Effective Agents",
+      "description": "Anthropic 工程博客的 AI Agent 架构与工作流模式解析",
+      "style": "general",
+      "style_name": "General + Dark Tech",
+      "tags": [
+        "Dark Theme",
+        "AI/ML",
+        "Anthropic"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_building_effective_agents",
+      "qiaomu_learning_tags": [
+        "technical-evidence"
+      ],
+      "slide_count": 12,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "Cover",
+          "desc": "Cover"
+        },
+        {
+          "file": "02_what_are_agents.svg",
+          "title": "What Are Agents",
+          "desc": "What Are Agents"
+        },
+        {
+          "file": "03_when_to_use_agents.svg",
+          "title": "When To Use Agents",
+          "desc": "When To Use Agents"
+        },
+        {
+          "file": "04_augmented_llm.svg",
+          "title": "Augmented Llm",
+          "desc": "Augmented Llm"
+        },
+        {
+          "file": "05_prompt_chaining.svg",
+          "title": "Prompt Chaining",
+          "desc": "Prompt Chaining"
+        },
+        {
+          "file": "06_routing.svg",
+          "title": "Routing",
+          "desc": "Routing"
+        },
+        {
+          "file": "07_parallelization.svg",
+          "title": "Parallelization",
+          "desc": "Parallelization"
+        },
+        {
+          "file": "08_orchestrator_workers.svg",
+          "title": "Orchestrator Workers",
+          "desc": "Orchestrator Workers"
+        },
+        {
+          "file": "09_evaluator_optimizer.svg",
+          "title": "Evaluator Optimizer",
+          "desc": "Evaluator Optimizer"
+        },
+        {
+          "file": "10_agents.svg",
+          "title": "Agents",
+          "desc": "Agents"
+        },
+        {
+          "file": "11_agents_in_practice.svg",
+          "title": "Agents In Practice",
+          "desc": "Agents In Practice"
+        },
+        {
+          "file": "12_summary.svg",
+          "title": "Summary",
+          "desc": "Summary"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_building_effective_agents/README.md",
+        "design_spec": "examples/ppt169_building_effective_agents/design_spec.md",
+        "spec_lock": "examples/ppt169_building_effective_agents/spec_lock.md",
+        "animations": null,
+        "image_analysis": "examples/ppt169_building_effective_agents/image_analysis.csv",
+        "svg_final_dir": "examples/ppt169_building_effective_agents/svg_final",
+        "images_dir": "examples/ppt169_building_effective_agents/images",
+        "exports": [
+          "examples/ppt169_building_effective_agents/exports/building_effective_agents.pptx"
+        ],
+        "notes_dir": "examples/ppt169_building_effective_agents/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 12,
+        "image_files": 9,
+        "export_files": 1,
+        "notes_files": 13,
+        "spec_image_refs": 8
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#0F1117",
+          "secondary_bg": "#1A1D27",
+          "primary": "#D4845A",
+          "accent": "#5B9BD5",
+          "secondary_accent": "#E8B87D",
+          "text": "#E8E8EC",
+          "text_secondary": "#9CA3AF",
+          "text_tertiary": "#6B7280",
+          "border": "#2D3348",
+          "success": "#4ADE80",
+          "warning": "#F87171"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": null,
+          "body_family": null,
+          "font_family": "\"Helvetica Neue\", Arial, sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "chunk",
+        "icon_inventory_count": 23,
+        "page_rhythm_counts": {
+          "anchor": 2,
+          "breathing": 3,
+          "dense": 7
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "breathing",
+          "P03": "dense",
+          "P04": "breathing",
+          "P05": "dense",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "dense",
+          "P10": "breathing",
+          "P11": "dense",
+          "P12": "anchor"
+        },
+        "page_chart_counts": {},
+        "page_charts": {},
+        "forbidden_count": 4,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)"
+        ]
+      },
+      "design_spec_headings": [
+        "Building Effective Agents - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: Introduction",
+        "Slide 01 — Cover (P01)",
+        "Slide 02 — What Are Agents? (P02)",
+        "Part 2: Foundations"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_fashion_weekly_digest",
+      "title": "时尚美学周鉴",
+      "description": "奢侈品与生活方式品牌新闻的杂志化周报",
+      "style": "editorial",
+      "style_name": "Luxury Editorial",
+      "tags": [
+        "Luxury",
+        "Fashion",
+        "杂志风"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_fashion_weekly_digest",
+      "qiaomu_learning_tags": [
+        "image-rich",
+        "magazine-editorial"
+      ],
+      "slide_count": 16,
+      "slide_files": [
+        {
+          "file": "01_封面.svg",
+          "title": "封面",
+          "desc": "封面"
+        },
+        {
+          "file": "02_爱马仕家居.svg",
+          "title": "爱马仕家居",
+          "desc": "爱马仕家居"
+        },
+        {
+          "file": "03_香奈儿海滩.svg",
+          "title": "香奈儿海滩",
+          "desc": "香奈儿海滩"
+        },
+        {
+          "file": "04_迪奥双面.svg",
+          "title": "迪奥双面",
+          "desc": "迪奥双面"
+        },
+        {
+          "file": "05_路易威登家居.svg",
+          "title": "路易威登家居",
+          "desc": "路易威登家居"
+        },
+        {
+          "file": "06_古驰记忆.svg",
+          "title": "古驰记忆",
+          "desc": "古驰记忆"
+        },
+        {
+          "file": "07_珠宝灵韵.svg",
+          "title": "珠宝灵韵",
+          "desc": "珠宝灵韵"
+        },
+        {
+          "file": "08_艺术表达.svg",
+          "title": "艺术表达",
+          "desc": "艺术表达"
+        },
+        {
+          "file": "09_传承新章.svg",
+          "title": "传承新章",
+          "desc": "传承新章"
+        },
+        {
+          "file": "10_结构重塑.svg",
+          "title": "结构重塑",
+          "desc": "结构重塑"
+        },
+        {
+          "file": "11_感官新篇.svg",
+          "title": "感官新篇",
+          "desc": "感官新篇"
+        },
+        {
+          "file": "12_跨界新风.svg",
+          "title": "跨界新风",
+          "desc": "跨界新风"
+        },
+        {
+          "file": "13_潮流共振.svg",
+          "title": "潮流共振",
+          "desc": "潮流共振"
+        },
+        {
+          "file": "14_亮点回顾.svg",
+          "title": "亮点回顾",
+          "desc": "亮点回顾"
+        },
+        {
+          "file": "15_品牌全景.svg",
+          "title": "品牌全景",
+          "desc": "品牌全景"
+        },
+        {
+          "file": "16_结尾.svg",
+          "title": "结尾",
+          "desc": "结尾"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_fashion_weekly_digest/README.md",
+        "design_spec": "examples/ppt169_fashion_weekly_digest/design_spec.md",
+        "spec_lock": "examples/ppt169_fashion_weekly_digest/spec_lock.md",
+        "animations": null,
+        "image_analysis": "examples/ppt169_fashion_weekly_digest/image_analysis.csv",
+        "svg_final_dir": "examples/ppt169_fashion_weekly_digest/svg_final",
+        "images_dir": "examples/ppt169_fashion_weekly_digest/images",
+        "exports": [
+          "examples/ppt169_fashion_weekly_digest/exports/fashion-weekly-digest.pptx"
+        ],
+        "notes_dir": "examples/ppt169_fashion_weekly_digest/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 16,
+        "image_files": 23,
+        "export_files": 1,
+        "notes_files": 17,
+        "spec_image_refs": 22
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#0A0A0A",
+          "bg_secondary": "#1A1A1A",
+          "primary": "#C9A96E",
+          "accent": "#E8D5B5",
+          "secondary_accent": "#8B7355",
+          "text": "#F5F0EB",
+          "text_secondary": "#9E9690",
+          "border": "#2A2520"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": "Georgia, SimSun, serif",
+          "body_family": null,
+          "font_family": "\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "phosphor-duotone",
+        "icon_inventory_count": 16,
+        "page_rhythm_counts": {
+          "anchor": 2,
+          "dense": 12,
+          "breathing": 2
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "dense",
+          "P03": "breathing",
+          "P04": "dense",
+          "P05": "breathing",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "dense",
+          "P10": "dense",
+          "P11": "dense",
+          "P12": "dense",
+          "P13": "dense",
+          "P14": "dense",
+          "P15": "dense",
+          "P16": "anchor"
+        },
+        "page_chart_counts": {},
+        "page_charts": {},
+        "forbidden_count": 5,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)",
+          "HTML named entities in text (`&nbsp;`, `&mdash;`, `&copy;`, `&ndash;`, `&reg;`, `&hellip;`, `&bull;` …) — write as raw Unicode"
+        ]
+      },
+      "design_spec_headings": [
+        "美学周鉴 · 解锁潮流序章 - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 开篇",
+        "Slide 01 — 封面",
+        "Part 2: 顶级奢侈品牌",
+        "Slide 02 — Hermès 家居世界"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_home_design_trends_2026",
+      "title": "2026 家居设计趋势",
+      "description": "杂志编辑风的家居色彩、材质与纹理趋势解析",
+      "style": "general",
+      "style_name": "Magazine Editorial",
+      "tags": [
+        "家居设计",
+        "杂志风",
+        "CMT"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_home_design_trends_2026",
+      "qiaomu_learning_tags": [
+        "expressive-culture",
+        "image-rich",
+        "magazine-editorial"
+      ],
+      "slide_count": 12,
+      "slide_files": [
+        {
+          "file": "01_封面.svg",
+          "title": "封面",
+          "desc": "封面"
+        },
+        {
+          "file": "02_从网红风到人的尺度.svg",
+          "title": "从网红风到人的尺度",
+          "desc": "从网红风到人的尺度"
+        },
+        {
+          "file": "03_色彩情绪魔法师.svg",
+          "title": "色彩情绪魔法师",
+          "desc": "色彩情绪魔法师"
+        },
+        {
+          "file": "04_冷暖色调对比.svg",
+          "title": "冷暖色调对比",
+          "desc": "冷暖色调对比"
+        },
+        {
+          "file": "05_材质空间语言.svg",
+          "title": "材质空间语言",
+          "desc": "材质空间语言"
+        },
+        {
+          "file": "06_纹理空间灵魂.svg",
+          "title": "纹理空间灵魂",
+          "desc": "纹理空间灵魂"
+        },
+        {
+          "file": "07_CMT体系.svg",
+          "title": "CMT体系",
+          "desc": "CMT体系"
+        },
+        {
+          "file": "08_奶油风进化论.svg",
+          "title": "奶油风进化论",
+          "desc": "奶油风进化论"
+        },
+        {
+          "file": "09_波西米亚与复古.svg",
+          "title": "波西米亚与复古",
+          "desc": "波西米亚与复古"
+        },
+        {
+          "file": "10_可持续奢华.svg",
+          "title": "可持续奢华",
+          "desc": "可持续奢华"
+        },
+        {
+          "file": "11_书籍推荐.svg",
+          "title": "书籍推荐",
+          "desc": "书籍推荐"
+        },
+        {
+          "file": "12_结语.svg",
+          "title": "结语",
+          "desc": "结语"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_home_design_trends_2026/README.md",
+        "design_spec": "examples/ppt169_home_design_trends_2026/design_spec.md",
+        "spec_lock": "examples/ppt169_home_design_trends_2026/spec_lock.md",
+        "animations": null,
+        "image_analysis": "examples/ppt169_home_design_trends_2026/image_analysis.csv",
+        "svg_final_dir": "examples/ppt169_home_design_trends_2026/svg_final",
+        "images_dir": "examples/ppt169_home_design_trends_2026/images",
+        "exports": [
+          "examples/ppt169_home_design_trends_2026/exports/home-design-trends-2026.pptx"
+        ],
+        "notes_dir": "examples/ppt169_home_design_trends_2026/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 12,
+        "image_files": 24,
+        "export_files": 1,
+        "notes_files": 13,
+        "spec_image_refs": 23
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#1A1714",
+          "secondary_bg": "#2A2520",
+          "primary": "#C4A882",
+          "accent": "#D4956A",
+          "secondary_accent": "#8B7355",
+          "text": "#E8E0D4",
+          "text_secondary": "#B0A08E",
+          "text_tertiary": "#7A6E60",
+          "border": "#3D362E",
+          "success": "#7BA37B",
+          "warning": "#C06048"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": "Georgia, SimSun, serif",
+          "body_family": null,
+          "font_family": "\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-filled",
+        "icon_inventory_count": 12,
+        "page_rhythm_counts": {
+          "anchor": 3,
+          "breathing": 3,
+          "dense": 6
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "breathing",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "dense",
+          "P06": "dense",
+          "P07": "anchor",
+          "P08": "breathing",
+          "P09": "dense",
+          "P10": "breathing",
+          "P11": "dense",
+          "P12": "anchor"
+        },
+        "page_chart_counts": {},
+        "page_charts": {},
+        "forbidden_count": 4,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)"
+        ]
+      },
+      "design_spec_headings": [
+        "2026家居趋势 - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 开篇",
+        "Slide 01 - 封面",
+        "Slide 02 - 从\"网红风\"到\"人的尺度\"",
+        "Part 2: 三大底层元素"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_kimsoong_loyalty_programme",
+      "title": "Kimsoong Loyalty Programme",
+      "description": "MBB 风格汽车品牌客户忠诚度战略提案",
+      "style": "consulting",
+      "style_name": "Top Consulting",
+      "tags": [
+        "MBB 级",
+        "Loyalty",
+        "Automotive"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_kimsoong_loyalty_programme",
+      "qiaomu_learning_tags": [
+        "report-and-data"
+      ],
+      "slide_count": 10,
+      "slide_files": [
+        {
+          "file": "slide_01_cover.svg",
+          "title": "Cover",
+          "desc": "Cover"
+        },
+        {
+          "file": "slide_02_critical_challenge.svg",
+          "title": "Critical Challenge",
+          "desc": "Critical Challenge"
+        },
+        {
+          "file": "slide_03_company_profile.svg",
+          "title": "Company Profile",
+          "desc": "Company Profile"
+        },
+        {
+          "file": "slide_04_customer_profile.svg",
+          "title": "Customer Profile",
+          "desc": "Customer Profile"
+        },
+        {
+          "file": "slide_05_priorities_gap.svg",
+          "title": "Priorities Gap",
+          "desc": "Priorities Gap"
+        },
+        {
+          "file": "slide_06_root_cause.svg",
+          "title": "Root Cause",
+          "desc": "Root Cause"
+        },
+        {
+          "file": "slide_07_strategic_pillars.svg",
+          "title": "Strategic Pillars",
+          "desc": "Strategic Pillars"
+        },
+        {
+          "file": "slide_08_initiatives.svg",
+          "title": "Initiatives",
+          "desc": "Initiatives"
+        },
+        {
+          "file": "slide_09_roadmap.svg",
+          "title": "Roadmap",
+          "desc": "Roadmap"
+        },
+        {
+          "file": "slide_10_conclusion.svg",
+          "title": "Conclusion",
+          "desc": "Conclusion"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_kimsoong_loyalty_programme/README.md",
+        "design_spec": "examples/ppt169_kimsoong_loyalty_programme/design_spec.md",
+        "spec_lock": "examples/ppt169_kimsoong_loyalty_programme/spec_lock.md",
+        "animations": null,
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_kimsoong_loyalty_programme/svg_final",
+        "images_dir": "examples/ppt169_kimsoong_loyalty_programme/images",
+        "exports": [
+          "examples/ppt169_kimsoong_loyalty_programme/exports/kimsoong_loyalty_programme.pptx"
+        ],
+        "notes_dir": "examples/ppt169_kimsoong_loyalty_programme/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 10,
+        "image_files": 4,
+        "export_files": 1,
+        "notes_files": 11,
+        "spec_image_refs": 4
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#FFFFFF",
+          "secondary_bg": "#F4F6F8",
+          "primary": "#1A3A5C",
+          "accent": "#E8A838",
+          "secondary_accent": "#2D8A4E",
+          "text": "#2C3E50",
+          "text_secondary": "#5D6D7E",
+          "text_tertiary": "#95A5A6",
+          "border": "#D5DDE5",
+          "success": "#27AE60",
+          "warning": "#E74C3C"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": null,
+          "body_family": null,
+          "font_family": "\"Helvetica Neue\", Arial, sans-serif",
+          "code_family": "Consolas, \"Courier New\", monospace"
+        },
+        "icon_library": "tabler-filled",
+        "icon_inventory_count": 16,
+        "page_rhythm_counts": {
+          "anchor": 2,
+          "breathing": 2,
+          "dense": 6
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "breathing",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "dense",
+          "P06": "dense",
+          "P07": "breathing",
+          "P08": "dense",
+          "P09": "dense",
+          "P10": "anchor"
+        },
+        "page_chart_counts": {},
+        "page_charts": {},
+        "forbidden_count": 4,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)"
+        ]
+      },
+      "design_spec_headings": [
+        "Kimsoong Customer Loyalty Programme - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Top Consulting Signature Elements",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: Setting the Stage",
+        "Slide 01 - Cover (anchor)",
+        "Slide 02 - The Challenge: A Critical Retention Gap (breathing)"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_lin_huiyin_architect",
+      "title": "林徽因：当之无愧的建筑师",
+      "description": "深色建筑人文纪念风的林徽因建筑贡献梳理",
+      "style": "editorial",
+      "style_name": "建筑人文纪念",
+      "tags": [
+        "建筑史",
+        "人文",
+        "深色主题"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_lin_huiyin_architect",
+      "qiaomu_learning_tags": [
+        "architecture-and-humanities",
+        "magazine-editorial"
+      ],
+      "slide_count": 10,
+      "slide_files": [
+        {
+          "file": "01_封面.svg",
+          "title": "封面",
+          "desc": "封面"
+        },
+        {
+          "file": "02_人生轨迹.svg",
+          "title": "人生轨迹",
+          "desc": "人生轨迹"
+        },
+        {
+          "file": "03_归国初期建筑实践.svg",
+          "title": "归国初期建筑实践",
+          "desc": "归国初期建筑实践"
+        },
+        {
+          "file": "04_战火中的建筑理想.svg",
+          "title": "战火中的建筑理想",
+          "desc": "战火中的建筑理想"
+        },
+        {
+          "file": "05_国之重器.svg",
+          "title": "国之重器",
+          "desc": "国之重器"
+        },
+        {
+          "file": "06_首篇建筑论文.svg",
+          "title": "首篇建筑论文",
+          "desc": "首篇建筑论文"
+        },
+        {
+          "file": "07_学术贡献一览.svg",
+          "title": "学术贡献一览",
+          "desc": "学术贡献一览"
+        },
+        {
+          "file": "08_穿越战火的建筑斗士.svg",
+          "title": "穿越战火的建筑斗士",
+          "desc": "穿越战火的建筑斗士"
+        },
+        {
+          "file": "09_当之无愧的建筑师.svg",
+          "title": "当之无愧的建筑师",
+          "desc": "当之无愧的建筑师"
+        },
+        {
+          "file": "10_结尾.svg",
+          "title": "结尾",
+          "desc": "结尾"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_lin_huiyin_architect/README.md",
+        "design_spec": "examples/ppt169_lin_huiyin_architect/design_spec.md",
+        "spec_lock": "examples/ppt169_lin_huiyin_architect/spec_lock.md",
+        "animations": null,
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_lin_huiyin_architect/svg_final",
+        "images_dir": "examples/ppt169_lin_huiyin_architect/images",
+        "exports": [
+          "examples/ppt169_lin_huiyin_architect/exports/lin-huiyin-architect.pptx"
+        ],
+        "notes_dir": "examples/ppt169_lin_huiyin_architect/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 10,
+        "image_files": 14,
+        "export_files": 1,
+        "notes_files": 11,
+        "spec_image_refs": 14
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#1A1A2E",
+          "bg_secondary": "#16213E",
+          "primary": "#C9A96E",
+          "accent": "#E8D5B7",
+          "secondary_accent": "#8B6F47",
+          "text": "#E8E8E8",
+          "text_secondary": "#A0A0B0",
+          "text_tertiary": "#6B6B80",
+          "border": "#2A2A4A"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": null,
+          "body_family": null,
+          "font_family": null,
+          "code_family": null
+        },
+        "icon_library": "chunk",
+        "icon_inventory_count": 14,
+        "page_rhythm_counts": {},
+        "page_rhythm": {},
+        "page_chart_counts": {},
+        "page_charts": {},
+        "forbidden_count": 4,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)"
+        ]
+      },
+      "design_spec_headings": [
+        "林徽因：被文学光环遮蔽的建筑巨匠 - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Common Layout Modes",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: 开篇",
+        "Slide 01 - 封面",
+        "Slide 02 - 人生轨迹概览",
+        "Part 2: 建筑师林徽因"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_lin_huiyin_architect_revised",
+      "title": "重识林徽因建筑师身份",
+      "description": "浅色博物馆展陈风的林徽因建筑贡献修订版",
+      "style": "editorial",
+      "style_name": "博物馆展陈风",
+      "tags": [
+        "建筑史",
+        "展陈图录",
+        "修订版"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_lin_huiyin_architect_revised",
+      "qiaomu_learning_tags": [
+        "architecture-and-humanities",
+        "magazine-editorial"
+      ],
+      "slide_count": 9,
+      "slide_files": [
+        {
+          "file": "01_封面.svg",
+          "title": "封面",
+          "desc": "封面"
+        },
+        {
+          "file": "02_为什么今天要重识林徽因.svg",
+          "title": "为什么今天要重识林徽因",
+          "desc": "为什么今天要重识林徽因"
+        },
+        {
+          "file": "03_建筑实践并不缺席.svg",
+          "title": "建筑实践并不缺席",
+          "desc": "建筑实践并不缺席"
+        },
+        {
+          "file": "04_作品现场：建筑不是抽象名词.svg",
+          "title": "作品现场：建筑不是抽象名词",
+          "desc": "作品现场：建筑不是抽象名词"
+        },
+        {
+          "file": "05_国家尺度上的建筑参与.svg",
+          "title": "国家尺度上的建筑参与",
+          "desc": "国家尺度上的建筑参与"
+        },
+        {
+          "file": "06_她不是辅助者，而是理论提出者.svg",
+          "title": "她不是辅助者，而是理论提出者",
+          "desc": "她不是辅助者，而是理论提出者"
+        },
+        {
+          "file": "07_学科、方法与远见.svg",
+          "title": "学科、方法与远见",
+          "desc": "学科、方法与远见"
+        },
+        {
+          "file": "08_她如何穿过战火与病痛.svg",
+          "title": "她如何穿过战火与病痛",
+          "desc": "她如何穿过战火与病痛"
+        },
+        {
+          "file": "09_结尾.svg",
+          "title": "结尾",
+          "desc": "结尾"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_lin_huiyin_architect_revised/README.md",
+        "design_spec": "examples/ppt169_lin_huiyin_architect_revised/design_spec.md",
+        "spec_lock": "examples/ppt169_lin_huiyin_architect_revised/spec_lock.md",
+        "animations": null,
+        "image_analysis": "examples/ppt169_lin_huiyin_architect_revised/image_analysis.csv",
+        "svg_final_dir": "examples/ppt169_lin_huiyin_architect_revised/svg_final",
+        "images_dir": "examples/ppt169_lin_huiyin_architect_revised/images",
+        "exports": [
+          "examples/ppt169_lin_huiyin_architect_revised/exports/lin-huiyin-architect-revised.pptx"
+        ],
+        "notes_dir": "examples/ppt169_lin_huiyin_architect_revised/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 9,
+        "image_files": 13,
+        "export_files": 1,
+        "notes_files": 10,
+        "spec_image_refs": 13
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#F6F1E8",
+          "bg_secondary": "#EFE7DA",
+          "surface": "#FFFFFF",
+          "primary": "#A44A3F",
+          "accent": "#6E7C80",
+          "secondary_accent": "#B6915E",
+          "text": "#1F1B16",
+          "text_secondary": "#6A6258",
+          "text_tertiary": "#978C7E",
+          "border": "#D8CBB8"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": "SimSun",
+          "body_family": "\"PingFang SC\", \"Microsoft YaHei\", Arial, sans-serif",
+          "font_family": "\"PingFang SC\", \"Microsoft YaHei\", Arial, sans-serif",
+          "code_family": null
+        },
+        "icon_library": "tabler-outline",
+        "icon_inventory_count": 12,
+        "page_rhythm_counts": {
+          "anchor": 2,
+          "breathing": 3,
+          "dense": 4
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "breathing",
+          "P03": "dense",
+          "P04": "dense",
+          "P05": "breathing",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "breathing",
+          "P09": "anchor"
+        },
+        "page_chart_counts": {},
+        "page_charts": {},
+        "forbidden_count": 4,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)"
+        ]
+      },
+      "design_spec_headings": [
+        "林徽因：重识建筑师，而非传说 - Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "Gradient Scheme (if needed, using SVG syntax)",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library (combine or break as content demands)",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List (fill as needed)",
+        "VII. Visualization Reference List (if needed)",
+        "VIII. Image Resource List (if needed)",
+        "IX. Content Outline",
+        "Part 1: 重新认识她",
+        "Slide 01 - 封面",
+        "Slide 02 - 为什么今天要重识林徽因",
+        "Part 2: 她作为建筑师"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_liziqi_plant_dye_colors",
+      "title": "李子柒植物染色彩",
+      "description": "东方文化叙事下的传统色与植物染研究",
+      "style": "editorial",
+      "style_name": "东方文化叙事",
+      "tags": [
+        "传统色",
+        "植物染",
+        "东方美学"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_liziqi_plant_dye_colors",
+      "qiaomu_learning_tags": [
+        "eastern-cultural-narrative",
+        "image-rich",
+        "magazine-editorial"
+      ],
+      "slide_count": 12,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "Cover",
+          "desc": "Cover"
+        },
+        {
+          "file": "02_intro.svg",
+          "title": "Intro",
+          "desc": "Intro"
+        },
+        {
+          "file": "03_zhanpao_decode.svg",
+          "title": "Zhanpao Decode",
+          "desc": "Zhanpao Decode"
+        },
+        {
+          "file": "04_history.svg",
+          "title": "History",
+          "desc": "History"
+        },
+        {
+          "file": "05_natural_colors_1.svg",
+          "title": "Natural Colors 1",
+          "desc": "Natural Colors 1"
+        },
+        {
+          "file": "06_natural_colors_2.svg",
+          "title": "Natural Colors 2",
+          "desc": "Natural Colors 2"
+        },
+        {
+          "file": "07_poetic_colors_1.svg",
+          "title": "Poetic Colors 1",
+          "desc": "Poetic Colors 1"
+        },
+        {
+          "file": "08_poetic_colors_2.svg",
+          "title": "Poetic Colors 2",
+          "desc": "Poetic Colors 2"
+        },
+        {
+          "file": "09_dye_plants.svg",
+          "title": "Dye Plants",
+          "desc": "Dye Plants"
+        },
+        {
+          "file": "10_diy_dyeing.svg",
+          "title": "Diy Dyeing",
+          "desc": "Diy Dyeing"
+        },
+        {
+          "file": "11_xuetaojian.svg",
+          "title": "Xuetaojian",
+          "desc": "Xuetaojian"
+        },
+        {
+          "file": "12_ending.svg",
+          "title": "Ending",
+          "desc": "Ending"
+        }
+      ],
+      "learning_materials": {
+        "readme": "examples/ppt169_liziqi_plant_dye_colors/README.md",
+        "design_spec": "examples/ppt169_liziqi_plant_dye_colors/design_spec.md",
+        "spec_lock": "examples/ppt169_liziqi_plant_dye_colors/spec_lock.md",
+        "animations": null,
+        "image_analysis": "examples/ppt169_liziqi_plant_dye_colors/image_analysis.csv",
+        "svg_final_dir": "examples/ppt169_liziqi_plant_dye_colors/svg_final",
+        "images_dir": "examples/ppt169_liziqi_plant_dye_colors/images",
+        "exports": [
+          "examples/ppt169_liziqi_plant_dye_colors/exports/liziqi-plant-dye-colors.pptx"
+        ],
+        "notes_dir": "examples/ppt169_liziqi_plant_dye_colors/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 12,
+        "image_files": 32,
+        "export_files": 1,
+        "notes_files": 13,
+        "spec_image_refs": 17
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#F7F2E8",
+          "bg_secondary": "#EDE5D3",
+          "primary": "#6B9AAE",
+          "accent": "#C99E62",
+          "secondary_accent": "#6F8F75",
+          "accent_2": "#B04A5C",
+          "text": "#3A3530",
+          "text_secondary": "#7A7068",
+          "text_tertiary": "#9B948B",
+          "border": "#D7CEB9"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": null,
+          "body_family": null,
+          "font_family": "\"KaiTi\", \"STKaiti\", \"Microsoft YaHei\", \"PingFang SC\", Georgia, serif",
+          "code_family": null
+        },
+        "icon_library": "tabler-filled",
+        "icon_inventory_count": 10,
+        "page_rhythm_counts": {},
+        "page_rhythm": {},
+        "page_chart_counts": {},
+        "page_charts": {},
+        "forbidden_count": 4,
+        "forbidden": [
+          "Mixing icon libraries (locked to tabler-filled)",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)"
+        ]
+      },
+      "design_spec_headings": [
+        "裁云织月 草木成诗 — Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme（取自文章中真实存在的传统色谱）",
+        "Gradient Scheme（使用 SVG 语法，无 rgba）",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Common Layout Modes",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Recommended Icon List",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1：启幕 — 春晚惊艳",
+        "Slide 01 - Cover（封面）",
+        "Slide 02 - 引子",
+        "Part 2：战袍解密"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    },
+    {
+      "id": "ppt169_general_dark_tech_claude_code_auto_mode",
+      "title": "Claude Code Auto Mode",
+      "description": "Anthropic AI safety engineering — classifier-based permissions",
+      "style": "general",
+      "style_name": "General + Dark Tech",
+      "tags": [
+        "Dark Theme",
+        "AI Safety",
+        "Anthropic"
+      ],
+      "online_viewer": "https://hugohe3.github.io/ppt-master/viewer.html?project=ppt169_general_dark_tech_claude_code_auto_mode",
+      "qiaomu_learning_tags": [],
+      "slide_count": 10,
+      "slide_files": [
+        {
+          "file": "01_cover.svg",
+          "title": "Cover",
+          "desc": "Claude Code Auto Mode"
+        },
+        {
+          "file": "02_approval_fatigue.svg",
+          "title": "Approval Fatigue",
+          "desc": "93% approval rate problem"
+        },
+        {
+          "file": "03_auto_mode.svg",
+          "title": "Auto Mode",
+          "desc": "Classifier-delegated approvals"
+        },
+        {
+          "file": "04_architecture.svg",
+          "title": "Architecture",
+          "desc": "Two layers of defense"
+        },
+        {
+          "file": "05_threat_model.svg",
+          "title": "Threat Model",
+          "desc": "Four threat categories"
+        },
+        {
+          "file": "06_permissions.svg",
+          "title": "Permissions",
+          "desc": "Three-tier permission system"
+        },
+        {
+          "file": "07_classifier.svg",
+          "title": "Classifier",
+          "desc": "Reasoning-blind by design"
+        },
+        {
+          "file": "08_results.svg",
+          "title": "Results",
+          "desc": "Evaluation metrics"
+        },
+        {
+          "file": "09_design_decisions.svg",
+          "title": "Design Decisions",
+          "desc": "Key engineering choices"
+        },
+        {
+          "file": "10_closing.svg",
+          "title": "Closing",
+          "desc": "Substantially safer"
+        }
+      ],
+      "learning_materials": {
+        "readme": null,
+        "design_spec": "examples/ppt169_general_dark_tech_claude_code_auto_mode/design_spec.md",
+        "spec_lock": "examples/ppt169_general_dark_tech_claude_code_auto_mode/spec_lock.md",
+        "animations": null,
+        "image_analysis": null,
+        "svg_final_dir": "examples/ppt169_general_dark_tech_claude_code_auto_mode/svg_final",
+        "images_dir": "examples/ppt169_general_dark_tech_claude_code_auto_mode/images",
+        "exports": [
+          "examples/ppt169_general_dark_tech_claude_code_auto_mode/exports/claude-code-auto-mode_20260422_143501.pptx"
+        ],
+        "notes_dir": "examples/ppt169_general_dark_tech_claude_code_auto_mode/notes"
+      },
+      "asset_counts": {
+        "svg_final_files": 10,
+        "image_files": 4,
+        "export_files": 1,
+        "notes_files": 11,
+        "spec_image_refs": 4
+      },
+      "spec_lock_summary": {
+        "colors": {
+          "bg": "#0D1117",
+          "bg_secondary": "#161B22",
+          "card_bg": "#1C2333",
+          "primary": "#D4A574",
+          "accent": "#60A5FA",
+          "secondary_accent": "#34D399",
+          "text": "#E6EDF3",
+          "text_secondary": "#8B949E",
+          "text_tertiary": "#6E7681",
+          "border": "#30363D",
+          "success": "#34D399",
+          "warning": "#F97316"
+        },
+        "image_rendering": null,
+        "image_palette": null,
+        "typography": {
+          "title_family": null,
+          "body_family": null,
+          "font_family": "\"Arial\", \"Calibri\", \"Helvetica\", sans-serif",
+          "code_family": null
+        },
+        "icon_library": "chunk",
+        "icon_inventory_count": 18,
+        "page_rhythm_counts": {
+          "anchor": 2,
+          "breathing": 2,
+          "dense": 6
+        },
+        "page_rhythm": {
+          "P01": "anchor",
+          "P02": "breathing",
+          "P03": "breathing",
+          "P04": "dense",
+          "P05": "dense",
+          "P06": "dense",
+          "P07": "dense",
+          "P08": "dense",
+          "P09": "dense",
+          "P10": "anchor"
+        },
+        "page_chart_counts": {},
+        "page_charts": {},
+        "forbidden_count": 4,
+        "forbidden": [
+          "Mixing icon libraries",
+          "rgba()",
+          "`<style>`, `class`, `<foreignObject>`, `textPath`, `@font-face`, `<animate*>`, `<script>`, `<iframe>`, `<symbol>`+`<use>`",
+          "`<g opacity>` (set opacity on each child element individually)"
+        ]
+      },
+      "design_spec_headings": [
+        "Claude Code Auto Mode — Design Spec",
+        "I. Project Information",
+        "II. Canvas Specification",
+        "III. Visual Theme",
+        "Theme Style",
+        "Color Scheme",
+        "Gradient Scheme",
+        "IV. Typography System",
+        "Font Plan",
+        "Font Size Hierarchy",
+        "V. Layout Principles",
+        "Page Structure",
+        "Layout Pattern Library",
+        "Spacing Specification",
+        "VI. Icon Usage Specification",
+        "Source",
+        "Icon Inventory",
+        "VII. Visualization Reference List",
+        "VIII. Image Resource List",
+        "IX. Content Outline",
+        "Part 1: Introduction",
+        "Slide 01 — Cover",
+        "Slide 02 — The Problem: Approval Fatigue",
+        "Part 2: How Auto Mode Works"
+      ],
+      "learnable_layers": [
+        "design_spec narrative and visual rationale",
+        "spec_lock execution values and per-page rhythm",
+        "svg_final page geometry and component composition",
+        "images and image prompt manifests",
+        "speaker notes",
+        null
+      ]
+    }
+  ]
+}

@@ -5,3 +5,5 @@ lxml>=5
 Pillow>=10
 python-pptx>=0.6.23
 pypdf>=4
+playwright>=1.45
+openai>=2.0

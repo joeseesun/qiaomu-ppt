@@ -13,6 +13,7 @@ import hashlib
 import json
 import mimetypes
 import re
+import shutil
 import subprocess
 import sys
 import textwrap
@@ -32,6 +33,7 @@ USER_AGENT = (
 )
 MIN_USEFUL_MARKDOWN_CHARS = 420
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+DEFAULT_PDF_IMAGE_PAGES = 4
 
 
 @dataclass
@@ -327,6 +329,84 @@ def extract_pdf_text(pdf_path: Path) -> tuple[str, list[str], str]:
     return "", warnings, "none"
 
 
+def pdf_page_count(pdf_path: Path) -> int | None:
+    try:
+        from pypdf import PdfReader
+
+        return len(PdfReader(str(pdf_path)).pages)
+    except Exception:
+        return None
+
+
+def render_pdf_page_images(pdf_path: Path, output_dir: Path, max_images: int) -> tuple[list[dict[str, str]], list[str]]:
+    """Render the first few PDF pages as visual evidence candidates."""
+    warnings: list[str] = []
+    if max_images <= 0:
+        return [], warnings
+    pdftoppm = shutil.which("pdftoppm")
+    if not pdftoppm:
+        return [], ["pdftoppm unavailable; pdf page images not rendered"]
+
+    page_limit = min(max_images, DEFAULT_PDF_IMAGE_PAGES)
+    count = pdf_page_count(pdf_path)
+    if count is not None:
+        page_limit = min(page_limit, max(count, 0))
+    if page_limit <= 0:
+        return [], ["pdf page count unavailable or zero; pdf page images not rendered"]
+
+    images_dir = output_dir / "images" / f"pdf-{slugify(pdf_path.stem)}-{hash_text(str(pdf_path), 8)}"
+    images_dir.mkdir(parents=True, exist_ok=True)
+    prefix = images_dir / "page"
+    for stale in images_dir.glob("page-*.jpg"):
+        stale.unlink(missing_ok=True)
+
+    try:
+        proc = subprocess.run(
+            [
+                pdftoppm,
+                "-jpeg",
+                "-r",
+                "144",
+                "-f",
+                "1",
+                "-l",
+                str(page_limit),
+                str(pdf_path),
+                str(prefix),
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=90,
+        )
+    except Exception as exc:
+        return [], [f"pdftoppm failed: {exc}"]
+    if proc.returncode != 0:
+        return [], [f"pdftoppm failed: {proc.stderr.strip()[:240]}"]
+
+    def page_number(path: Path) -> int:
+        match = re.search(r"-(\d+)\.jpe?g$", path.name, flags=re.I)
+        return int(match.group(1)) if match else 9999
+
+    rendered = sorted(images_dir.glob("page-*.jpg"), key=page_number)
+    if not rendered:
+        return [], ["pdftoppm produced no page images"]
+
+    images: list[dict[str, str]] = []
+    for idx, image_path in enumerate(rendered[:page_limit], start=1):
+        images.append(
+            {
+                "path": str(image_path.relative_to(output_dir)),
+                "alt": f"{pdf_path.stem} page {idx}",
+                "role": "pdf_page_image",
+                "page": str(idx),
+                "source_path": str(pdf_path),
+                "bytes": str(image_path.stat().st_size),
+            }
+        )
+    return images, warnings
+
+
 def write_markdown(path: Path, title: str, input_value: str, source_type: str, fetch_route: str, body: str) -> None:
     frontmatter = {
         "title": title or Path(path).stem,
@@ -424,6 +504,11 @@ def ingest(input_value: str, output_dir: Path, download_image_files: bool, max_i
             warnings.extend(pdf_warnings)
             if not markdown:
                 missing_evidence.append("pdf_text_extraction_failed")
+            page_images, page_warnings = render_pdf_page_images(path, output_dir, max_images)
+            images.extend(page_images)
+            warnings.extend(page_warnings)
+            if max_images > 0 and not page_images:
+                missing_evidence.append("pdf_page_images_not_rendered")
             title = path.stem
             saved_pdf_path = str(path)
         else:
@@ -448,6 +533,11 @@ def ingest(input_value: str, output_dir: Path, download_image_files: bool, max_i
             warnings.extend(pdf_warnings)
             if not markdown:
                 missing_evidence.append("pdf_text_extraction_failed")
+            page_images, page_warnings = render_pdf_page_images(pdf_path, output_dir, max_images)
+            images.extend(page_images)
+            warnings.extend(page_warnings)
+            if max_images > 0 and not page_images:
+                missing_evidence.append("pdf_page_images_not_rendered")
             title = Path(urlparse(input_value).path).stem or "Remote PDF"
             fetch_route = f"remote_pdf:{extractor}"
         else:

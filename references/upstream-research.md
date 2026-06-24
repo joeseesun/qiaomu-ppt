@@ -1,6 +1,6 @@
 # Upstream Research Notes
 
-These notes summarize the local research used to shape `qiaomu-ppt`. The full upstream repositories were cloned under `research/upstreams/` and pinned in `research/upstreams.lock.json`. They are research evidence only, not runtime dependencies.
+These notes summarize the local research used to shape `qiaomu-ppt`. The full upstream repositories were cloned under `research/upstreams/` and pinned in `research/upstreams.lock.json`. They are not runtime skill dependencies. MIT-licensed infrastructure code may be vendored into `qiaomu-ppt` with attribution; upstream commands and installed upstream skills are still not required at runtime.
 
 ## ppt-master
 
@@ -100,6 +100,6 @@ The qllm MCP discussion converged on this architecture:
 - Keep the SVG-to-PPTX-oriented production spine as the practical default, without depending on `ppt-master`.
 - Add a pre-production narrative and visual strategy layer to offset aesthetics.
 - Route brand launch and courseware differently because their success criteria are opposite in density, pacing, and note style.
-- Keep the package lightweight and do not vendor upstream code.
+- Keep the package lightweight; vendor only the infrastructure code that materially improves output quality, is license-compatible, and is attributed in `NOTICE.md`.
 - Be explicit about verification gaps, especially native Office/WPS opening, exporter availability, and HTML-to-PPTX parity.
 - Add a local design-style recommender so open-ended PPT requests can choose a concrete visual system before production.

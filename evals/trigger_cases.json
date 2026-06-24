@@ -17,7 +17,9 @@
     "speaker": ["演讲", "speaker notes", "演讲备注", "教师备注", "讲稿"],
     "style": ["风格", "设计样式", "自动推荐", "模板", "template"],
     "copy": ["文案", "内容", "说服力", "标题", "claim title", "claim-title", "内容策略"],
-    "url": ["URL", "url", "链接", "网页", "文章链接", "PDF", "pdf", "url-to-ppt", "根据链接做PPT", "网页转PPT", "PDF转PPT"]
+    "url": ["URL", "url", "链接", "网页", "文章链接", "PDF", "pdf", "url-to-ppt", "根据链接做PPT", "网页转PPT", "PDF转PPT"],
+    "paper": ["论文", "paper", "arxiv", "Hugging Face Papers", "Hugging Face paper", "论文做PPT", "arXiv做PPT"],
+    "wechat": ["微信公众号", "公众号文章", "mp.weixin.qq.com", "微信文章", "公众号链接"]
   },
   "negative_patterns": [
     "不要 ppt",
@@ -25,6 +27,7 @@
     "不是 ppt",
     "no ppt",
     "not slides",
+    "不需要 ppt",
     "不需要 pptx",
     "不要生成幻灯片",
     "只要图片",
@@ -66,6 +69,14 @@
     {
       "text": "把这份线上 PDF 报告转成 PPT，先抽取来源和图表。",
       "family": "pdf_to_ppt"
+    },
+    {
+      "text": "把这篇 Hugging Face paper 做成 PPT，先从 arXiv TeX 里提取图表。",
+      "family": "paper_to_ppt"
+    },
+    {
+      "text": "根据这个微信公众号链接做一份 PPT，文章图片也要抓取。",
+      "family": "wechat_article_to_ppt"
     }
   ],
   "should_not_trigger": [

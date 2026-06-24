@@ -7,7 +7,8 @@
 The strongest practical route is:
 
 ```text
-source material
+source intake
+  -> source manifest / source notes / source cards
   -> route card
   -> audience/learning-state plan
   -> style contract

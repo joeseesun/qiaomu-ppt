@@ -1,15 +1,42 @@
 # Design Style Library
 
-This is a Qiaomu-owned PPT abstraction of `voltagent/awesome-design-md`. The upstream repository is a local research snapshot; normal `qiaomu-ppt` runs use the JSON presets and recommendation rules here, not the upstream files.
+This is a Qiaomu-owned PPT abstraction of `voltagent/awesome-design-md`, plus
+Qiaomu-owned prompt-derived and case-derived style packs such as Magazine Art
+Direction and PPT Master Case Styles. Upstream repositories and prompt
+attachments are research snapshots; normal `qiaomu-ppt` runs use the local JSON
+presets and recommendation rules here, not upstream files.
 
 Source snapshot: `voltagent/awesome-design-md` commit `664b3e7`.
+
+Additional local style pack:
+
+- `data/magazine_art_styles.json`: luxury digital magazine art direction adapted
+  from a user-provided prompt, including 29 magazine variants and one searchable
+  `Magazine Art Direction` meta-style.
+- `data/ppt_master_case_styles.json`: 14 case-proven PPT style grammar packs
+  abstracted from `hugohe3/ppt-master` examples, including academic blueprint,
+  data journalism, architecture editorial, Swiss grid, glassmorphism SaaS,
+  Memphis Pop, Risograph Zine, Brutalist Newspaper, Engineering Blueprint,
+  Top Consulting, Luxury Editorial Digest, Eastern Culture Narrative,
+  Image-Text Layout Showcase, and Urban Renewal Editorial directions.
+- `data/32kw_bento_style_presets.json`: 60 Bento Grid style seeds transformed
+  from `https://www.32kw.com/view/bb3310b` into Qiaomu PPT recommendation
+  presets. These are useful for style exploration and candidate recommendation,
+  but they are not mature PPT templates until renderer tokens, slide-pattern
+  examples, four-slide previews, and PPTX compatibility evidence exist.
+- `data/ppt_master_examples_catalog.json`: full learning catalog for the 21
+  studied ppt-master examples, including slide counts, local image counts,
+  learning materials, page rhythm, and page chart vocabulary.
 
 ## How To Use
 
 - If the user gives a brand or visual direction, match it directly when present.
-- If no style is specified, run `python3 <skill>/scripts/recommend_style.py --query "<brief>" --top 5` and choose a style before producing the deck.
+- If no style is specified, run `python3 <skill>/scripts/recommend_style.py --query "<brief>" --top 5` and choose a style before producing the deck. The default command searches `design_style_presets.json`, `magazine_art_styles.json`, `ppt_master_case_styles.json`, and `32kw_bento_style_presets.json`.
 - Treat every preset as style inspiration, not brand ownership. Do not use third-party logos, proprietary assets, or copied wording unless the user supplied rights.
 - Convert web UI tokens into PPT tokens: palette, typography, slide rhythm, media policy, chart policy, and speaker-note intent.
+- In the user-facing design proposal, always show at least 3 style candidates
+  with reason, palette, typography, fit, and risk. Do not hide the decision only
+  in `style_recommendations.json`.
 
 ## Archetype Clusters
 
@@ -33,6 +60,39 @@ Source snapshot: `voltagent/awesome-design-md` commit `664b3e7`.
 | Creative workshop or visual-first launch | `playful_creative_canvas` | Use color blocks/galleries without losing content hierarchy. |
 | Consumer/service journey | `friendly_marketplace` | Use human scenes, rounded cards, and benefit hierarchy. |
 | Nostalgia/internet-history theme | `retro_web_nostalgia` | Use only when the brief intentionally wants period flavor. |
+| High-end magazine / knowledge cards | `editorial_argument` + `Magazine Art Direction` | Use headline, folio, pull quote, sidebar, and editor-note components; do not mix many variants in one final deck. |
+
+## PPT Master Case Styles
+
+The `ppt-master` examples are valuable because their good decks combine style,
+image assets, chart components, page rhythm, and spec locks. Absorb the grammar,
+not the files.
+
+| Case Style | Use When | Visual / Asset Rule | Chart / Layout Rule |
+|---|---|---|---|
+| Academic Blueprint | arXiv, Hugging Face Papers, technical seminar, algorithm explanation | Use paper figures, formulas, TeX tables, and blueprint atmosphere; keep evidence no-crop by default. | Rebuild mechanism diagrams, comparison tables, formula focus pages, and result charts as editable objects. |
+| Data Journalism | market report, annual review, AI capital, finance or strategy briefing | Images are rare and contextual; charts and source captions carry visual interest. | Use varied chart vocabulary: KPI, bar, dumbbell, bubble, Sankey, Pareto, dual-axis, quadrant, table. |
+| Architecture Editorial | architecture, culture, design, biography, place-based story | Let one strong image own the page; captions are evidence, not decoration. | Use timelines, map callouts, caption grids, and simple comparisons rather than forced charts. |
+| Swiss Grid | methodology, design education, old PPT cleanup, clear courseware | Define grid, margins, columns, and red accent use before rendering. | Use matrices, rules, tables, process diagrams, and directly labeled charts. |
+| Glassmorphism SaaS | AI SaaS launch, product demo, UI screenshot story, agent workflow | Use real screenshots and restrained frosted surfaces with solid PPTX fallbacks. | Use KPI panels, architecture maps, product flow, and readable dark-surface charts. |
+| Memphis Pop | youth brand, festival, creative workshop, event guide | Use vivid geometric motifs as controlled accents; body copy stays short. | Use schedule, icon grid, map/zone, comparison cards, and simple event metrics. |
+| Risograph Zine | indie culture, bookstore guide, creator community, art-book essay | Use screen-print, duotone, hard edges, collage texture; text and guide labels remain editable. | Use agenda, timeline, vertical lists, numbered steps, icon grids, tables, and labeled cards. |
+| Brutalist Newspaper | trend dossier, annual report, public-interest analysis, media briefing | Use newsprint texture lightly, columns, source clips, and red as signal only. | Use annotated tables, timelines, bar/slope charts, evidence boxes, and source notes. |
+| Engineering Blueprint | Kubernetes, AI agents, developer tools, infrastructure | Use native diagrams, code/terminal evidence, node ports, and connector grammar. | Use architecture maps, process flows, client-server flows, dependency maps, and matrices. |
+| Top Consulting | business diagnosis, customer strategy, loyalty, roadmap | Trace challenge -> root cause -> pillars -> initiatives -> roadmap. | Use gap charts, root-cause trees, strategic pillars, initiative matrices, and roadmap timelines. |
+| Luxury Editorial Digest | fashion, home design, lifestyle, lookbook, trend digest | Let product/lifestyle imagery carry proof; use restrained champagne accents. | Use trend grids, editorial rankings, galleries, material matrices, and captioned spreads. |
+| Eastern Culture Narrative | Chinese culture, craft, plant dye, heritage, poetic color | Use cultural color tokens and craft images as semantic evidence. | Use color-token grids, process steps, artifact decomposition, quote spreads, and timelines. |
+| Image-Text Layout Showcase | visual essay, portfolio, composition exploration | Treat it as layout vocabulary; every image needs slot, crop focal point, and text-safe area. | Borrow 3-5 compatible layouts, not all patterns at once. |
+| Urban Renewal Editorial | architecture humanities, museum exhibition, biography, before/after cases | Use honest before/after images, place/date captions, and documentary pacing. | Use timelines, maps, before/after comparisons, policy matrices, and case tables. |
+
+Selection rule: if a case style is selected, write its `image_asset_strategy`,
+`page_rhythm`, `page_charts`, and `layout_rules` into `style_brief.md` and
+`spec_lock.json`. A selected case style should change asset planning and chart
+planning, not only colors.
+
+Use [ppt-master-example-catalog.md](ppt-master-example-catalog.md) when the
+style choice needs deeper evidence: asset density, concrete example files,
+speaker notes, animation sidecars, and final SVG geometry.
 
 ## Style Index
 
@@ -115,13 +175,29 @@ Source snapshot: `voltagent/awesome-design-md` commit `664b3e7`.
 
 ## PPT Template Contract
 
-Every preset in `data/design_style_presets.json` provides:
+Every preset in the default style libraries provides:
 
 - `template_name`: user-facing PPT style name.
 - `archetype` and `qiaomu_visual_system`: how it fits Qiaomu routes.
 - `recommended_routes`, `best_for`, `avoid_for`: recommendation guardrails.
 - `palette`, `typography`, `slide_patterns`: the reusable PPT template spec.
 - `layout_rules`, `media_policy`, `chart_policy`, `animation_hint`: production constraints.
+
+## Seed To Template Promotion
+
+Style seeds from broad inspiration pages, including the 32kw Bento set, become
+real Qiaomu PPT templates only after this evidence exists:
+
+- `style_direction.json/md` maps the seed to renderer tokens, component
+  language, proof language, media policy, and chart policy.
+- At least four representative preview slides exist: cover, evidence/proof,
+  diagram/process, and closing/breathing page.
+- The preview passes readability, no-overlap, image/text clearance, and
+  decorative-noise review.
+- SVG/PPTX conversion keeps foreground text, charts, labels, and diagrams
+  editable; bitmap material is limited to background/atmosphere/source images.
+- The seed has an explicit `avoid_for` boundary so it is not recommended for
+  dense evidence or classroom decks when legibility would suffer.
 
 ## Source Boundary
 

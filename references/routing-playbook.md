@@ -48,6 +48,39 @@ Copy method:
 - Prefer memorable one-line claims over feature lists.
 - Put product detail and nuance into speaker notes.
 
+## Topic Research Deck
+
+Use when the user says:
+
+- 介绍某人/某书/某地/某历史事件/某概念
+- 做一个关于 X 的 PPT
+- 没有提供 URL、PDF、旧 PPT、讲稿、教材或资料包
+
+Default:
+
+- `final_delivery`: `editable_pptx`
+- `density`: medium unless the user asks for keynote style
+- `notes`: speaker notes with source context and transition logic
+- `research`: required unless explicitly skipped by the user
+- `checkpoint`: content angle confirmation before full design proposal
+
+Structure:
+
+1. Research brief
+2. Source collection and source cards
+3. User-confirmed angle
+4. Audience state change
+5. Claim-title outline
+6. Style direction
+7. Four-slide preview when the deck exceeds 7 pages
+
+Copy method:
+
+- Use `topic-research-method.md` before outline generation.
+- Turn facts into a point of view. "蒲松龄生平介绍" is weaker than "一个科举失意者如何写出中国最锋利的志怪文学".
+- Every mainline slide should cite `source_card_ids`.
+- If source images are weak, choose archival/museum/public-domain assets, generated concept imagery, or a text/diagram-led visual strategy. Do not pretend weak image material is rich.
+
 ## High School Courseware
 
 Use when the user says:
