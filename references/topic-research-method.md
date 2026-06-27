@@ -42,6 +42,25 @@ Research is not a decoration step. It decides:
 If the original data and images are weak, do not compensate with generic copy.
 Report the weakness, ask for material, or choose a more honest visual strategy.
 
+## Phase 0: Context Intake
+
+Before searching or rendering, collect the minimum context through the guided
+choice flow unless the user's first message is already complete or includes a
+strict approval-bypass phrase.
+
+Show a compact card with recommended defaults for:
+
+- topic angle or narrative direction
+- audience/depth
+- page count
+- style or scene type
+- image/source policy
+- output format
+
+If the user replies `生成`, `默认`, or partial codes after this card, apply the
+defaults and begin the research workflow. This reply does not approve final PPT
+generation.
+
 ## Phase 1: Research Brief
 
 Write a short research brief before searching:
@@ -102,11 +121,14 @@ sources/
   source_notes.md
   source_cards.json
   images/
+research_dossier.md
 ```
 
 `source_manifest.json` records where material came from. `source_notes.md`
 records what the material means. `source_cards.json` is a structured bridge to
-the slide plan.
+the slide plan. `research_dossier.md` is the human-readable research Markdown
+shown or summarized before the slide plan; it may be a root-level file or a
+substantial `sources/source_notes.md` when the project stays compact.
 
 For a deterministic first pass, use:
 
@@ -171,7 +193,7 @@ Recommended `source_cards.json` shape:
 
 ## Phase 3: Source Notes
 
-`source_notes.md` should include:
+`source_notes.md` and/or `research_dossier.md` should include:
 
 - one-paragraph topic understanding
 - timeline or key sequence
@@ -181,6 +203,8 @@ Recommended `source_cards.json` shape:
 - contradictions or uncertain facts
 - visual asset inventory and rights notes
 - material gaps that would weaken the deck
+- which points came from supplied material, which came from web/source research,
+  and which are model-knowledge assumptions needing verification
 
 Never hide gaps. A deck with honest gaps is better than a confident generic
 deck.
@@ -238,11 +262,21 @@ Then write `slide_plan.json`. Every mainline slide should include:
 - `source_card_ids`
 - `source_anchor`
 - `proof_object`
+- `claim_title`
+- `visible_content`
+- `layout_pattern`
+- `image_or_background_plan`
 - `visual_role`
 - `speaker_note_goal`
 - `qa_risk`
 
 If a slide lacks a source card, it is probably filler.
+
+Before rendering, present the slide plan to the user for confirmation. The
+confirmation surface should make every page inspectable: slide number, title,
+content, source anchor, layout, background/image plan, and risk. If the user
+approves with changes, update `content_contract.json`, `slide_plan.json`, and
+the design proposal before any preview or full deck generation.
 
 ## Phase 6: Style Comes After Evidence
 
@@ -269,6 +303,8 @@ For a normal public-facing topic PPT, aim for:
 - at least 3 visual asset candidates or a clear reason why generated conceptual
   images will be used instead
 - a source note for every major date, number, quotation, and interpretation
+- a Markdown research dossier detailed enough to support the slide-plan
+  confirmation step
 
 If these are not met, mark `research_status: partial` and discuss the gap with
 the user before pretending the deck is final.

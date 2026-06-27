@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_family": "content_preparation",
+  "purpose": "把第一步从资料摘要升级为可审计的内容准备包：先证明主题、证据、故事和落版条件成立，再生成正式大纲或 PPT。",
+  "profiles": {
+    "plan": {
+      "minimum_overall_score": 72,
+      "minimum_category_score": 55,
+      "allow_missing_page_kernels": true
+    },
+    "draft": {
+      "minimum_overall_score": 78,
+      "minimum_category_score": 62,
+      "allow_missing_page_kernels": false
+    },
+    "final": {
+      "minimum_overall_score": 84,
+      "minimum_category_score": 70,
+      "allow_missing_page_kernels": false
+    },
+    "release": {
+      "minimum_overall_score": 90,
+      "minimum_category_score": 76,
+      "allow_missing_page_kernels": false
+    }
+  },
+  "expected_artifacts": [
+    {
+      "id": "content_brief",
+      "preferred_files": ["content_brief.json", "deck_brief.json", "content_contract.json", "deck_brief.md"],
+      "label_zh": "内容任务书",
+      "purpose": "说明主题、受众、使用场景、当前状态、目标状态、交付格式、边界和成功标准。"
+    },
+    {
+      "id": "question_tree",
+      "preferred_files": ["research_questions.json", "research_question_tree.json", "question_tree.json", "research_questions.md"],
+      "label_zh": "研究问题树",
+      "purpose": "把宽泛主题拆成核心问题、子问题、反方问题、必须验证的事实、可视化问题和缺口。"
+    },
+    {
+      "id": "evidence_matrix",
+      "preferred_files": ["evidence_matrix.json", "source_evidence_matrix.json", "sources/source_cards.json", "source_cards.json"],
+      "label_zh": "证据卡矩阵",
+      "purpose": "把来源资料整理成能支撑页面主张的证据卡，并标注置信度、来源、适用页面和视觉机会。"
+    },
+    {
+      "id": "page_kernel_map",
+      "preferred_files": ["page_kernel_map.json", "slide_kernel_map.json", "slide_plan.json"],
+      "label_zh": "页面内核表",
+      "purpose": "在正式设计前确认每页唯一主张、证明对象、证据锚点、观众反应、视觉角色、布局理由和转场。"
+    },
+    {
+      "id": "visual_translation",
+      "preferred_files": ["visual_translation_plan.json", "visual_contract.json", "style_direction.json", "style_direction.md"],
+      "label_zh": "视觉翻译准备",
+      "purpose": "把内容主张翻译成版式、图文关系、图片角色、图解方式、文字安全区和反俗套限制。"
+    }
+  ],
+  "content_brief_fields": [
+    "topic",
+    "audience",
+    "use_context",
+    "current_state",
+    "desired_state",
+    "central_thesis",
+    "success_criteria",
+    "constraints",
+    "delivery_format"
+  ],
+  "question_tree_fields": [
+    "root_question",
+    "subquestions",
+    "counter_questions",
+    "must_verify",
+    "source_plan",
+    "visual_questions",
+    "known_gaps"
+  ],
+  "evidence_card_fields": [
+    "id",
+    "claim",
+    "evidence",
+    "source_ids",
+    "source_url_or_path",
+    "confidence",
+    "supports_questions",
+    "supports_slide",
+    "visual_opportunity",
+    "risk"
+  ],
+  "page_kernel_fields": [
+    "slide_no",
+    "claim_title",
+    "proof_object",
+    "source_card_ids",
+    "concrete_anchor",
+    "audience_shift",
+    "content_role",
+    "visual_role",
+    "layout_reason",
+    "transition_from_previous"
+  ],
+  "quality_rules": [
+    "第一步先证明内容成立，再生成漂亮页面。",
+    "研究问题树必须覆盖正向问题和反方问题，避免只搜支持自己结论的材料。",
+    "证据卡必须能映射到页面主张；不能只保存来源摘要。",
+    "页面内核表优先于正式 slide_plan；每页只有一个主张和一个主要证明对象。",
+    "视觉翻译准备要说明内容为什么适合某种版式或图片角色，而不是泛泛说高级、科技、简洁。",
+    "资料不足时写 missing evidence，不用空泛背景补洞。"
+  ],
+  "hard_blockers": [
+    "缺内容任务书，无法判断受众和使用场景",
+    "缺研究问题树，宽泛主题容易变目录",
+    "缺证据卡或证据卡没有来源",
+    "正式大纲前缺页面内核表",
+    "关键页没有证据锚点或具体事实",
+    "视觉翻译准备只写风格词，没有图文关系和布局理由"
+  ]
+}

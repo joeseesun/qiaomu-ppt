@@ -56,7 +56,7 @@
       "name": "Node.js",
       "required": false,
       "commands": ["node", "npm", "npx"],
-      "used_for": "Optional CSS/Canvas/WebGL procedural background rendering for HTML previews or static raster export.",
+      "used_for": "Optional CSS/Canvas/WebGL procedural background rendering, GSAP/Lottie browser-library self-hosting, and static raster export for HTML previews.",
       "macos_install": "brew install node",
       "ubuntu_install": "sudo apt-get install nodejs npm"
     },
@@ -139,10 +139,35 @@
     ],
     "policy": "Optional JS libraries are allowed for project-specific HTML previews, but public qiaomu-ppt output must still degrade to deterministic SVG/Python backgrounds."
   },
+  "optional_html_motion_engines": {
+    "presets": "data/html_motion_presets.json",
+    "manifest": "html_motion_manifest.json",
+    "browser_packages": [
+      {
+        "package": "gsap",
+        "used_for": "Timeline choreography for DOM/SVG/CSS formal HTML deck elements.",
+        "install": "npm install gsap",
+        "runtime_policy": "Copy a local browser build into the project asset folder or clearly list the external dependency in html_motion_manifest.json."
+      },
+      {
+        "package": "lottie-web",
+        "used_for": "Playback of After Effects / Bodymovin JSON animation assets in formal HTML decks.",
+        "install": "npm install lottie-web",
+        "runtime_policy": "Use local .json assets and set autoplay false unless the manifest explicitly records a finite loop need."
+      },
+      {
+        "package": "@lottiefiles/dotlottie-web",
+        "used_for": "Playback of packaged .lottie assets in formal HTML decks.",
+        "install": "npm install @lottiefiles/dotlottie-web",
+        "runtime_policy": "Use local .lottie assets and provide a poster/static fallback for cinematic motion."
+      }
+    ],
+    "policy": "HTML motion is opt-in. Final/professional HTML decks that use authored motion must include html_motion_manifest.json, respect prefers-reduced-motion, keep a readable static state, and pass validate_html_deck.py with --motion-manifest."
+  },
   "degradation_policy": [
     "If Python URL packages are missing, run scripts/bootstrap.py --install-python or use direct Markdown/local files.",
     "If image generation is unavailable, run scripts/procedural_background_pack.py and record procedural_fallback_policy in visual_contract.json.",
-    "If Node.js is missing, use deterministic SVG/Python procedural backgrounds instead of Canvas/WebGL.",
+    "If Node.js is missing, use deterministic SVG/Python procedural backgrounds instead of Canvas/WebGL; for HTML motion, use already-packaged local browser assets or downgrade to CSS/static motion.",
     "If LibreOffice is missing, run scripts/bootstrap.py --install-system and rerun scripts/bootstrap.py --check before claiming PPTX-to-PDF preview verification.",
     "If Poppler is missing, use pypdf fallback for PDF text extraction and mark layout fidelity as missing evidence.",
     "If fonts are missing, use system CJK and Latin fonts and record typography as missing evidence for exact rendering.",

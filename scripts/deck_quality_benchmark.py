@@ -16,6 +16,58 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 SKILL_DIR = SCRIPT_DIR.parent
 DEFAULT_CATALOG = SKILL_DIR / "data" / "ppt_master_examples_catalog.json"
 TERMINAL_STATUSES = {"Generated", "Sourced", "Existing", "Rendered"}
+BACKGROUND_ROLE_TOKENS = {
+    "background",
+    "atmosphere",
+    "ambient",
+    "texture",
+    "wallpaper",
+    "wash",
+}
+MEDIA_EXPECTATION_TOKENS = {
+    "album",
+    "music",
+    "musician",
+    "singer",
+    "song",
+    "cover art",
+    "architecture",
+    "architect",
+    "fashion",
+    "design",
+    "culture",
+    "biography",
+    "portrait",
+    "product",
+    "brand",
+    "museum",
+    "editorial",
+    "magazine",
+    "photo essay",
+    "image-rich",
+    "visual essay",
+    "专辑",
+    "唱片",
+    "音乐",
+    "歌手",
+    "歌曲",
+    "封面",
+    "艺人",
+    "建筑",
+    "建筑师",
+    "时尚",
+    "设计",
+    "文化",
+    "人物",
+    "传记",
+    "照片",
+    "影像",
+    "杂志",
+    "图像",
+    "图文",
+    "产品",
+    "品牌",
+}
 
 
 def load_json(path: Path) -> Any:
@@ -42,6 +94,92 @@ def iter_slides(plan: Any) -> list[dict[str, Any]]:
     else:
         slides = plan
     return [item for item in slides if isinstance(item, dict)] if isinstance(slides, list) else []
+
+
+def asset_slide_numbers(item: dict[str, Any]) -> set[int]:
+    slides: set[int] = set()
+
+    def add(value: Any) -> None:
+        if value is None:
+            return
+        if isinstance(value, int):
+            if value > 0:
+                slides.add(value)
+            return
+        text = str(value)
+        for match in re.finditer(r"\d+", text):
+            try:
+                number = int(match.group(0))
+            except Exception:
+                continue
+            if 0 < number < 200:
+                slides.add(number)
+
+    for key in ("slide_no", "slide", "page", "page_no"):
+        add(item.get(key))
+    for key in ("allowed_pages", "slides", "pages", "usage", "used_on"):
+        raw = item.get(key)
+        if isinstance(raw, list):
+            for value in raw:
+                add(value)
+        else:
+            add(raw)
+    if not slides:
+        for key in ("asset_id", "filename", "path"):
+            text = str(item.get(key) or "")
+            match = re.search(r"(?:slide|page|p|bg|visual|image)[-_ ]?0?(\d{1,3})(?:\D|$)", text, flags=re.IGNORECASE)
+            if match:
+                add(match.group(1))
+                break
+    return slides
+
+
+def is_background_like_asset(item: dict[str, Any]) -> bool:
+    blob = " ".join(
+        str(item.get(key) or "")
+        for key in ("asset_role", "purpose", "visual_type", "page_role", "reference", "filename", "asset_id")
+    ).lower()
+    return any(token in blob for token in BACKGROUND_ROLE_TOKENS)
+
+
+def is_primary_media_asset(item: dict[str, Any]) -> bool:
+    acquire_via = str(item.get("acquire_via") or "").lower()
+    if acquire_via in {"source", "web", "user", "formula"}:
+        return True
+    if acquire_via == "ai":
+        return not is_background_like_asset(item)
+    return False
+
+
+def media_expectation_stats(project: Path, slides: list[dict[str, Any]]) -> dict[str, Any]:
+    snippets: list[str] = []
+    for name in (
+        "deck_brief.md",
+        "design_proposal.md",
+        "style_brief.md",
+        "design_spec.md",
+        "content_contract.json",
+        "slide_plan.json",
+    ):
+        path = project / name
+        if path.exists():
+            try:
+                snippets.append(path.read_text(encoding="utf-8", errors="replace")[:50000])
+            except Exception:
+                continue
+    for slide in slides:
+        snippets.append(
+            " ".join(
+                str(slide.get(key) or "")
+                for key in ("title", "claim_title", "intent", "visual_role", "proof_object", "source_anchor")
+            )
+        )
+    blob = "\n".join(snippets).lower()
+    matched = sorted(token for token in MEDIA_EXPECTATION_TOKENS if token.lower() in blob)
+    return {
+        "expected": bool(matched),
+        "matched_tokens": matched[:20],
+    }
 
 
 def catalog_baseline(path: Path) -> dict[str, Any]:
@@ -88,6 +226,10 @@ def visual_asset_stats(project: Path) -> dict[str, Any]:
             "real_imagegen_count": 0,
             "procedural_fallback_count": 0,
             "source_or_web_count": 0,
+            "source_or_web_slide_count": 0,
+            "primary_media_count": 0,
+            "primary_media_slide_count": 0,
+            "background_terminal_count": 0,
         }
     data = load_json(path)
     items = data.get("items") if isinstance(data, dict) else []
@@ -98,8 +240,14 @@ def visual_asset_stats(project: Path) -> dict[str, Any]:
         "real_imagegen_count": 0,
         "procedural_fallback_count": 0,
         "source_or_web_count": 0,
+        "source_or_web_slide_count": 0,
+        "primary_media_count": 0,
+        "primary_media_slide_count": 0,
+        "background_terminal_count": 0,
     }
     slides: set[int] = set()
+    source_or_web_slides: set[int] = set()
+    primary_media_slides: set[int] = set()
     for item in items if isinstance(items, list) else []:
         if not isinstance(item, dict):
             continue
@@ -108,24 +256,28 @@ def visual_asset_stats(project: Path) -> dict[str, Any]:
         generator = str(item.get("generator") or "")
         if acquire_via == "ai":
             stats["ai_count"] += 1
-        if acquire_via in {"web", "source", "user"} and status in {"Sourced", "Existing"}:
-            stats["source_or_web_count"] += 1
         if status in {"Generated", "Sourced", "Existing", "Rendered"}:
             rel = str(item.get("path") or "")
             if rel and (project / rel).exists():
                 stats["terminal_count"] += 1
-                try:
-                    no = int(item.get("slide_no") or 0)
-                except Exception:
-                    no = 0
-                if no > 0:
-                    slides.add(no)
+                slide_numbers = asset_slide_numbers(item)
+                slides.update(slide_numbers)
+                if acquire_via in {"web", "source", "user"} and status in {"Sourced", "Existing"}:
+                    stats["source_or_web_count"] += 1
+                    source_or_web_slides.update(slide_numbers)
+                if is_primary_media_asset(item):
+                    stats["primary_media_count"] += 1
+                    primary_media_slides.update(slide_numbers)
+                elif is_background_like_asset(item):
+                    stats["background_terminal_count"] += 1
                 if acquire_via == "ai" and status == "Generated":
                     if generator == "procedural-preview-fallback":
                         stats["procedural_fallback_count"] += 1
                     elif generator:
                         stats["real_imagegen_count"] += 1
     stats["terminal_slide_count"] = len(slides)
+    stats["source_or_web_slide_count"] = len(source_or_web_slides)
+    stats["primary_media_slide_count"] = len(primary_media_slides)
     return stats
 
 
@@ -164,15 +316,10 @@ def image_diversity_stats(project: Path, slide_count: int) -> dict[str, Any]:
         if not rel or not (project / rel).exists():
             continue
         result["terminal_image_count"] += 1
-        try:
-            slide_no = int(item.get("slide_no") or 0)
-        except Exception:
-            slide_no = 0
-        if slide_no <= 0:
-            continue
-        # Count one primary visual fingerprint per slide; extra ITL comparison rows
-        # still matter elsewhere, but thumbnail diversity is slide-level.
-        slide_paths.setdefault(slide_no, rel)
+        for slide_no in sorted(asset_slide_numbers(item)):
+            # Count one primary visual fingerprint per slide; extra ITL comparison rows
+            # still matter elsewhere, but thumbnail diversity is slide-level.
+            slide_paths.setdefault(slide_no, rel)
 
     ordered = [slide_paths[idx] for idx in sorted(slide_paths)]
     counts = {rel: ordered.count(rel) for rel in set(ordered)}
@@ -563,6 +710,7 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
     image_diversity = image_diversity_stats(project, slide_count)
     style_exec = style_execution_stats(project)
     upstream_creation = upstream_creation_stats(project)
+    media_expectation = media_expectation_stats(project, slides)
 
     art_target = max(3, min(slide_count, round(slide_count * 0.55)))
     fp_target = max(3, min(slide_count, round(slide_count * 0.55)))
@@ -571,6 +719,10 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
     svg_image_ratio = ratio(float(rhythm.get("svg_image_slides") or 0), slide_count)
     real_image_ratio = ratio(float(assets["real_imagegen_count"]), max(1.0, float(assets["ai_count"])))
     non_ai_terminal_visual_ratio = ratio(float(assets["source_or_web_count"]), max(1.0, float(slide_count or 1)))
+    primary_media_target = min(slide_count, max(3, round(slide_count * 0.35))) if media_expectation["expected"] else 0
+    primary_media_score = 100 if not media_expectation["expected"] else pct(
+        ratio(float(assets["primary_media_slide_count"]), float(primary_media_target or 1))
+    )
     source_ratio = float(sources["cited_slide_ratio"])
     source_visual_ratio = 1.0
     if sources["image_candidates"]:
@@ -645,6 +797,21 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
                 f"terminal image slides {assets['terminal_slide_count']}/{slide_count}, "
                 f"SVG image slides {rhythm.get('svg_image_slides', 0)}/{slide_count}, "
                 f"baseline target ratio {image_ratio_target:.2f}"
+            ),
+        },
+        {
+            "id": "primary_media_evidence",
+            "weight": 12,
+            "score": primary_media_score,
+            "evidence": (
+                (
+                    f"primary media slides {assets['primary_media_slide_count']}/{primary_media_target} target; "
+                    f"primary media assets {assets['primary_media_count']}; "
+                    f"background-only assets {assets['background_terminal_count']}; "
+                    "media expectation tokens: " + ", ".join(media_expectation["matched_tokens"][:8])
+                )
+                if media_expectation["expected"]
+                else "no image-rich subject signal detected"
             ),
         },
         {
@@ -747,6 +914,9 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
     if image_diversity.get("adjacent_repeat_count", 0):
         total = min(total, 90)
         score_caps.append("adjacent repeated image assets cap score at 90")
+    if media_expectation["expected"] and primary_media_target and assets["primary_media_slide_count"] < min(3, primary_media_target):
+        total = min(total, 82)
+        score_caps.append("image-rich subject with insufficient primary media assets caps score at 82")
     if slide_count >= 8 and not exports["has_pdf"]:
         total = min(total, 89)
         score_caps.append("missing PDF export caps score at 89")
@@ -774,6 +944,12 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
             f"{image_diversity.get('adjacent_repeat_count', 0)} adjacent repeat(s), "
             f"{image_diversity.get('overused_count', 0)} overused asset(s)"
         )
+    if media_expectation["expected"] and primary_media_score < 80:
+        warnings.append(
+            "primary media evidence is weak for an image-rich subject: "
+            f"{assets['primary_media_slide_count']} primary-media slide(s), "
+            f"{assets['background_terminal_count']} background-only asset(s)"
+        )
     if int(style_exec.get("score") or 0) < 75:
         warnings.append(f"style execution audit is weak: score {style_exec.get('score', 0)}")
     if int(upstream_creation.get("score") or 0) < 75:
@@ -792,6 +968,7 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
         and int(upstream_creation.get("score") or 0) >= 75
         and int(style_exec.get("score") or 0) >= 75
         and ratio(float(rhythm.get("unique_art_directions") or 0), art_target) >= 1.0
+        and (not media_expectation["expected"] or primary_media_score >= 80)
     )
     if ppt_master_ready:
         readiness = "ppt_master_ready"
@@ -820,6 +997,7 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
             "exports": exports,
             "image_resolution": image_resolution,
             "image_diversity": image_diversity,
+            "media_expectation": media_expectation,
             "style_execution": style_exec,
             "upstream_creation": upstream_creation,
         },

@@ -361,6 +361,175 @@ def mirror_research_plan_to_root(project: Path) -> None:
         target.write_text(source_plan.read_text(encoding="utf-8"), encoding="utf-8")
 
 
+def read_text_if_exists(path: Path, max_chars: int | None = None) -> str:
+    if not path.exists():
+        return ""
+    text = path.read_text(encoding="utf-8", errors="replace").strip()
+    if max_chars and len(text) > max_chars:
+        return text[:max_chars].rstrip() + "\n\n...(truncated for dossier; see source file)"
+    return text
+
+
+def load_json_if_exists(path: Path) -> Any:
+    if not path.exists():
+        return None
+    try:
+        return read_json(path)
+    except Exception:
+        return None
+
+
+def compact_cell(value: Any, max_chars: int = 120) -> str:
+    if isinstance(value, list):
+        value = " / ".join(str(item) for item in value[:4])
+    if isinstance(value, dict):
+        value = " / ".join(f"{key}: {val}" for key, val in list(value.items())[:4])
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    return text[:max_chars].rstrip() + ("..." if len(text) > max_chars else "")
+
+
+def slide_plan_confirmation_table(project: Path) -> str:
+    plan_path = project / "slide_plan.json"
+    if not plan_path.exists():
+        plan_path = project / "slide_plan_seed.json"
+    payload = load_json_if_exists(plan_path)
+    slides = payload.get("slides") if isinstance(payload, dict) else None
+    if not isinstance(slides, list) or not slides:
+        return "- Slide plan is pending. Generate/refine `slide_plan.json` before rendering."
+
+    rows = [
+        "| Page | Title/claim | Visible content | Source anchor | Layout | Background/image | QA risk |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for idx, slide in enumerate(slides, start=1):
+        if not isinstance(slide, dict):
+            continue
+        page = slide.get("page") or slide.get("slide_no") or f"P{idx:02d}"
+        title = slide.get("claim_title") or slide.get("title") or ""
+        content = (
+            slide.get("visible_content")
+            or slide.get("content")
+            or slide.get("content_chunks")
+            or slide.get("body")
+            or ""
+        )
+        source_anchor = slide.get("source_anchor") or slide.get("source_card_ids") or ""
+        layout = slide.get("layout_pattern") or slide.get("layout_pattern_id") or slide.get("component_plan") or ""
+        background = (
+            slide.get("image_or_background_plan")
+            or slide.get("background_id")
+            or slide.get("visual_role")
+            or slide.get("proof_object")
+            or ""
+        )
+        qa_risk = slide.get("qa_risk") or slide.get("copy_risk") or ""
+        rows.append(
+            "| "
+            + " | ".join(
+                compact_cell(item).replace("|", "/")
+                for item in [page, title, content, source_anchor, layout, background, qa_risk]
+            )
+            + " |"
+        )
+    return "\n".join(rows)
+
+
+def write_research_dossier(
+    project: Path,
+    topic: str,
+    route: str,
+    audience: str,
+    status: str,
+    inputs: list[str],
+    warning: str = "",
+) -> None:
+    sources_dir = project / "sources"
+    source_notes = read_text_if_exists(sources_dir / "source_notes.md", max_chars=12000)
+    research_plan = read_text_if_exists(project / "research_plan.md", max_chars=4000) or read_text_if_exists(
+        sources_dir / "research_plan.md",
+        max_chars=4000,
+    )
+    manifest = load_json_if_exists(sources_dir / "source_manifest.json")
+    cards_payload = load_json_if_exists(sources_dir / "source_cards.json")
+
+    source_lines: list[str] = []
+    if isinstance(manifest, dict):
+        for idx, item in enumerate(manifest.get("sources") or [], start=1):
+            if not isinstance(item, dict):
+                continue
+            title = item.get("title") or item.get("source") or item.get("url") or item.get("path") or f"source {idx}"
+            source_type = item.get("source_type") or item.get("type") or ""
+            route_name = item.get("fetch_route") or item.get("route") or ""
+            missing = item.get("missing_evidence") or []
+            source_lines.append(
+                f"- s{idx:02d}: {title} ({source_type or 'source'}; {route_name or 'route recorded'})"
+                + (f"; missing: {', '.join(str(x) for x in missing)}" if missing else "")
+            )
+
+    card_lines: list[str] = []
+    image_lines: list[str] = []
+    if isinstance(cards_payload, dict):
+        for card in (cards_payload.get("cards") or [])[:16]:
+            if not isinstance(card, dict):
+                continue
+            card_lines.append(
+                f"- `{card.get('id', '')}` {compact_cell(card.get('claim'), 180)}"
+                + (f" [{card.get('confidence')}]" if card.get("confidence") else "")
+            )
+        for item in (cards_payload.get("image_candidates") or [])[:16]:
+            if not isinstance(item, dict):
+                continue
+            image_lines.append(
+                f"- `{item.get('id', '')}` {item.get('role') or item.get('usable_pages') or 'image'}: "
+                f"{compact_cell(item.get('path_or_url') or item.get('path') or item.get('url'), 160)}"
+            )
+
+    write_text(
+        project / "research_dossier.md",
+        f"""# Research Dossier: {topic or "source-backed deck"}
+
+generated_at: {now_iso()}  
+route: {route}  
+audience: {audience}  
+status: {status}
+
+## Context
+
+- Inputs: {", ".join(inputs) if inputs else "topic-only request"}
+- This dossier is the reviewable material base before slide planning.
+- Model prior knowledge may inform search lanes and synthesis, but slide claims should be anchored to supplied or ingested sources.
+
+## Source Coverage
+
+{chr(10).join(source_lines) if source_lines else "- No ingested source manifest yet. Use this dossier as a research brief, not as evidence."}
+
+## Research Plan
+
+{research_plan or "No separate research plan was generated."}
+
+## Source Notes
+
+{source_notes or "No source notes were generated yet."}
+
+## Evidence Cards
+
+{chr(10).join(card_lines) if card_lines else "- No source cards were generated yet."}
+
+## Visual Assets And Image Candidates
+
+{chr(10).join(image_lines) if image_lines else "- No image candidates were found yet; record source-image gaps or generated-image policy before rendering."}
+
+## Gaps And Warnings
+
+{warning.strip() if warning.strip() else "- No additional warnings recorded at preparation time."}
+
+## Next Required Confirmation
+
+Review `design_proposal.md` and the page-by-page `slide_plan.json` summary before rendering any PPT pages.
+""",
+    )
+
+
 def build_outline_and_visuals(
     project: Path,
     topic: str,
@@ -667,6 +836,7 @@ def write_briefs(
         return "\n\n".join(lines) or "- no style candidates generated"
 
     style_candidate_md = style_candidate_lines()
+    slide_plan_md = slide_plan_confirmation_table(project)
     write_text(
         project / "deck_brief.md",
         f"""# Deck Brief
@@ -717,9 +887,13 @@ Archetype: {top_style.get("archetype", "editorial_argument")}
         f"""# PPT Design Proposal
 
 - page_count: generated from requested slide count or source-card coverage.
-- source_research_summary: see `sources/source_notes.md` and `sources/source_cards.json`; status `{status}`.
+- source_research_summary: see `research_dossier.md`, `sources/source_notes.md`, and `sources/source_cards.json`; status `{status}`.
 - audience_state_change: from raw material or broad topic to a memorable source-backed argument.
 - story_arc: claim-title outline in `slide_plan_seed.json` / `slide_plan.json` when available.
+- slide_plan_for_confirmation:
+
+{slide_plan_md}
+
 - reference_model: {top_style.get("label", "source-backed editorial")} with source-backed proof objects and concrete image/text layouts.
 - style_candidates:
 
@@ -729,9 +903,9 @@ Archetype: {top_style.get("archetype", "editorial_argument")}
 - layout_mix: recorded in `layout_recommendations.json`.
 - image_text_layout_plan: choose from the recommended ITL patterns and source image availability.
 - visual_components: charts, diagrams, quote pages, source screenshots, and generated atmosphere only when they serve the claim.
-- visual_asset_acquisition_plan: source/user/web/formula assets for evidence; AI only for atmosphere, chapter art, scenario, concept metaphor, or texture.
-- image_generation_decision: allowed for atmosphere/concept imagery, never for fake evidence, charts, screenshots, logos, or layout objects.
-- recommended_generation_stack: Claude Opus 4.8 for reasoning/layout/code and gpt-image-2 or Codex built-in image generation for bitmap backgrounds/concept images when available.
+- visual_asset_acquisition_plan: source/user/web/formula assets for evidence; Codex/host-native AI generation by default when available for atmosphere, chapter art, scenario, concept metaphor, quiet texture, or closing visuals.
+- image_generation_decision: recommended default is Codex/host-native image generation when available; use configured API second; never use AI for fake evidence, charts, screenshots, logos, source/product objects, or layout objects.
+- recommended_generation_stack: strongest suitable reasoning/layout/code model plus Codex built-in image generation as the first-choice bitmap route in Codex environments; gpt-image-2 or another verified provider as API-backed second route for backgrounds/concept images when host-native generation is unavailable or declined.
 - background_plan: per-slide background roles are locked in `visual_contract.json` after slide plan exists.
 - deliverables: PPTX, semantic HTML, parity HTML preview, PDF, Keynote when feasible, speaker notes, and sidecar contracts.
 - model_contract: yes; use `content_contract.json`, `slide_plan.json`, `visual_contract.json`, `visual_asset_manifest.json`, and export manifests.
@@ -919,6 +1093,16 @@ def main() -> int:
             else:
                 write_topic_research_plan(project, topic, route, args.audience)
 
+    mirror_research_plan_to_root(project)
+    write_research_dossier(
+        project=project,
+        topic=topic,
+        route=route,
+        audience=args.audience,
+        status=status,
+        inputs=inputs,
+        warning="\n".join(item for item in [research_warning, source_supplement_warning] if item),
+    )
     write_briefs(
         project=project,
         topic=topic,
@@ -982,6 +1166,15 @@ def main() -> int:
                 image_art_direction_result = build_image_art_direction(project, topic)
                 if args.materialize_assets:
                     materialize_result = materialize_visual_assets(project, force=args.force)
+                write_research_dossier(
+                    project=project,
+                    topic=topic,
+                    route=route,
+                    audience=args.audience,
+                    status=status,
+                    inputs=inputs,
+                    warning="\n".join(item for item in [research_warning, source_supplement_warning] if item),
+                )
                 write_briefs(
                     project=project,
                     topic=topic,
@@ -1033,6 +1226,7 @@ def main() -> int:
         "materialize_result": materialize_result,
         "artifacts": {
             "deck_brief": "deck_brief.md",
+            "research_dossier": "research_dossier.md" if (project / "research_dossier.md").exists() else "",
             "style_brief": "style_brief.md",
             "design_proposal": "design_proposal.md",
             "style_recommendations": "style_recommendations.json",

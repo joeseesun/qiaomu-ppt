@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "乔木 PPT 顶级质量前置评分。用于在四页预览或最终生成前检查资料、叙事、页面文案、视觉系统和图片艺术指导是否足够支撑高质量 PPT。",
+  "profiles": {
+    "plan": {
+      "minimum_overall_score": 70,
+      "minimum_category_score": 55,
+      "allow_missing_visual_assets": true
+    },
+    "draft": {
+      "minimum_overall_score": 76,
+      "minimum_category_score": 62,
+      "allow_missing_visual_assets": false
+    },
+    "final": {
+      "minimum_overall_score": 82,
+      "minimum_category_score": 70,
+      "allow_missing_visual_assets": false
+    },
+    "release": {
+      "minimum_overall_score": 88,
+      "minimum_category_score": 76,
+      "allow_missing_visual_assets": false
+    }
+  },
+  "categories": [
+    {
+      "id": "content_preparation",
+      "label_zh": "内容准备包",
+      "weight": 18,
+      "goal": "第一步先把任务、问题、证据、故事和落版条件准备充分，再生成正式大纲。",
+      "must_have": ["内容任务书", "研究问题树", "证据卡矩阵", "叙事主线", "页面内核表", "视觉翻译准备"]
+    },
+    {
+      "id": "research_dossier",
+      "label_zh": "资料档案",
+      "weight": 18,
+      "goal": "资料不是摘要，而是可支撑页面主张的证据库。",
+      "must_have": ["已验证事实", "来源证据", "解释判断", "冲突/缺口", "候选图片", "权利或来源风险", "可支撑页面"]
+    },
+    {
+      "id": "story_outline",
+      "label_zh": "叙事大纲",
+      "weight": 22,
+      "goal": "大纲不是目录，而是观众状态变化和证据推进链。",
+      "must_have": ["受众当前状态", "目标状态", "每页主判断", "证明对象", "来源锚点", "转场关系", "使用场景"]
+    },
+    {
+      "id": "slide_copy",
+      "label_zh": "页面文案",
+      "weight": 16,
+      "goal": "页面标题必须是判断句，正文只服务一个主张。",
+      "must_have": ["判断式标题", "具体锚点", "少而准的正文", "非泛化表达", "演讲备注目标"]
+    },
+    {
+      "id": "visual_system",
+      "label_zh": "视觉系统",
+      "weight": 14,
+      "goal": "先有整套视觉 DNA，再做单页美化。",
+      "must_have": ["字体策略", "色彩策略", "版式节奏", "图文关系", "页面密度", "反俗套约束", "风格参考"]
+    },
+    {
+      "id": "image_art_direction",
+      "label_zh": "图片艺术指导",
+      "weight": 12,
+      "goal": "图片不是配图，而是有构图、留白、镜头、材质和文字安全区的主视觉计划。",
+      "must_have": ["画面角色", "构图", "文字安全区", "光线/材质", "负面提示", "可编辑前景边界", "来源/生成状态"]
+    }
+  ],
+  "hard_blockers": [
+    "缺内容准备包或内容准备前置评估失败",
+    "缺 slide_plan.json 或没有 slides",
+    "计划最终交付但缺资料档案",
+    "final/release 档缺视觉资产或图片艺术指导",
+    "页面标题大多是标签词而不是判断句",
+    "视觉计划没有文字安全区或可编辑前景边界"
+  ]
+}

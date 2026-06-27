@@ -124,7 +124,7 @@ Richer charts/diagrams must still belong to one visual system.
 
 ## Codex Image Generation Usage
 
-When built-in image generation is available, use it for presentation imagery that benefits from visual atmosphere or metaphor. Do not use it to bake editable layout into the background.
+When built-in image generation is available, use it as the default route for presentation imagery that benefits from visual atmosphere or metaphor. Do not use it to bake editable layout into the background.
 
 Good uses:
 

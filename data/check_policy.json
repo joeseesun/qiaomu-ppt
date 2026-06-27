@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "乔木 PPT 的分层检查策略。用于让 plan_run.py 按路线和阶段输出当前要跑、最终再跑、默认跳过的检查，避免每次都执行重验证。",
+  "stage_profile_defaults": {
+    "initial": "plan",
+    "after_choice": "plan",
+    "proposal_approved": "draft",
+    "preview_approved": "final",
+    "production": "final"
+  },
+  "direct_production_profile": "final",
+  "route_profile_overrides": {
+    "content_copy_improvement": "plan",
+    "planning_only": "plan"
+  },
+  "profiles": {
+    "none": {
+      "label_zh": "不使用本技能",
+      "run_now": ["触发边界门"],
+      "defer_until_final": [],
+      "skip_by_default": ["qiaomu-ppt 全部生产检查"],
+      "expensive_checks": [],
+      "notes": ["用户明确排除 PPT/PPTX/幻灯片生产时，不要继续读取 qiaomu-ppt 参考。"]
+    },
+    "plan": {
+      "label_zh": "方案档",
+      "run_now": ["路线卡与最终交付门", "来源/事实缺口判断", "确认边界门", "content_preflight.py <project> --profile plan（进入正式大纲前）", "top_quality_plan.py <project> --profile plan（已有资料/大纲/视觉计划时）"],
+      "defer_until_final": ["PPTX/HTML 导出验证", "原生 Office/Keynote/WPS 验证", "图片生成完整性验证", "质量基准评分"],
+      "skip_by_default": ["bootstrap.py --check", "check_project.py <project>", "pptx_preview.py", "pptx_text_check.py", "validate_html_deck.py"],
+      "expensive_checks": ["LibreOffice 导出/预览转换", "浏览器截图", "图片生成", "完整质量基准"],
+      "notes": ["方案档只证明路线和边界正确，不证明最终文件质量。"]
+    },
+    "draft": {
+      "label_zh": "草稿档",
+      "run_now": ["content_preflight.py <project> --profile draft", "top_quality_plan.py <project> --profile draft", "check_project.py <project>", "导出文件存在/可读检查", "关键页预览抽查"],
+      "defer_until_final": ["原生 Office/Keynote/WPS 验证", "完整质量基准 85 分门槛", "全量图片出处审计"],
+      "skip_by_default": ["instruction_eval.py", "trigger_eval.py", "validate_skill.py", "Keynote 自动化验证"],
+      "expensive_checks": ["LibreOffice 批量预览转换", "浏览器截图", "图片生成"],
+      "notes": ["草稿档用于发现结构性问题，不承诺最终可交付质量。"]
+    },
+    "final": {
+      "label_zh": "最终档",
+      "run_now": ["content_preflight.py <project> --profile final", "top_quality_plan.py <project> --profile final", "check_project.py <project>", "最终导出清单 export_manifest.json", "路线相关预览/文本/语义验证", "质量基准和修复计划"],
+      "defer_until_final": [],
+      "skip_by_default": ["instruction_eval.py", "trigger_eval.py", "validate_skill.py", "PowerPoint/WPS/Keynote 原生验证，除非用户明确要求"],
+      "expensive_checks": ["LibreOffice 导出/预览转换", "浏览器截图", "图片生成", "完整质量基准"],
+      "notes": ["最终档才声称文件可交付；无法验证的原生软件或外部服务要写成 missing evidence。"]
+    },
+    "release": {
+      "label_zh": "发布档",
+      "run_now": ["content_preflight.py <project> --profile release", "top_quality_plan.py <project> --profile release", "final 档全部检查", "公开交付包完整性检查", "敏感路径/凭证泄露检查", "用户明确要求的原生软件验证"],
+      "defer_until_final": [],
+      "skip_by_default": ["与用户交付格式无关的旁路导出"],
+      "expensive_checks": ["原生 PowerPoint/WPS/Keynote 验证", "全量媒体来源复核", "发布包复验"],
+      "notes": ["发布档只用于客户、公开发布、长期复用模板或用户明确要求严验的场景。"]
+    }
+  },
+  "delivery_policy": {
+    "editable_pptx": {
+      "run_now": {
+        "draft": ["PPTX 文件存在与可打开性抽查"],
+        "final": ["PPTX 预览缩略图", "PPTX 文本/可编辑性检查", "LibreOffice 导出证据"],
+        "release": ["PPTX 预览缩略图", "PPTX 文本/可编辑性检查", "用户明确要求的原生 Office/WPS/Keynote 验证"]
+      },
+      "defer_until_final": {
+        "plan": ["PPTX 可编辑性检查", "PPTX 预览缩略图", "LibreOffice 导出证据"],
+        "draft": ["PPTX 文本/可编辑性完整检查"]
+      },
+      "skip_by_default": {
+        "all": ["HTML 动效验证，除非同时交付 HTML deck"]
+      },
+      "notes": ["承诺可编辑 PPTX 时，最终档必须有 PPTX 预览或等价导出证据。"]
+    },
+    "semantic_html_deck": {
+      "run_now": {
+        "draft": ["HTML 文件存在与本地打开检查", "关键页浏览器截图抽查"],
+        "final": ["validate_html_deck.py", "浏览器截图", "键盘导航检查", "动效降级检查"],
+        "release": ["validate_html_deck.py", "浏览器截图", "键盘导航检查", "本地资产完整性检查"]
+      },
+      "defer_until_final": {
+        "plan": ["浏览器截图", "validate_html_deck.py", "html_motion_manifest.json 检查"],
+        "draft": ["完整浏览器截图和导航检查"]
+      },
+      "skip_by_default": {
+        "all": ["PPTX 可编辑性检查，除非用户要求静态伴随版"]
+      },
+      "notes": ["HTML deck 的最终证据来自语义验证、浏览器截图和导航检查，不来自 PPTX parity。"]
+    },
+    "planning_only": {
+      "run_now": {
+        "all": ["输出边界门", "引用/事实缺口标注"]
+      },
+      "defer_until_final": {},
+      "skip_by_default": {
+        "all": ["最终 PPTX/HTML/PDF 导出", "图片生成", "PPTX/HTML 预览", "原生 Office/Keynote/WPS 验证"]
+      },
+      "notes": ["planning_only 不生成最终文件，不能跑导出类检查来伪装完成。"]
+    }
+  },
+  "route_policy": {
+    "source_to_ppt": {
+      "run_now": {
+        "plan": ["来源清单", "来源权限与 missing evidence 记录"],
+        "draft": ["来源引用覆盖抽查"],
+        "final": ["来源证据门"]
+      }
+    },
+    "paper_to_ppt": {
+      "run_now": {
+        "plan": ["论文来源可达性", "图表/公式提取缺口记录"],
+        "final": ["论文图表/公式证据门"]
+      }
+    },
+    "wechat_to_ppt": {
+      "run_now": {
+        "plan": ["微信正文/图片提取可行性判断"],
+        "final": ["微信提取门", "来源图片使用门"]
+      }
+    },
+    "broad_topic_ppt": {
+      "run_now": {
+        "plan": ["选择卡或默认路线门"],
+        "draft": ["四页预览门，除非用户明确跳过"],
+        "final": ["主题研究覆盖门"]
+      }
+    },
+    "brand_release": {
+      "run_now": {
+        "plan": ["品牌事实门", "视觉证据缺口判断"],
+        "draft": ["四页预览门"],
+        "final": ["视觉资产门"]
+      }
+    },
+    "courseware": {
+      "run_now": {
+        "plan": ["学科/年级/教材边界门"],
+        "final": ["教学正确性门", "教师备注门"]
+      }
+    },
+    "html_deck": {
+      "run_now": {
+        "plan": ["HTML 最终交付确认门", "动效等级确认门"],
+        "draft": ["关键页浏览器截图抽查"],
+        "final": ["HTML 语义门", "固定舞台门", "动效降级门"]
+      }
+    },
+    "pptx_beautify": {
+      "run_now": {
+        "plan": ["原 deck 缩略图/文本检查"],
+        "draft": ["保留/重做策略抽查"],
+        "final": ["PPTX 可编辑性门", "预览修复门"]
+      }
+    },
+    "content_copy_improvement": {
+      "run_now": {
+        "all": ["文案门", "具体性门"]
+      }
+    },
+    "planning_only": {
+      "run_now": {
+        "all": ["路线门", "输出边界门"]
+      }
+    }
+  }
+}

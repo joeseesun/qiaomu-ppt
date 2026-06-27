@@ -168,6 +168,17 @@ def is_fresh(output: Path, source: Path | None) -> bool:
         return False
 
 
+def outputs_fresh(outputs: list[Path], inputs: list[Path]) -> bool:
+    if not outputs or any(not output.exists() for output in outputs):
+        return False
+    existing_inputs = [path for path in inputs if path.exists()]
+    input_mtime = max((artifact_mtime(path) for path in existing_inputs), default=0.0)
+    try:
+        return min(artifact_mtime(output) for output in outputs) >= input_mtime
+    except OSError:
+        return False
+
+
 def resolve_svg_source_dir(project: Path, source: str) -> Path:
     aliases = {
         "final": "svg_final",
@@ -400,6 +411,10 @@ def export_formal_html(project: Path, slug: str, title: str, source: str, screen
             }
         return {"status": STATUS_MISSING, "reason": f"no SVG pages found under {rel(project, source_dir)}/"}
 
+    cached = cached_formal_html(project, slug, title, source, svgs, screenshots)
+    if cached:
+        return cached
+
     html = render_formal_html(slides, svgs, title)
     html_dir = project / "html"
     exports = project / "exports"
@@ -423,6 +438,7 @@ def export_formal_html(project: Path, slug: str, title: str, source: str, screen
     manifest = {
         "schema_version": "1.0.0",
         "mode": "semantic_html_deck",
+        "title": title,
         "slide_count": len(svgs),
         "svg_source": rel(project, source_dir),
         "source_contracts": [
@@ -456,6 +472,57 @@ def export_formal_html(project: Path, slug: str, title: str, source: str, screen
     }
 
 
+def cached_formal_html(
+    project: Path,
+    slug: str,
+    title: str,
+    source: str,
+    svgs: list[Path],
+    screenshots: bool,
+) -> dict[str, Any] | None:
+    html_path = project / "html" / "index.html"
+    export_path = project / "exports" / f"{slug}.html"
+    manifest_path = project / "html_delivery_manifest.json"
+    if not html_path.exists() or not export_path.exists() or not manifest_path.exists():
+        return None
+    try:
+        manifest = read_json(manifest_path)
+    except Exception:
+        return None
+    if not isinstance(manifest, dict):
+        return None
+    if manifest.get("mode") != "semantic_html_deck":
+        return None
+    if manifest.get("title") != title or manifest.get("slide_count") != len(svgs):
+        return None
+    inputs = svgs + [
+        project / "slide_plan.json",
+        project / "content_contract.json",
+        project / "visual_contract.json",
+        project / "spec_lock.json",
+        Path(__file__).resolve(),
+    ]
+    outputs = [html_path, export_path, manifest_path]
+    readability = manifest.get("readability_qa") if isinstance(manifest.get("readability_qa"), dict) else {}
+    if screenshots:
+        if readability.get("screenshot_warning"):
+            return None
+        screenshots_out = readability.get("browser_screenshots")
+        if not isinstance(screenshots_out, list) or not screenshots_out:
+            return None
+        outputs.extend(project / str(path) for path in screenshots_out)
+        inputs.append(html_path)
+    if not outputs_fresh(outputs, inputs):
+        return None
+    return {
+        "status": STATUS_EXISTING,
+        "path": rel(project, export_path),
+        "index": rel(project, html_path),
+        "manifest": "html_delivery_manifest.json",
+        "cache": {"status": "reused", "reason": "formal HTML outputs are fresh for unchanged SVG source"},
+    }
+
+
 def ensure_preview_images(project: Path, pptx: Path | None) -> dict[str, Any]:
     existing = find_preview_images(project)
     if not pptx:
@@ -478,6 +545,10 @@ def export_html_parity(project: Path, slug: str, title: str, pptx: Path | None) 
     preview_status = ensure_preview_images(project, pptx)
     if preview_status["status"] not in {STATUS_EXISTING, STATUS_EXPORTED}:
         return {"status": STATUS_MISSING, "reason": "preview images unavailable", "preview": preview_status}
+    cached = cached_html_parity(project, slug, title)
+    if cached:
+        cached["preview"] = preview_status
+        return cached
     try:
         from html_from_previews import build
     except ImportError as exc:
@@ -492,6 +563,38 @@ def export_html_parity(project: Path, slug: str, title: str, pptx: Path | None) 
         "path": outputs[-1] if outputs else "",
         "manifest": "html_parity_manifest.json",
         "preview": preview_status,
+    }
+
+
+def cached_html_parity(project: Path, slug: str, title: str) -> dict[str, Any] | None:
+    manifest_path = project / "html_parity_manifest.json"
+    if not manifest_path.exists():
+        return None
+    try:
+        manifest = read_json(manifest_path)
+    except Exception:
+        return None
+    if not isinstance(manifest, dict):
+        return None
+    if manifest.get("artifact_type") != "html_parity_preview" or manifest.get("title") != title:
+        return None
+    outputs = [manifest_path]
+    html_outputs = manifest.get("html_outputs")
+    if not isinstance(html_outputs, list) or not html_outputs:
+        return None
+    outputs.extend(project / str(path) for path in html_outputs)
+    images = find_preview_images(project)
+    if not images:
+        return None
+    script = Path(__file__).resolve().parent / "html_from_previews.py"
+    inputs = images + [project / "slide_plan.json", script, Path(__file__).resolve()]
+    if not outputs_fresh(outputs, inputs):
+        return None
+    return {
+        "status": STATUS_EXISTING,
+        "path": str(html_outputs[-1]),
+        "manifest": "html_parity_manifest.json",
+        "cache": {"status": "reused", "reason": "parity HTML is fresh for unchanged preview images"},
     }
 
 

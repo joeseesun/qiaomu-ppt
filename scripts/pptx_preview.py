@@ -22,6 +22,20 @@ def write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def read_json(path: Path) -> Any:
+    with path.open("r", encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def resolve_manifest_path(project: Path, value: str) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else project / path
+
+
+def is_fresh(path: Path, source: Path) -> bool:
+    return path.exists() and path.stat().st_mtime >= source.stat().st_mtime
+
+
 def which_any(candidates: list[str]) -> str | None:
     for item in candidates:
         found = shutil.which(item)
@@ -112,7 +126,42 @@ def make_contact_sheet(images: list[Path], output: Path, columns: int = 5, thumb
     return output
 
 
-def build_preview(project: Path, pptx: Path, out_dir: Path, resolution: int) -> dict[str, Any]:
+def cached_preview(project: Path, pptx: Path, resolution: int) -> dict[str, Any] | None:
+    manifest_path = project / "pptx_preview_manifest.json"
+    if not manifest_path.exists():
+        return None
+    try:
+        manifest = read_json(manifest_path)
+    except Exception:
+        return None
+    if not isinstance(manifest, dict):
+        return None
+    if int(manifest.get("resolution") or 0) != resolution:
+        return None
+    manifest_pptx = Path(str(manifest.get("pptx") or "")).expanduser()
+    if not manifest_pptx.is_absolute():
+        manifest_pptx = (project / manifest_pptx).resolve()
+    if manifest_pptx.resolve() != pptx.resolve():
+        return None
+    pdf_rel = str(manifest.get("pdf") or "")
+    grid_rel = str(manifest.get("thumbnail_grid") or "")
+    image_rels = manifest.get("preview_images")
+    if not pdf_rel or not grid_rel or not isinstance(image_rels, list) or not image_rels:
+        return None
+    paths = [resolve_manifest_path(project, pdf_rel), resolve_manifest_path(project, grid_rel)]
+    paths.extend(resolve_manifest_path(project, str(item)) for item in image_rels)
+    if not all(is_fresh(path, pptx) for path in paths):
+        return None
+    manifest["cache"] = {"status": "reused", "reason": "preview artifacts are newer than PPTX"}
+    return manifest
+
+
+def build_preview(project: Path, pptx: Path, out_dir: Path, resolution: int, *, force: bool = False) -> dict[str, Any]:
+    if not force:
+        cached = cached_preview(project, pptx, resolution)
+        if cached:
+            write_json(project / "pptx_preview_manifest.json", cached)
+            return cached
     soffice = which_any(["soffice", "libreoffice"])
     if not soffice:
         raise SystemExit("LibreOffice executable not found; install soffice before PPTX preview QA")
@@ -135,6 +184,7 @@ def build_preview(project: Path, pptx: Path, out_dir: Path, resolution: int) -> 
             "soffice": soffice,
             "pdftoppm": pdftoppm,
         },
+        "cache": {"status": "refreshed"},
         "external_skill_dependency": "none",
     }
     write_json(project / "pptx_preview_manifest.json", manifest)
@@ -147,6 +197,7 @@ def main() -> int:
     parser.add_argument("--project", help="Project root. Defaults to PPTX parent parent when under exports/.")
     parser.add_argument("--output-dir", "-o", help="Preview output directory. Defaults to <project>/previews.")
     parser.add_argument("--resolution", "-r", type=int, default=150, help="pdftoppm render resolution")
+    parser.add_argument("--force", action="store_true", help="Rerender PDF and slide images even when cached previews are fresh")
     args = parser.parse_args()
     pptx = Path(args.pptx).resolve()
     if args.project:
@@ -156,7 +207,7 @@ def main() -> int:
     else:
         project = pptx.parent
     out_dir = Path(args.output_dir).resolve() if args.output_dir else project / "previews"
-    manifest = build_preview(project, pptx, out_dir, args.resolution)
+    manifest = build_preview(project, pptx, out_dir, args.resolution, force=args.force)
     print(json.dumps(manifest, ensure_ascii=False, indent=2))
     return 0
 

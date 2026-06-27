@@ -1,0 +1,158 @@
+{
+  "version": "2026-06-26",
+  "purpose": "Internal visual-character families for qiaomu-ppt style selection. These are execution axes, not normal user-facing choices.",
+  "source_inspiration": {
+    "name": "rohitg00/awesome-claude-design",
+    "url": "https://github.com/rohitg00/awesome-claude-design",
+    "absorbed_as": "taxonomy and picker method only",
+    "not_absorbed": [
+      "exact DESIGN.md files",
+      "Claude-specific prompt text",
+      "web landing-page templates",
+      "host-specific workflow claims"
+    ]
+  },
+  "selection_policy": {
+    "user_choice_surface": "Use data/html_style_archetypes.json for public labels.",
+    "internal_axis": "Choose 1 primary visual_character_family and optionally 1 counterpoint family.",
+    "max_user_visible_options": 3,
+    "force_choice": true,
+    "avoid_all_styles_mode": "Never present every family as a menu. Recommend a small set with a best choice, an alternative, and an avoid note."
+  },
+  "families": [
+    {
+      "id": "editorial_minimal",
+      "label": "Editorial Minimal",
+      "best_for": ["read-heavy decks", "essays", "docs", "position papers", "calm product narratives"],
+      "avoid_for": ["dense dashboards", "high-energy launch trailers", "playful consumer decks"],
+      "visual_behavior": {
+        "typography": "Strong type hierarchy, generous line height, restrained accent.",
+        "layout": "Long-form rhythm, wide margins, occasional pull quotes and sidenotes.",
+        "media": "Use images as proof or atmosphere, not as filler.",
+        "chart_policy": "Simple, annotated, source-first."
+      },
+      "qiaomu_archetype_fit": ["talk_story", "research_report", "culture_aesthetic", "person_brand_story"],
+      "risk": "Can become empty if claims are weak; require concrete proof anchors."
+    },
+    {
+      "id": "warm_editorial",
+      "label": "Warm Editorial",
+      "best_for": ["human stories", "creator decks", "culture", "education", "trust-building narratives"],
+      "avoid_for": ["hard technical debugging", "ultra-dense financial screens"],
+      "visual_behavior": {
+        "typography": "Humanist sans or refined serif pairing when Chinese readability is proven.",
+        "layout": "Breathing room, soft tonal surfaces, one warm accent moment per viewport.",
+        "media": "Portraits, artifacts, source pages, and quiet generated atmosphere.",
+        "chart_policy": "Readable explanatory charts with narrative captions."
+      },
+      "qiaomu_archetype_fit": ["talk_story", "person_brand_story", "culture_aesthetic", "knowledge_explainer"],
+      "risk": "Do not drift into beige monotony; add contrast through evidence, type scale, or source imagery."
+    },
+    {
+      "id": "data_dense_pro",
+      "label": "Data-Dense Pro",
+      "best_for": ["research reports", "market analysis", "technical evidence", "metrics-heavy decks"],
+      "avoid_for": ["emotional openers", "pure culture essays", "portfolio stories"],
+      "visual_behavior": {
+        "typography": "Tabular numerals, compact labels, strong hierarchy between claim and evidence.",
+        "layout": "Dense but ordered grids, sticky evidence zones, chart-first pages.",
+        "media": "Charts, tables, source screenshots, and annotated documents dominate.",
+        "chart_policy": "No chartjunk; every chart has a visible takeaway and source record."
+      },
+      "qiaomu_archetype_fit": ["research_report", "knowledge_explainer", "product_launch"],
+      "risk": "Can look like software dashboards; avoid nested cards and filler metric rows."
+    },
+    {
+      "id": "technical_terminal",
+      "label": "Technical Terminal",
+      "best_for": ["developer tools", "AI infrastructure", "CLI products", "engineering explainers"],
+      "avoid_for": ["consumer culture", "children education", "luxury brand stories"],
+      "visual_behavior": {
+        "typography": "Mono is used for code, IDs, commands, or numbered evidence, not everything by default.",
+        "layout": "Command palette, logs, architecture strips, and code/evidence splits.",
+        "media": "Real code, terminal output, architecture diagrams, and product screenshots.",
+        "chart_policy": "Operational charts, traces, timelines, and dependency maps."
+      },
+      "qiaomu_archetype_fit": ["knowledge_explainer", "product_launch", "research_report"],
+      "risk": "Mono-everywhere can hurt Chinese readability; keep CJK body in a readable sans."
+    },
+    {
+      "id": "cinematic_product",
+      "label": "Cinematic Product",
+      "best_for": ["product launches", "brand reveals", "portfolio hero decks", "media-rich talks"],
+      "avoid_for": ["data-heavy due diligence", "ordinary classroom handouts"],
+      "visual_behavior": {
+        "typography": "Large claim titles, controlled contrast, strong title/image clearance.",
+        "layout": "Full-bleed or stage-like media, sparse foreground, deliberate section turns.",
+        "media": "Real product/source imagery first; generated images only for atmosphere or concept.",
+        "chart_policy": "Charts appear as proof chapters, not decoration."
+      },
+      "qiaomu_archetype_fit": ["product_launch", "talk_story", "person_brand_story", "culture_aesthetic"],
+      "risk": "Never let images cover titles; enforce safe areas and clearance contracts."
+    },
+    {
+      "id": "playful_creative",
+      "label": "Playful Creative",
+      "best_for": ["creator tools", "workshops", "community decks", "light learning"],
+      "avoid_for": ["serious crisis reports", "legal/medical/financial claims"],
+      "visual_behavior": {
+        "typography": "Friendly but disciplined type; avoid childish novelty fonts for serious content.",
+        "layout": "Varied grids, stickers only when semantic, high scanability.",
+        "media": "Illustrations, screenshots, icons, and examples tied to the teaching path.",
+        "chart_policy": "Simple visual metaphors and low-friction comparisons."
+      },
+      "qiaomu_archetype_fit": ["knowledge_explainer", "product_launch", "talk_story"],
+      "risk": "Can become decorative icon soup; every playful object needs a role."
+    },
+    {
+      "id": "premium_cultural",
+      "label": "Premium Cultural",
+      "best_for": ["public-domain books", "history", "literature", "art", "music", "biography"],
+      "avoid_for": ["SaaS release notes", "bug triage", "dense KPI reporting"],
+      "visual_behavior": {
+        "typography": "Elegant Chinese-first reading hierarchy, careful punctuation and line height.",
+        "layout": "Artifact pages, chapter openers, quote spreads, timelines, and context maps.",
+        "media": "Primary source pages, artwork, portraits, places, and generated atmosphere as a support layer.",
+        "chart_policy": "Use timelines, maps, and relationship diagrams before business charts."
+      },
+      "qiaomu_archetype_fit": ["culture_aesthetic", "person_brand_story", "talk_story"],
+      "risk": "Do not use generic antique paper or fake seals unless they serve the source."
+    },
+    {
+      "id": "soft_futurism",
+      "label": "Soft Futurism",
+      "best_for": ["consumer AI", "hardware concepts", "future-facing products", "interactive HTML decks"],
+      "avoid_for": ["classic literature", "formal reports", "source-evidence pages"],
+      "visual_behavior": {
+        "typography": "Clean, rounded but not childish; high contrast for projector readability.",
+        "layout": "Layered depth, product-safe focus, restrained glass only when the object demands it.",
+        "media": "Real product or concept renders; avoid fake interfaces and fake devices.",
+        "chart_policy": "Use simple system diagrams and product flow maps."
+      },
+      "qiaomu_archetype_fit": ["product_launch", "person_brand_story"],
+      "risk": "Glassmorphism is not a default; forbid frosted-card stacks without semantic purpose."
+    },
+    {
+      "id": "indie_brutalist",
+      "label": "Indie Brutalist",
+      "best_for": ["opinionated creator decks", "media critique", "zines", "counter-position talks"],
+      "avoid_for": ["enterprise trust decks", "teacher courseware", "medical/legal/finance"],
+      "visual_behavior": {
+        "typography": "Bold display choices, intentional roughness, controlled contrast.",
+        "layout": "Asymmetry, poster energy, irregular but readable rhythm.",
+        "media": "Collage and source artifacts, never random decorative noise.",
+        "chart_policy": "Use strong contrast annotations, not dashboards."
+      },
+      "qiaomu_archetype_fit": ["talk_story", "culture_aesthetic"],
+      "risk": "Use as counterpoint only unless the user asks for a sharp public voice."
+    }
+  ],
+  "archetype_to_default_families": {
+    "talk_story": ["editorial_minimal", "warm_editorial", "cinematic_product"],
+    "knowledge_explainer": ["editorial_minimal", "data_dense_pro", "technical_terminal"],
+    "research_report": ["data_dense_pro", "editorial_minimal", "warm_editorial"],
+    "product_launch": ["cinematic_product", "soft_futurism", "technical_terminal"],
+    "person_brand_story": ["warm_editorial", "cinematic_product", "premium_cultural"],
+    "culture_aesthetic": ["premium_cultural", "warm_editorial", "editorial_minimal"]
+  }
+}

@@ -77,18 +77,24 @@ Fix:
 Symptom:
 
 - Slides contain thin lines, grids, rails, or light streaks that do not connect content or frame a real object.
+- Backgrounds contain grid/guide/ruled-paper/construction lines or decorative
+  line overlays by default.
 - The design says "technical" but does not improve reading, hierarchy, or evidence focus.
 - Backgrounds look busy even after saturated shapes are removed.
 
 Root cause:
 
 - The generator tries to replace weak composition with surface texture.
-- Words such as `subtle grid`, `thin rule`, or `tech line` were treated as a style recipe.
+- Words such as `subtle grid`, `thin rule`, `guide line`, `ruled paper`, or
+  `tech line` were treated as a style recipe.
 - Layout roles are not strong enough, so linework becomes filler.
 
 Fix:
 
 - Lines must be functional: chart axes, table rules, connectors, content separators, or real framing.
+- Remove default background line systems. Do not keep them by reducing opacity;
+  replace them with spacing, typography hierarchy, subject imagery, quiet grain,
+  or a calmer surface.
 - Prefer generated bitmap backgrounds in Codex image-generation environments,
   but only when each generated background has a `content_link`,
   `background_duty`, and `semantic_anchor` tied to the slide claim/proof.
@@ -103,6 +109,9 @@ Symptom:
 - The background looks premium in isolation yet does not clarify the page's
   claim, evidence, mood, scenario, or transition.
 - The foreground text sits on top of an unrelated cinematic image.
+- The opposite overcorrection also appears: every middle slide gets a literal
+  thematic scene or symbolic object, so the deck feels like a sequence of
+  posters and the foreground proof has to fight the background.
 
 Root cause:
 
@@ -124,8 +133,44 @@ Fix:
   data-center walls, stock people, or cinematic fog when the slide content
   points to a more specific object, place, mechanism, document, product, era, or
   consequence.
+- Do not make every page a thematic illustration. Cover, chapter, and closing
+  pages may use expressive topic-fusing imagery; ordinary middle/body slides
+  should usually use quiet low-distraction surfaces with subtle material,
+  light, palette, or texture cues.
 - Keep the foreground editable: titles, bullets, labels, diagrams, charts,
   frames, and source evidence stay outside the bitmap.
+
+## 4B. Invented Source Props In AI Backgrounds
+
+Symptom:
+
+- A generated background contains a vinyl record, CD, album cover, booklet,
+  instrument, product pack, screenshot, document, label, or logo that the user
+  did not supply.
+- The page starts to look like fake evidence or a fake product photo rather
+  than a quiet stage for real assets.
+- The invented object competes with the slide title or makes real source
+  objects harder to inspect.
+
+Root cause:
+
+- The prompt translated a topic into the most obvious genre symbol.
+- The deck did not separate background atmosphere from foreground evidence.
+- `hero_subject` was treated as permission to synthesize product/source props.
+
+Fix:
+
+- For generated backgrounds, imply topic through place, light, material, water,
+  weather, texture, scale, depth, or abstract motion before using objects.
+- For album/music decks, ban AI-made vinyl records, CDs, covers, booklets, and
+  instruments unless the user explicitly asks for them.
+- For product/source decks, ban AI-made screenshots, documents, packs, labels,
+  and logos unless they are real supplied assets.
+- Put real inspectable assets into declared foreground slots with captions,
+  mattes, and source metadata; let the background provide only the environment
+  and mood.
+- If a generated image contains an unsupplied prop, regenerate it before slide
+  rendering.
 
 ## 5. Dashboard Card Chrome
 
@@ -344,6 +389,75 @@ Fix:
 - Use a separator only when it marks a meaningful zone boundary.
 - In talk decks, prefer fewer frames, larger type, and cleaner whitespace over dense UI chrome.
 
+## 14A. Panelized Image-Text Split
+
+Symptom:
+
+- The deck uses strong generated or source images, but each slide reads as a
+  large black/white text slab beside an image.
+- Titles wrap awkwardly inside narrow rails while the image area has unused
+  copy space.
+- Bottom chips or tags look like UI controls, do not point to image details,
+  and become unreadable in phone screenshots.
+- Neighboring slides repeat the same split-panel structure, so the thumbnail
+  grid feels monotone even though the pictures differ.
+
+Root cause:
+
+- `Lxx`/`ITLxx` were selected, but no concrete image-text integration move was
+  declared.
+- The generated image was treated as a wallpaper instead of a visual canvas.
+- Labels were used as decoration or outline bullets instead of annotations tied
+  to visible targets.
+
+Fix:
+
+- Declare `integration_move` before rendering: real copy space, local scrim,
+  image-as-canvas annotations, edge fade, detail zoom, or comparison structure.
+- Replace half-slide text slabs with local title zones, object-adjacent labels,
+  and one clear takeaway near the relevant visual region.
+- Every chip, label, arrow, or callout needs an `annotation_target`; otherwise
+  delete it or move it to speaker notes.
+- If text only becomes legible after adding a large opaque panel, recrop or
+  regenerate the image and reconsider the `ITLxx` pattern.
+- Use phone/contact-sheet review as the deciding evidence. If the first read is
+  panel chrome rather than slide claim plus visual proof, simplify and rerender.
+
+## 14B. Low-Contrast Text On Images
+
+Symptom:
+
+- A slide looks atmospheric, but the title, claim, body, path, or source note is
+  hard to read in screenshot, phone preview, or contact sheet.
+- Accent-colored text sits on pale paper, fossil, sand, product, UI, or other
+  textured image areas and loses contrast.
+- Footnotes and lower-priority explanations technically exist but disappear at
+  review size.
+- A transparent scrim looks acceptable in one renderer but becomes a hard block
+  or too weak in another renderer.
+
+Root cause:
+
+- The page selected an `ITLxx` pattern but did not declare
+  `text_surface_policy`.
+- Palette harmony was prioritized over actual foreground/background contrast.
+- The generator treated text color as style and image texture as decoration,
+  instead of designing a stable reading surface.
+
+Fix:
+
+- Declare `text_surface_policy` for every media-heavy slide: true copy-space,
+  baked gradient/scrim, local matte, separate proof zone, caption outside image,
+  or speaker-notes-only.
+- Use high-contrast neutral colors for sentence-level claim/body/path text.
+  Reserve accent colors for short labels, leader lines, or large display words.
+- For PPTX workflows, bake soft gradients/scrims into the bitmap when native
+  transparency has cross-renderer risk; keep text itself editable.
+- Shorten or split copy before shrinking type. Move weak footnotes and nuance to
+  speaker notes unless they are intentionally visible and readable.
+- Review the rendered slide at phone/contact-sheet size. If the text requires
+  zooming or guessing, rerender before delivery.
+
 ## 15. Required Visual QA
 
 Before calling a deck complete:
@@ -358,11 +472,22 @@ Before calling a deck complete:
 - Inspect every generated background for content fit. Regenerate or replace any
   background whose `content_link`, `background_duty`, or `semantic_anchor` does
   not match the visible slide claim.
+- Inspect generated backgrounds for overactive middle-slide imagery. If a body
+  slide would read better with the background removed, replace it with a quiet
+  surface instead of adding heavier scrims or panels.
 - Inspect every chart/image slide for image overflow beyond the declared slot.
 - Inspect visible slide text for internal provenance or speaker-cue leakage.
 - Inspect every card, pill, callout, formula block, and diagram node for text escaping the visible shape.
 - Inspect every connector for nested symbols, block-arrow clutter, and operator-in-arrow motifs.
 - Inspect every slide for card/separator overload: if chrome dominates the idea, simplify before export.
+- Inspect media-heavy slides for panelized image-text splits: no repeated
+  half-slide text slabs, no tiny bottom chip bars without targets, no awkward
+  title wrapping caused by a narrow rail, and no labels disconnected from the
+  image.
+- Inspect text on images for contrast failures: no sentence-level accent text
+  on pale/complex texture, no body/path text without a declared reading
+  surface, and no visible footnote that disappears in phone/contact-sheet
+  review.
 - If a screenshot reveals a frame/clip problem, fix the generation method, not just that slide's coordinates.
 
 ## 16. Connector Lines Cut Through Nodes

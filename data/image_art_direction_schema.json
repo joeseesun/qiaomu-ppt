@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0.0",
+  "artifact": "visual_asset_manifest.json",
+  "purpose": "把图片生成从临时 prompt 升级为可审计的艺术指导和资产队列。",
+  "asset_fields": [
+    {
+      "name": "asset_id",
+      "required": true,
+      "description": "稳定资产 ID。"
+    },
+    {
+      "name": "slide_no",
+      "required": true,
+      "description": "对应页码。"
+    },
+    {
+      "name": "image_role",
+      "required": true,
+      "description": "背景、主视觉、证据图、情绪图、纹理、图解参考等。"
+    },
+    {
+      "name": "content_link",
+      "required": true,
+      "description": "这张图服务哪条页面主张或证据。"
+    },
+    {
+      "name": "art_direction",
+      "required": true,
+      "description": "一句话艺术指导：风格、气质、画面任务。"
+    },
+    {
+      "name": "composition",
+      "required": true,
+      "description": "主体位置、留白、安全区、前后景关系。"
+    },
+    {
+      "name": "safe_area",
+      "required": true,
+      "description": "文字安全区和低细节区域。"
+    },
+    {
+      "name": "camera",
+      "required": false,
+      "description": "镜头、视角、景别或构图方式。"
+    },
+    {
+      "name": "lighting",
+      "required": false,
+      "description": "光线方向、对比、氛围。"
+    },
+    {
+      "name": "material",
+      "required": false,
+      "description": "材质、纹理、介质。"
+    },
+    {
+      "name": "foreground_boundary",
+      "required": true,
+      "description": "哪些文字、标签、图表、标注必须保持可编辑前景。"
+    },
+    {
+      "name": "prompt",
+      "required": true,
+      "description": "可用于生成的正向提示。"
+    },
+    {
+      "name": "negative_prompt",
+      "required": true,
+      "description": "禁止文字、假标志、假截图、假数据、假来源等。"
+    },
+    {
+      "name": "text_policy",
+      "required": true,
+      "description": "图片里是否允许文字；默认不允许任何可见文字。"
+    },
+    {
+      "name": "status",
+      "required": true,
+      "description": "planned、queued、generated、source_selected、fallback、missing。"
+    }
+  ],
+  "quality_rules": [
+    "图片不得承载页面标题、正文、数据、标签或引用。",
+    "每张主视觉都要声明文字安全区和可编辑前景边界。",
+    "同一 deck 的图片要共享色彩、材质、镜头或编辑风格。",
+    "来源图片必须说明证据用途；生成图片不能伪造证据。",
+    "纯装饰图、泛抽象渐变、装饰球、假玻璃和随机线条默认不合格。"
+  ]
+}

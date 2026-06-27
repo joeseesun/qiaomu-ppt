@@ -290,7 +290,7 @@ Rules:
 - Keep motif continuity through palette/type/spacing, not by repeating one side stripe or one card forever.
 - If a page uses a dense source image, background should become quieter, not busier.
 
-Background planning must be explicit in the design proposal. State whether the deck will use built-in image generation, procedural backgrounds, source imagery, or plain surfaces. If Codex image generation is available and the deck is a talk, brand, or technical evidence deck, default to generating 3-5 candidate backgrounds or concept images before final rendering unless the user forbids it.
+Background planning must be explicit in the design proposal. State whether the deck will use built-in image generation, procedural backgrounds, source imagery, or plain surfaces. If Codex image generation is available, default to generated atmosphere/background or concept-image candidates for any deck whose quality depends on visual presence, especially talk, brand, culture, biography, technical evidence, and editorial decks, unless the user forbids it or the proposal deliberately chooses a source-only/diagram-only style.
 
 ## Calm Background System
 
@@ -301,7 +301,9 @@ Rules:
 - Default `visual_noise_budget` is `quiet`.
 - Use generated bitmap backgrounds when the environment supports it; otherwise use deterministic CSS/Canvas/SVG procedural backgrounds, large quiet surfaces, or paper bands. Generated and procedural backgrounds are atmosphere only: color, gradient, light, grain, abstract texture, soft noise, or subtle mathematical forms.
 - Generated backgrounds must not include boxes, rectangles, panels, cards, frames, placeholders, chart areas, image slots, windows, UI chrome, or text blocks. Those are editable foreground objects.
-- Do not use ornamental grids, random thin rules, tech lines, side rails, or abstract stripes as decoration. Lines are allowed only as chart axes, table rules, connectors, or true content structure.
+- Do not use default background grid lines, guide lines, ruled-paper lines, construction lines, ornamental grids, random thin rules, tech lines, side rails, line overlays, or abstract stripes as decoration. This is a Qiaomu taste rule, not just a noise preference.
+- Lines are allowed only as chart axes, table rules, connectors, focus underlines, separators, map/process/timeline paths, or true content structure with a declared semantic purpose.
+- If a background feels empty without linework, replace the linework with quieter color, grain, light, subject imagery, spacing, or typography hierarchy.
 - Use one accent system per slide. Do not combine neon wedges, rails, glows, multiple card stacks, and saturated dots on the same page.
 - Enforce a max-three active color budget per slide: neutral base, readable text, and one accent. Source images/charts are exempt, but surrounding UI must become quieter when a source image is colorful.
 - Evidence slides should use the quietest backgrounds in the deck.

@@ -146,6 +146,7 @@ def build(root: Path, slug: str, title: str) -> dict[str, Any]:
     manifest = {
         "mode": "rendered_slide_parity",
         "artifact_type": "html_parity_preview",
+        "title": title,
         "slide_count": len(images),
         "slide_plan_count": len(slides),
         "html_outputs": [str(html_path.relative_to(root)), str(export_path.relative_to(root))],

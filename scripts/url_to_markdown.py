@@ -3,7 +3,8 @@
 
 This script intentionally keeps the URL-to-PPT entry self-contained. It can use
 optional packages listed in requirements.txt, but it does not require the
-qiaomu-markdown-proxy skill at runtime.
+qiaomu-markdown-proxy skill at runtime. It does, however, internalize the same
+proxy-cascade pattern for login-wall pages such as X/Twitter articles.
 """
 
 from __future__ import annotations
@@ -34,6 +35,17 @@ USER_AGENT = (
 MIN_USEFUL_MARKDOWN_CHARS = 420
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 DEFAULT_PDF_IMAGE_PAGES = 4
+PROXY_FIRST_HOSTS = {"x.com", "twitter.com", "mobile.twitter.com", "t.co"}
+ERROR_PAGE_MARKERS = (
+    "JavaScript is not available.",
+    "Something went wrong, but don",
+    "Don\u2019t miss what\u2019s happening",
+    "Don't miss what's happening",
+    "Access Denied",
+    "404 Not Found",
+    "SecurityCompromiseError",
+    "Anonymous access to domain",
+)
 
 
 @dataclass
@@ -119,6 +131,91 @@ def fetch_url(url: str, timeout: int = 30) -> FetchResult:
 
 def jina_reader_url(url: str) -> str:
     return f"https://r.jina.ai/{url}"
+
+
+def defuddle_url(url: str) -> str:
+    return f"https://defuddle.md/{url}"
+
+
+def is_proxy_first_url(url: str) -> bool:
+    parsed = urlparse(url)
+    host = parsed.netloc.lower()
+    return host in PROXY_FIRST_HOSTS or host.endswith(".twitter.com")
+
+
+def useful_markdown(markdown: str, min_chars: int = MIN_USEFUL_MARKDOWN_CHARS) -> bool:
+    text = cleanup_markdown(markdown)
+    if len(text) < min_chars:
+        return False
+    if len([line for line in text.splitlines() if line.strip()]) <= 5:
+        return False
+    return not any(marker in text for marker in ERROR_PAGE_MARKERS)
+
+
+def read_agent_fetch_output(raw: str) -> str:
+    raw = raw.strip()
+    if not raw:
+        return ""
+    try:
+        payload = json.loads(raw)
+    except Exception:
+        return cleanup_markdown(raw)
+    if isinstance(payload, dict):
+        for key in ("markdown", "content", "text", "html"):
+            value = payload.get(key)
+            if isinstance(value, str) and value.strip():
+                return html_to_markdown(value, payload.get("url") or "") if key == "html" else cleanup_markdown(value)
+    return cleanup_markdown(raw)
+
+
+def proxy_markdown_targets(input_url: str, final_url: str = "") -> list[str]:
+    targets: list[str] = []
+    for candidate in (input_url, final_url):
+        if candidate and candidate not in targets:
+            targets.append(candidate)
+    return targets
+
+
+def fetch_markdown_via_proxy_cascade(input_url: str, final_url: str = "") -> tuple[str, str, list[str]]:
+    """Return markdown, route, warnings from built-in proxy cascade."""
+    warnings: list[str] = []
+    for target in proxy_markdown_targets(input_url, final_url):
+        for route, proxy_url in (
+            ("jina_reader", jina_reader_url(target)),
+            ("defuddle", defuddle_url(target)),
+        ):
+            result = fetch_url(proxy_url, timeout=35)
+            warnings.extend([f"{route}: {item}" for item in result.warnings])
+            if result.status and result.status >= 400:
+                warnings.append(f"{route} returned HTTP {result.status} for {target}")
+            markdown = cleanup_markdown(result.data.decode("utf-8", errors="replace") if result.data else "")
+            if useful_markdown(markdown):
+                return markdown, f"{route}:{target}", warnings
+            if markdown:
+                warnings.append(f"{route} returned weak or blocked content for {target}")
+
+    if shutil.which("npx"):
+        for target in proxy_markdown_targets(input_url, final_url):
+            try:
+                proc = subprocess.run(
+                    ["npx", "--yes", "agent-fetch", target, "--json"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    timeout=60,
+                )
+                if proc.returncode != 0:
+                    warnings.append(f"agent_fetch failed for {target}: {proc.stderr.strip()[:240]}")
+                    continue
+                markdown = read_agent_fetch_output(proc.stdout)
+                if useful_markdown(markdown):
+                    return markdown, f"agent_fetch:{target}", warnings
+                if markdown:
+                    warnings.append(f"agent_fetch returned weak or blocked content for {target}")
+            except Exception as exc:
+                warnings.append(f"agent_fetch failed for {target}: {exc}")
+
+    return "", "", warnings
 
 
 def extract_title_from_html(html: str) -> str:
@@ -541,28 +638,41 @@ def ingest(input_value: str, output_dir: Path, download_image_files: bool, max_i
             title = Path(urlparse(input_value).path).stem or "Remote PDF"
             fetch_route = f"remote_pdf:{extractor}"
         else:
+            final_url = result.final_url or input_value
             html = result.data.decode("utf-8", errors="replace") if result.data else ""
             title = extract_title_from_html(html) or urlparse(input_value).netloc
-            markdown = html_to_markdown(html, result.final_url or input_value)
-            fetch_route = "direct_html"
-            image_candidates = discover_images(html, result.final_url or input_value)
+            image_candidates = discover_images(html, final_url)
 
-            if len(markdown) < MIN_USEFUL_MARKDOWN_CHARS:
-                jina = fetch_url(jina_reader_url(input_value), timeout=35)
-                warnings.extend([f"jina fallback: {item}" for item in jina.warnings])
-                jina_text = jina.data.decode("utf-8", errors="replace") if jina.data else ""
-                if len(cleanup_markdown(jina_text)) > len(markdown):
-                    markdown = cleanup_markdown(jina_text)
-                    fetch_route = "jina_reader"
+            if is_proxy_first_url(input_value) or is_proxy_first_url(final_url):
+                proxy_markdown, proxy_route, proxy_warnings = fetch_markdown_via_proxy_cascade(input_value, final_url)
+                warnings.extend(proxy_warnings)
+                if proxy_markdown:
+                    markdown = proxy_markdown
+                    fetch_route = proxy_route
+                    title = extract_title_from_markdown(markdown) or title
+                else:
+                    markdown = html_to_markdown(html, final_url)
+                    fetch_route = "direct_html_after_proxy_failed"
+                    missing_evidence.append("proxy_cascade_failed")
+            else:
+                markdown = html_to_markdown(html, final_url)
+                fetch_route = "direct_html"
+
+            if not useful_markdown(markdown):
+                proxy_markdown, proxy_route, proxy_warnings = fetch_markdown_via_proxy_cascade(input_value, final_url)
+                warnings.extend(proxy_warnings)
+                if proxy_markdown and len(proxy_markdown) > len(markdown):
+                    markdown = proxy_markdown
+                    fetch_route = proxy_route
                     title = extract_title_from_markdown(markdown) or title
                     if not title:
                         title = urlparse(input_value).netloc
                 else:
-                    warnings.append("jina_reader did not improve extracted text")
+                    warnings.append("proxy cascade did not improve extracted text")
 
             image_candidates = merge_images(
                 image_candidates,
-                discover_markdown_images(markdown, result.final_url or input_value),
+                discover_markdown_images(markdown, final_url),
             )
             if download_image_files and image_candidates:
                 images = download_images(image_candidates, output_dir / "images", max_images)

@@ -76,6 +76,16 @@
 - Decks longer than 8 slides have a `background_rhythm` with at least 4 roles and no role repeated more than 2 consecutive slides.
 - Decks longer than 8 slides should have 8-12 available background assets or justified fewer assets, and should not use the exact same background asset on consecutive slides.
 - Decks longer than 8 slides declare `visual_noise_budget`, normally `quiet`.
+- Decks declare `background_decoration_budget` from
+  `data/background_decoration_budgets.json` when they use procedural
+  backgrounds, HTML motion backgrounds, repeated linework, grids, or abstract
+  visual systems. Body slides default to `quiet`; cover/chapter/closing slides
+  may use `moderate` or `cinematic` only when the decoration is tied to a
+  semantic object, proof path, map, orbit, timeline, or reading sequence.
+- Background decoration is rejected when linework is noticed before the title,
+  when more than one unrelated line direction competes on a body slide, when
+  decorative lines cross title/body/proof/chart/image-label safe areas, or when
+  the proposed repair is only "lower opacity" instead of removing a line family.
 - Decks longer than 8 slides declare `color_budget` with `max_active_colors_per_slide <= 3`, and each slide declares `active_colors`.
 - When Codex image generation is available, decks explicitly decide whether to use generated backgrounds/concept images. Default for talk/brand/technical decks is a 3-5 candidate background or concept-image exploration before final rendering; if skipped, the reason is recorded.
 - Generated backgrounds are content-led atmosphere only. Each AI background or
@@ -88,18 +98,44 @@
 - When generated, web, user, source, formula, or placeholder assets are planned, `visual_asset_manifest.json` exists and is referenced from `visual_contract.json` or `spec_lock.json`.
 - The thumbnail grid shows visible variation in background tone, dominant object placement, and slide density.
 - Backgrounds are calmer than the content: no repeated hard side stripes, oversized saturated wedges, stacked decorative motifs, meaningless tech lines, ornamental grids, or noisy chart backdrops unless explicitly brand-required.
-- Lines are functional only: chart axes, table rules, connectors, or content separators. Lines that exist only to add texture or "tech feel" fail the visual gate.
+- Lines are functional only: chart axes, table rules, connectors, focus underlines,
+  map/process/timeline paths, or content separators. Lines that exist only to add
+  texture, "tech feel", paper feel, motion, energy, or background structure fail
+  the visual gate.
+- Default background grid lines, guide lines, ruled-paper lines, construction
+  lines, decorative line overlays, side rails, random thin rules, and abstract
+  stripes fail unless the user explicitly requested them and the slide records a
+  semantic purpose.
+- Every visible line-like element must have an allowed semantic purpose from
+  `data/line_semantics_policy.json`. In formal HTML, SVG `<line>`,
+  `<polyline>`, stroked `<path>`, stroked `<ellipse>`, and class names such as
+  `line`, `curve`, `orbit`, `ring`, `path`, `ray`, `burst`, or `streak` must
+  declare `data-line-purpose`. CSS border rings, pseudo-element rays, and
+  gradient stripes count as line-like elements. Purposes such as decoration,
+  energy, speed, tech feel, atmosphere, texture, noise, background, or
+  motion-only fail the visual gate.
+- If a planned line cannot be named as a chart axis/series, table rule,
+  connector, diagram edge, process flow, timeline, map route, separator, focus
+  underline, or shape border, remove it. Replace it with spacing, typography,
+  object placement, bitmap atmosphere, or a real visual asset.
 - Connector lines must terminate at shape perimeter/ports and must not pass through node interiors or text. Heavy connector strokes, connector shadows, and center-to-center lines through nodes fail the visual gate.
 - If style was unspecified, `style_recommendations.json` exists or the reason for skipping style recommendation is stated.
 - Any selected Design-MD preset is copied into `style_brief.md` and `spec_lock.json` as PPT rules, not left as vague inspiration.
 - No one-note generic palette, no default purple-gradient design, no arbitrary style mixing.
 - Chinese content uses readable spacing and avoids obvious CJK layout failure.
+- Title/body separation is visible at thumbnail size. On a 16:9 slide, ordinary
+  title-to-body/proof clearance should normally be `36-56px` at `1280x720` or
+  `0.55-0.80` of the title line-height; body leading should normally be
+  `1.45-1.75` for Chinese paragraphs.
 
 ## Visual Asset Acquisition Gate
 
 - Every non-trivial image/chart/diagram/icon/placeholder has a row in `visual_asset_manifest.json`.
 - Every row declares `acquire_via`: `ai`, `web`, `user`, `source`, `formula`, or `placeholder`.
 - AI rows declare deck-wide image rendering/palette behavior plus a concrete prompt, page role, asset role, and `text_policy`.
+- AI rows or the matching prompt sidecar declare composition, safe text area,
+  and editable foreground boundary. A generic "beautiful background" prompt
+  without layout-safe information fails for final-quality decks.
 - Web/source/user rows declare source URL/path/card id, rights/provenance notes, and extraction gaps when relevant.
 - Formula/chart/diagram rows declare the source spec and rendered output path.
 - `Generated`, `Sourced`, `Existing`, and `Rendered` rows point to files that exist under the project folder or to explicitly allowed external user files.
@@ -119,6 +155,12 @@ Hard defects must be fixed before export:
 - low contrast on title, proof object, or essential labels
 - broken or missing image assets
 - title or proof object covered by decoration, texture, or watermark
+- title, subtitle, body, chips, or proof/media objects touching or visually
+  collapsing into one cramped block
+- accent chips, red/blue/green callouts, or short labels rendered as flattened
+  pills, hard-edge rectangles, skinny stickers, or color blocks without enough
+  vertical breathing room
+- decorative background linework visible before the title or proof object
 - chart/table/diagram too small to read at the target preview size
 - text over image without copy space, scrim, gradient, text block, or local blur
 - screenshot annotations, before/after pairs, or collages with no clear focal hierarchy
@@ -132,6 +174,7 @@ Soft quality defects should be fixed in focused passes:
 - image and text feel adjacent but unrelated
 - breathing pages use dense multi-card grids
 - CJK text uses awkward letter spacing, tiny punctuation, or cramped line breaks
+- CJK title/body spacing feels pasted together instead of deliberately staged
 
 Fix one concrete defect at a time. QA fixes should not quietly change the deck
 mode, rewrite the argument, or replace the approved visual direction.
@@ -168,15 +211,27 @@ mode, rewrite the argument, or replace the approved visual direction.
 - Each slide in the contract declares `rhythm`, `layout_pattern_id`, `component_type`, `reading_path`, `coordinate_slots`, and `group_ids`.
 - Media-rich slides also declare `image_text_pattern_id`, `image_role`, `crop_policy`, `text_safe_area`, `contrast_policy`, and `font_floor_pt`.
 - The component type matches the proof object: steps use steps/flow, time uses timeline, records use table, source data uses chart-with-takeaway, categories use icon grid or labeled cards, scenes use image claim layouts.
+- Component choices have rationale when multiple common patterns could fit.
+  Record rejected alternatives for likely mistakes, such as using numbered steps
+  for fixed-date timelines, using decorative KPI cards for source tables, or
+  using dense comparison tables where pricing/tier cards are the clearer proof.
 - Coordinate slots include title and proof regions and use the deck's fixed coordinate system.
+- Coordinate slots include minimum clearances between title, subtitle, body,
+  chips, captions, proof objects, and media. Title/body crowding is a layout
+  execution failure, not a final polish issue.
 - SVG pages under `svg_output/` or `svg_final/` use stable top-level `<g id="...">` groups that match the contract.
-- SVG-first decks should expose multiple semantic top-level groups per slide, not just a single whole-slide wrapper. At minimum, normal pages should make background/chrome, title, proof or media, body/callouts, and footer separable when those regions exist.
+- SVG-first decks should expose multiple semantic top-level groups per slide, not just a single whole-slide wrapper. At minimum, normal pages should make background, title, proof or media, and body/callouts separable. Chrome/footer groups are optional and exist only when explicitly requested by `slide_chrome_policy`.
 - If `animations.json` exists, every animated group ID exists in the corresponding SVG page.
 - Motion follows the reading path; it does not introduce a second decorative rhythm.
+- For presentation-ready, narrated, or keynote-style decks, `notes/total.md`
+  and `animations.json` or `animation_manifest.json` are expected sidecars. If
+  they are absent, the delivery report must say the deck is static or missing
+  presentation-layer evidence.
 
 ## Image Slot Gate
 
 - Every source image/chart has a declared image slot with `fit`, `mask`, `padding`, and `overflow_policy`.
+- Formal HTML decks expose every non-decorative image slot through `data-image-slot` and connect it to `visual_asset_manifest.json`, `html_delivery_manifest.json`, or an equivalent image-slot registry.
 - Every substantial image slot has a declared `finish_policy`: real clipping/masking when rounded, low-contrast border or hairline when needed, subtle shadow only when it improves separation, and color/contrast normalization when the source image fights the deck palette.
 - Every media-rich slide has protected title/body/proof/caption boxes and a minimum clearance from the image slot. Default clearance is `48px` on `1242x1660` social canvases, `28px` on `1280x720` slides, or `0.22in` in PPTX coordinates.
 - Every substantial media slide has a declared image role: background, evidence, emotion, product, person, step, context, or screenshot. One image should not be asked to do several roles at once.
@@ -216,9 +271,14 @@ mode, rewrite the argument, or replace the approved visual direction.
 - `page_content_guide.md`, `page_content_guide.json`, and `page_content/` exist for normal production runs. They gather each page's outline, source evidence, visual plan, visual assets, speaker notes, and QA summary in human-readable form so the user can understand and edit what each page is doing.
 - `svg_generation_manifest.json` and `svg_preview_manifest.json` exist when SVG-first pages are generated.
 - `pptx_generation_manifest.json` exists when the low-complexity `python-pptx` fallback exporter is used.
-- `pptx_text_check.json` exists for final PPTX runs and reports no missing slide-plan titles, placeholders, or internal production metadata.
+- `pptx_text_check.json` exists for final PPTX runs and reports no missing slide-plan titles, placeholders, internal production metadata, likely text overflow, title-image collisions, or cramped title-to-content spacing.
+- `scripts/pptx_text_check.py` is a hard layout gate, not only a text extractor. It checks editable text, text fit, title-image clearance, title-to-following-content breathing room, and accent-callout geometry. If it reports `text likely overflows`, `title overlaps image`, `title is too close to image`, `title is too close to following content`, `accent callout should be a rounded rectangle`, `accent callout is too short`, `accent info bar needs more vertical breathing room`, or `accent callout is too skinny`, do not deliver the PPTX; resize the text box, reduce text, move/crop the image, increase spacing, use a real rounded rectangle component, or change the layout pattern and rerun the check.
+- `scripts/layout_guard.py` is the focused geometry-only entry point for quick iteration. Use it when debugging layout density or after a generator change: `python3 <skill>/scripts/layout_guard.py <project>/exports/<slug>.pptx --output <project>/reports/layout_guard.json`.
 - Normal PPT runs produce editable PPTX; when HTML is requested or expected, they produce a formal semantic HTML presentation artifact unless the user explicitly forbids HTML or the route is planning-only.
 - Formal HTML decks have `html_delivery_manifest.json`, use DOM/SVG/Canvas/CSS/JS as the visible layer, preserve slide-plan content parity, include readability QA, and do not use whole-slide PPTX/PDF/JPG/PNG screenshots.
+- Formal HTML decks declare a Qiaomu-owned layout registry: each slide has a stable `data-slide-id`/`id` and `data-layout-id`/`data-layout` mapped to the approved `Lxx`, `ITLxx`, and executable `component_type`. Do not copy upstream layout catalogs or class systems into Qiaomu artifacts.
+- Formal HTML decks pass `python3 <skill>/scripts/validate_html_deck.py <html> --json <project>/reports/html_deck_validation.json --markdown <project>/reports/html_deck_validation.md`; final/professional runs should use `--strict`. Validator failures are production failures, not cosmetic warnings.
+- Formal HTML decks keep progress/page counters/search/navigation/download/share controls outside the fixed slide stage. A top progress strip, generic footer, visible source URL, or production label inside the slide canvas fails the production gate unless explicitly requested in `slide_chrome_policy`.
 - PPTX parity screenshot HTML is allowed only as QA/preview output under `html-parity/` or `*.parity.html`, with `html_parity_manifest.json`.
 - PDF delivery is backed by a real exported or preview-derived PDF file, or it is marked `missing` / `failed` in `export_manifest.json`.
 - Keynote delivery is backed by a real `.key` artifact saved by Keynote automation and at least as fresh as the current PPTX source, or it is marked `missing` / `failed` in `export_manifest.json`. LibreOffice preview evidence is not Keynote evidence.

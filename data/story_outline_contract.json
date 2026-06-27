@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0.0",
+  "artifact": "slide_plan.json",
+  "purpose": "把 PPT 大纲约束成叙事链，而不是目录列表。",
+  "upstream_artifacts": [
+    "content_brief.json 或 content_contract.json",
+    "research_questions.json",
+    "evidence_matrix.json 或 sources/source_cards.json",
+    "page_kernel_map.json",
+    "content-preflight.json/md"
+  ],
+  "deck_level_fields": [
+    "audience",
+    "use_context",
+    "current_state",
+    "desired_state",
+    "central_thesis",
+    "narrative_conflict",
+    "turning_point",
+    "narrative_arc",
+    "visual_system_summary",
+    "evidence_policy",
+    "image_policy"
+  ],
+  "slide_fields": [
+    {
+      "name": "slide_no",
+      "required": true,
+      "description": "页码。"
+    },
+    {
+      "name": "claim_title",
+      "required": true,
+      "description": "判断式标题，不是标签词。"
+    },
+    {
+      "name": "slide_role",
+      "required": true,
+      "description": "开场、问题、证据、机制、对比、转折、结论、行动等叙事角色。"
+    },
+    {
+      "name": "proof_object",
+      "required": true,
+      "description": "这一页唯一主要证明对象。"
+    },
+    {
+      "name": "source_card_ids",
+      "required": false,
+      "description": "支撑这一页的证据卡。没有时必须有 source_anchor 或 missing evidence。"
+    },
+    {
+      "name": "audience_shift",
+      "required": false,
+      "description": "这一页让观众的认知、情绪或行动意愿发生什么变化。"
+    },
+    {
+      "name": "concrete_anchor",
+      "required": true,
+      "description": "具体事实、人物、数字、物件、原文、场景或来源锚点。"
+    },
+    {
+      "name": "content_points",
+      "required": true,
+      "description": "少而准的页面正文要点，建议 2-4 条。"
+    },
+    {
+      "name": "visual_role",
+      "required": true,
+      "description": "这页的视觉任务：主视觉、证据图、图解、对比、呼吸页等。"
+    },
+    {
+      "name": "layout_pattern_id",
+      "required": true,
+      "description": "布局模式或自定义布局说明。"
+    },
+    {
+      "name": "layout_reason",
+      "required": false,
+      "description": "为什么这个内容适合该布局或图文关系。"
+    },
+    {
+      "name": "image_text_pattern_id",
+      "required": false,
+      "description": "图文关系模式，尤其适用于图文页。"
+    },
+    {
+      "name": "reading_path",
+      "required": true,
+      "description": "观众视线从哪里开始、如何读完。"
+    },
+    {
+      "name": "transition_from_previous",
+      "required": false,
+      "description": "和上一页的逻辑转场。"
+    },
+    {
+      "name": "speaker_note_goal",
+      "required": false,
+      "description": "演讲者在这一页要完成的口头动作。"
+    },
+    {
+      "name": "qa_risk",
+      "required": true,
+      "description": "这页最可能出问题的事实、文案、视觉或可读性风险。"
+    }
+  ],
+  "quality_rules": [
+    "正式 slide_plan 应从 page_kernel_map 扩展而来，不要直接从资料摘要跳到页面目录。",
+    "每页只证明一个主判断。",
+    "普通内容页标题必须能独立表达观点。",
+    "证据页必须有具体来源锚点，不要只有 source_id。",
+    "视觉角色和布局模式必须服务证明对象。",
+    "至少每 3-4 页有一次节奏变化：开场、密集证明、图解、呼吸、转折或结论。"
+  ]
+}

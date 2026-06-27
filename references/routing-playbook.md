@@ -62,17 +62,18 @@ Default:
 - `density`: medium unless the user asks for keynote style
 - `notes`: speaker notes with source context and transition logic
 - `research`: required unless explicitly skipped by the user
-- `checkpoint`: content angle confirmation before full design proposal
+- `checkpoint`: guided choice first, then research dossier and content angle confirmation before full design proposal
 
 Structure:
 
-1. Research brief
-2. Source collection and source cards
-3. User-confirmed angle
-4. Audience state change
-5. Claim-title outline
-6. Style direction
-7. Four-slide preview when the deck exceeds 7 pages
+1. Route card plus guided choice card when the brief is incomplete
+2. Research brief
+3. Source collection, source cards, and Markdown research dossier
+4. User-confirmed angle
+5. Audience state change
+6. Page-by-page claim-title, content, layout, and background plan
+7. Style direction
+8. Four-slide preview when the deck exceeds 7 pages
 
 Copy method:
 

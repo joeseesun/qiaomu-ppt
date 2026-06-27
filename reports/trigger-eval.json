@@ -13,7 +13,6 @@
     "speaker",
     "style",
     "url",
-    "wechat",
     "workflow"
   ],
   "missing_description_concepts": [],
@@ -170,11 +169,10 @@
         "expected_trigger": true,
         "predicted_trigger": true,
         "passed": true,
-        "score": 0.6,
+        "score": 0.4,
         "matched_concepts": [
           "ppt",
-          "url",
-          "wechat"
+          "url"
         ],
         "negative_pattern": null
       }
@@ -196,10 +194,9 @@
         "expected_trigger": false,
         "predicted_trigger": false,
         "passed": true,
-        "score": 0.4,
+        "score": 0.2,
         "matched_concepts": [
-          "ppt",
-          "wechat"
+          "ppt"
         ],
         "negative_pattern": "不需要 ppt"
       },

@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0.0",
+  "tool": "qiaomu-ppt/scripts/top_quality_plan.py",
+  "generated_at": "2026-06-26T19:07:05+00:00",
+  "project": "/var/folders/xp/7w1bhy250_d427qj0931xnt40000gn/T/qiaomu-ppt-top-quality-7mx0eviy",
+  "profile": "final",
+  "minimum_overall_score": 82,
+  "minimum_category_score": 70,
+  "overall_score": 98,
+  "ok": true,
+  "gate_ready": true,
+  "files": {
+    "research_path": "/var/folders/xp/7w1bhy250_d427qj0931xnt40000gn/T/qiaomu-ppt-top-quality-7mx0eviy/research_dossier.md",
+    "slide_plan_path": "/var/folders/xp/7w1bhy250_d427qj0931xnt40000gn/T/qiaomu-ppt-top-quality-7mx0eviy/slide_plan.json",
+    "content_contract_path": "/var/folders/xp/7w1bhy250_d427qj0931xnt40000gn/T/qiaomu-ppt-top-quality-7mx0eviy/content_contract.json",
+    "visual_contract_path": "/var/folders/xp/7w1bhy250_d427qj0931xnt40000gn/T/qiaomu-ppt-top-quality-7mx0eviy/visual_contract.json",
+    "visual_manifest_path": "/var/folders/xp/7w1bhy250_d427qj0931xnt40000gn/T/qiaomu-ppt-top-quality-7mx0eviy/visual_asset_manifest.json",
+    "style_direction_path": "/var/folders/xp/7w1bhy250_d427qj0931xnt40000gn/T/qiaomu-ppt-top-quality-7mx0eviy/style_direction.json"
+  },
+  "categories": [
+    {
+      "id": "content_preparation",
+      "label": "内容准备包",
+      "weight": 18,
+      "score": 95,
+      "passed": true,
+      "evidence": "content_preflight.py; artifacts=content_brief,question_tree,research_dossier,evidence_matrix,page_kernel_map,visual_translation",
+      "findings": [
+        "内容准备前置分 95/100。",
+        "内容准备分项：内容任务书 100、研究问题树 90、证据卡矩阵 100、叙事主线 86、页面内核表 100、视觉翻译准备 86"
+      ],
+      "recommended_actions": [],
+      "blockers": []
+    },
+    {
+      "id": "research_dossier",
+      "label": "资料档案",
+      "weight": 18,
+      "score": 92,
+      "passed": true,
+      "evidence": "/var/folders/xp/7w1bhy250_d427qj0931xnt40000gn/T/qiaomu-ppt-top-quality-7mx0eviy/research_dossier.md; sections=scope,facts,evidence,interpretation,gaps,visual,rights,slide_map; chars=575",
+      "findings": [
+        "检测到 2 个 URL、6 个来源 ID。"
+      ],
+      "recommended_actions": [
+        "资料档案偏短，补充证据卡、视觉机会和缺口。"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "story_outline",
+      "label": "叙事大纲",
+      "weight": 22,
+      "score": 100,
+      "passed": true,
+      "evidence": "slides=2; deck_fields=audience,use_context,current_state,desired_state,central_thesis,stakes",
+      "findings": [
+        "2/2 页有判断式标题，2/2 页有证明对象。",
+        "2/2 页有来源或具体锚点，2/2 页有视觉角色。"
+      ],
+      "recommended_actions": [],
+      "blockers": []
+    },
+    {
+      "id": "slide_copy",
+      "label": "页面文案",
+      "weight": 16,
+      "score": 100,
+      "passed": true,
+      "evidence": "slides=2; weak_titles=0; generic=0",
+      "findings": [
+        "2/2 页标题像判断句；2/2 页正文数量和长度较克制。"
+      ],
+      "recommended_actions": [],
+      "blockers": []
+    },
+    {
+      "id": "visual_system",
+      "label": "视觉系统",
+      "weight": 14,
+      "score": 100,
+      "passed": true,
+      "evidence": "matched=字体,色彩,布局节奏,图像风格,反俗套; layout=2/2",
+      "findings": [
+        "视觉系统覆盖：字体,色彩,布局节奏,图像风格,反俗套。",
+        "2/2 页有布局模式，2/2 页有阅读路径。"
+      ],
+      "recommended_actions": [],
+      "blockers": []
+    },
+    {
+      "id": "image_art_direction",
+      "label": "图片艺术指导",
+      "weight": 12,
+      "score": 100,
+      "passed": true,
+      "evidence": "assets=2; prompts=2; safe_area=2; negative=2",
+      "findings": [
+        "2/2 个资产有较完整艺术指导。",
+        "2/2 个资产声明文字安全区，2/2 个资产有有效负面提示。"
+      ],
+      "recommended_actions": [],
+      "blockers": []
+    }
+  ],
+  "blockers": [],
+  "warnings": [],
+  "recommended_actions": [
+    "资料档案偏短，补充证据卡、视觉机会和缺口。"
+  ]
+}

@@ -1,0 +1,275 @@
+{
+  "version": "2026-06-26",
+  "purpose": "User-facing HTML/PPT style archetypes for qiaomu-ppt. Names are scenario/outcome oriented; internal design-system terms stay hidden from normal users.",
+  "selection_policy": {
+    "max_primary_choices": 6,
+    "max_recommended_choices": 3,
+    "default_behavior": "Recommend one best-fit archetype from source type, route, audience, media density, and user intent.",
+    "do_not_expose_terms": [
+      "Swiss",
+      "瑞士风",
+      "blueprint",
+      "brutalist",
+      "glassmorphism",
+      "data journalism",
+      "Memphis",
+      "Bauhaus",
+      "constructivism"
+    ],
+    "preview_contract": [
+      "cover",
+      "body/evidence",
+      "visual/diagram",
+      "closing"
+    ]
+  },
+  "archetypes": [
+    {
+      "id": "talk_story",
+      "label_zh": "演讲故事型",
+      "short_description": "把文章、观点或复盘讲成一场有节奏的演讲。",
+      "best_for": [
+        "X 长文",
+        "公众号文章",
+        "个人观点",
+        "创业复盘",
+        "公开分享"
+      ],
+      "avoid_for": [
+        "密集表格",
+        "严肃财务报表",
+        "逐步教学课件"
+      ],
+      "user_prompts": [
+        "我要做演讲",
+        "把文章讲得有故事",
+        "适合分享会"
+      ],
+      "internal_style_families": [
+        "editorial_argument",
+        "cinematic_product_reveal when media-rich"
+      ],
+      "internal_case_styles": [
+        "Magazine Art Direction",
+        "Brutalist Newspaper only as restrained editorial energy"
+      ],
+      "layout_intent": [
+        "hook cover",
+        "turning point",
+        "quote spread",
+        "one-claim body",
+        "closing memory hook"
+      ],
+      "media_policy": "Use 2-5 strong visuals or generated atmosphere images only when they support the story; keep text selectable.",
+      "html_signature": "Keyboard-led narrative deck with calm transitions, large claim titles, pull quotes, and optional speaker notes."
+    },
+    {
+      "id": "knowledge_explainer",
+      "label_zh": "知识讲解型",
+      "short_description": "把复杂概念、论文或课程讲清楚。",
+      "best_for": [
+        "论文",
+        "技术概念",
+        "课程",
+        "方法论",
+        "教材式解释"
+      ],
+      "avoid_for": [
+        "情绪型发布会",
+        "纯视觉作品集"
+      ],
+      "user_prompts": [
+        "我要讲清楚",
+        "做课程",
+        "解释一个复杂概念"
+      ],
+      "internal_style_families": [
+        "minimal_precision",
+        "developer_technical_evidence when technical"
+      ],
+      "internal_case_styles": [
+        "Academic Blueprint",
+        "Engineering Blueprint",
+        "Swiss Grid as hidden layout discipline"
+      ],
+      "layout_intent": [
+        "definition",
+        "mechanism diagram",
+        "step ladder",
+        "comparison",
+        "practice/checkpoint"
+      ],
+      "media_policy": "Prefer diagrams, formula/table rebuilds, source screenshots, and no-crop evidence objects over decorative images.",
+      "html_signature": "Readable fixed-stage teaching deck with diagrams, revealable steps, searchable text, and projector-safe typography."
+    },
+    {
+      "id": "research_report",
+      "label_zh": "研究报告型",
+      "short_description": "把 PDF、白皮书、行业资料变成有证据的报告。",
+      "best_for": [
+        "行业报告",
+        "趋势分析",
+        "PDF 白皮书",
+        "投资/市场研究",
+        "年度复盘"
+      ],
+      "avoid_for": [
+        "个人故事",
+        "轻松创作者分享"
+      ],
+      "user_prompts": [
+        "我要做报告",
+        "整理 PDF",
+        "分析趋势",
+        "要数据和来源"
+      ],
+      "internal_style_families": [
+        "trust_finance_dashboard",
+        "minimal_precision",
+        "editorial_argument"
+      ],
+      "internal_case_styles": [
+        "Data Journalism",
+        "Top Consulting",
+        "Brutalist Newspaper only for public-interest dossiers"
+      ],
+      "layout_intent": [
+        "executive summary",
+        "key finding",
+        "chart with takeaway",
+        "source evidence",
+        "recommendation roadmap"
+      ],
+      "media_policy": "Charts, tables, source captions, and cited excerpts are the visual layer; images are contextual, not decorative.",
+      "html_signature": "Source-backed web report deck with chart annotations, sidecar provenance, and strong download/share readability."
+    },
+    {
+      "id": "product_launch",
+      "label_zh": "产品发布型",
+      "short_description": "把产品、功能或项目讲成有冲击力的发布稿。",
+      "best_for": [
+        "产品介绍",
+        "功能发布",
+        "融资 BP",
+        "项目展示",
+        "Demo Day"
+      ],
+      "avoid_for": [
+        "纯学术解释",
+        "长篇文化阅读"
+      ],
+      "user_prompts": [
+        "我要发布产品",
+        "介绍功能",
+        "做项目路演"
+      ],
+      "internal_style_families": [
+        "cinematic_product_reveal",
+        "developer_technical_evidence for developer products"
+      ],
+      "internal_case_styles": [
+        "Glassmorphism SaaS",
+        "Engineering Blueprint for architecture slides"
+      ],
+      "layout_intent": [
+        "category tension",
+        "hero product",
+        "feature proof",
+        "workflow/demo",
+        "pricing/next action"
+      ],
+      "media_policy": "Real product screenshots, UI flows, architecture diagrams, and short claims dominate; no fake UI or invented logos.",
+      "html_signature": "Media-first HTML deck with product-safe image slots, crisp screenshots, restrained motion, and external viewer controls."
+    },
+    {
+      "id": "person_brand_story",
+      "label_zh": "人物/品牌故事型",
+      "short_description": "把人、团队、品牌或作品集讲得有身份和记忆点。",
+      "best_for": [
+        "自我介绍",
+        "个人 IP",
+        "创始人故事",
+        "公司故事",
+        "作品集"
+      ],
+      "avoid_for": [
+        "严肃数据报告",
+        "密集课程"
+      ],
+      "user_prompts": [
+        "做自我介绍",
+        "讲品牌故事",
+        "个人 IP",
+        "作品集"
+      ],
+      "internal_style_families": [
+        "editorial_argument",
+        "friendly_marketplace",
+        "cinematic_product_reveal"
+      ],
+      "internal_case_styles": [
+        "Architecture Editorial",
+        "Urban Renewal Editorial",
+        "Luxury Editorial Digest when image-rich"
+      ],
+      "layout_intent": [
+        "identity contrast",
+        "timeline",
+        "signature work",
+        "values/proof",
+        "closing promise"
+      ],
+      "media_policy": "Use real portraits, works, screenshots, places, and timelines; generated images only provide atmosphere or chapter art.",
+      "html_signature": "Portfolio-like story deck with strong first-person signal, image captions, timeline navigation, and clean copy."
+    },
+    {
+      "id": "culture_aesthetic",
+      "label_zh": "文化美学型",
+      "short_description": "把文学、历史、艺术和公版书做成有气质的视觉阅读。",
+      "best_for": [
+        "文学",
+        "历史",
+        "公版书",
+        "艺术",
+        "音乐/电影",
+        "东方文化"
+      ],
+      "avoid_for": [
+        "SaaS 产品发布",
+        "高密度财务报告"
+      ],
+      "user_prompts": [
+        "做得有文化气质",
+        "公版书",
+        "历史人物",
+        "艺术赏析"
+      ],
+      "internal_style_families": [
+        "editorial_argument",
+        "minimal_precision"
+      ],
+      "internal_case_styles": [
+        "Eastern Culture Narrative",
+        "Architecture Editorial",
+        "Risograph Zine only for independent-culture briefs"
+      ],
+      "layout_intent": [
+        "chapter opener",
+        "quote spread",
+        "artifact/source page",
+        "timeline/context",
+        "reflective close"
+      ],
+      "media_policy": "Use source pages, public-domain images, artifacts, typography, and careful whitespace; avoid pseudo-antique decoration.",
+      "html_signature": "Quiet reading-oriented HTML deck with source-text dignity, image-object framing, and restrained atmosphere."
+    }
+  ],
+  "advanced_archetypes": [
+    {
+      "id": "creator_visual",
+      "label_zh": "创作者视觉型",
+      "default_visibility": "advanced_only",
+      "description": "For creator courses, social sharing, AI/design inspiration, and visual-first decks. Use only when readability risk is acceptable."
+    }
+  ]
+}

@@ -119,6 +119,14 @@ def quality_policy(profile: str, args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+def resolve_image_limit(args: argparse.Namespace) -> int:
+    if args.image_limit is not None:
+        return max(0, args.image_limit)
+    if args.quality_profile == "draft":
+        return max(0, args.draft_image_limit)
+    return 0
+
+
 def is_unresolved_source_ai_fallback(item: dict[str, Any]) -> bool:
     asset_id = str(item.get("asset_id") or "").lower()
     notes = str(item.get("notes") or "").lower()
@@ -438,6 +446,188 @@ def latest_existing(paths: list[Path]) -> Path | None:
     return max(existing, key=lambda path: path.stat().st_mtime)
 
 
+def artifact_mtime(path: Path) -> float:
+    if path.is_dir():
+        newest = path.stat().st_mtime
+        for child in path.rglob("*"):
+            try:
+                newest = max(newest, child.stat().st_mtime)
+            except OSError:
+                continue
+        return newest
+    return path.stat().st_mtime
+
+
+def existing_paths(paths: list[Path]) -> list[Path]:
+    return [path for path in paths if path.exists()]
+
+
+def newest_mtime(paths: list[Path]) -> float:
+    existing = existing_paths(paths)
+    if not existing:
+        return 0.0
+    return max(artifact_mtime(path) for path in existing)
+
+
+def outputs_fresh(outputs: list[Path], inputs: list[Path]) -> bool:
+    if not outputs or any(not output.exists() for output in outputs):
+        return False
+    input_mtime = newest_mtime(inputs)
+    try:
+        return min(artifact_mtime(output) for output in outputs) >= input_mtime
+    except OSError:
+        return False
+
+
+def directory_fresh(directory: Path, inputs: list[Path], *, pattern: str, min_count: int) -> bool:
+    if not directory.is_dir():
+        return False
+    outputs = sorted(directory.glob(pattern))
+    if len(outputs) < min_count:
+        return False
+    return outputs_fresh(outputs, inputs)
+
+
+def files_under(path: Path) -> list[Path]:
+    if path.is_file():
+        return [path]
+    if not path.is_dir():
+        return []
+    return [child for child in path.rglob("*") if child.is_file()]
+
+
+def terminal_asset_paths(project: Path) -> list[Path]:
+    manifest = project / "visual_asset_manifest.json"
+    if not manifest.exists():
+        return []
+    try:
+        payload = read_json(manifest)
+    except Exception:
+        return []
+    items = payload.get("items") if isinstance(payload, dict) else []
+    if not isinstance(items, list):
+        return []
+    terminal = {"Generated", "Sourced", "Existing", "Rendered"}
+    paths: list[Path] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("status") or "") not in terminal:
+            continue
+        raw_path = str(item.get("path") or "").strip()
+        if not raw_path:
+            continue
+        path = Path(raw_path)
+        paths.append(path if path.is_absolute() else project / path)
+    return existing_paths(paths)
+
+
+def svg_generation_inputs(project: Path) -> list[Path]:
+    candidates = [
+        project / "slide_plan.json",
+        project / "content_contract.json",
+        project / "style_direction.json",
+        project / "style_brief.md",
+        project / "visual_contract.json",
+        project / "visual_asset_manifest.json",
+        project / "image_art_direction.json",
+        project / "assets" / "images" / "image_sources.json",
+        project / "assets" / "images" / "image_prompts.json",
+        project / "assets" / "images" / "image_generation_queue.json",
+        SCRIPT_DIR / "svg_deck_from_slide_plan.py",
+    ]
+    return existing_paths(candidates) + terminal_asset_paths(project)
+
+
+def report_ok(path: Path, *, min_score: int | None = None, allow_non_json: bool = False) -> bool:
+    if allow_non_json and path.exists():
+        return True
+    try:
+        payload = read_json(path)
+    except Exception:
+        return False
+    if not isinstance(payload, dict):
+        return False
+    if "ok" in payload and not bool(payload.get("ok")):
+        return False
+    if min_score is not None:
+        try:
+            if float(payload.get("score", 0)) < min_score:
+                return False
+        except (TypeError, ValueError):
+            return False
+    return True
+
+
+def cached_step(
+    name: str,
+    reason: str,
+    *,
+    command: list[str] | None = None,
+    required: bool = True,
+    outputs: list[Path] | None = None,
+    project: Path | None = None,
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "name": name,
+        "required": required,
+        "command": command_to_string(command or []),
+        "status": "passed",
+        "cache": "reused",
+        "reason": reason,
+        "started_at": utc_now(),
+        "duration_seconds": 0,
+    }
+    if outputs and project:
+        payload["outputs"] = [rel(project, path) for path in outputs if path.exists()]
+    return payload
+
+
+def cached_report_step(
+    name: str,
+    output: Path,
+    inputs: list[Path],
+    *,
+    command: list[str],
+    project: Path,
+    required: bool = True,
+    markdown: Path | None = None,
+    min_score: int | None = None,
+    allow_non_json: bool = False,
+) -> dict[str, Any] | None:
+    outputs = [output] + ([markdown] if markdown else [])
+    if outputs_fresh(outputs, inputs) and report_ok(output, min_score=min_score, allow_non_json=allow_non_json):
+        return cached_step(
+            name,
+            f"{rel(project, output)} is fresh for unchanged inputs",
+            command=command,
+            required=required,
+            outputs=outputs,
+            project=project,
+        )
+    return None
+
+
+def previous_step_passed(project: Path, name: str, command: list[str]) -> bool:
+    manifest = project / "production_manifest.json"
+    if not manifest.exists():
+        return False
+    try:
+        payload = read_json(manifest)
+    except Exception:
+        return False
+    steps = payload.get("steps") if isinstance(payload, dict) else []
+    if not isinstance(steps, list):
+        return False
+    command_text = command_to_string(command)
+    for step in reversed(steps):
+        if not isinstance(step, dict):
+            continue
+        if step.get("name") == name and step.get("status") == "passed" and step.get("command") == command_text:
+            return True
+    return False
+
+
 def collect_artifacts(project: Path, slug: str) -> dict[str, Any]:
     exports = project / "exports"
     previews = project / "previews"
@@ -702,11 +892,12 @@ def main() -> int:
         "--no-generate-images",
         dest="generate_images",
         action="store_false",
-        help="Disable real image generation; use only for explicit draft/offline runs.",
+        help="Disable real image generation; use only for explicit offline/text-structure smoke tests.",
     )
     parser.add_argument("--image-provider", default="openai", help="Image generation provider for --generate-images. Default: openai.")
     parser.add_argument("--image-model", default="", help="Image generation model for --generate-images. Defaults to the provider preset.")
-    parser.add_argument("--image-limit", type=int, default=0, help="Maximum real images to generate. 0 means all queued items.")
+    parser.add_argument("--image-limit", type=int, default=None, help="Maximum real images to generate. Use 0 for all queued items. Defaults to --draft-image-limit for draft and all for professional/final.")
+    parser.add_argument("--draft-image-limit", type=int, default=4, help="Default real image count for --quality-profile draft when --image-limit is omitted.")
     parser.add_argument("--image-size", default="", help="Provider image size override for --generate-images.")
     parser.add_argument("--image-quality", default="auto", help="Provider image quality for --generate-images.")
     parser.add_argument("--image-api-key-env", default="", help="Environment variable holding the image provider API key. Defaults to the provider preset.")
@@ -785,7 +976,14 @@ def main() -> int:
     ):
         requested_formats.append("keynote")
         auto_keynote_added = True
+    effective_image_limit = resolve_image_limit(args)
     policy = quality_policy(args.quality_profile, args)
+    policy["effective_image_limit"] = effective_image_limit
+    policy["image_limit_reason"] = (
+        "draft profile defaults to a small real-image set for visual review"
+        if args.image_limit is None and args.quality_profile == "draft"
+        else "explicit --image-limit" if args.image_limit is not None else "generate all queued images"
+    )
     policy["auto_keynote_added"] = auto_keynote_added
     policy["auto_keynote_reason"] = (
         "macOS Keynote automation detected; added keynote to professional/final formats"
@@ -816,8 +1014,28 @@ def main() -> int:
     ]
     if args.quality_profile in {"professional", "final"}:
         source_adequacy_command.append("--strict")
+    source_adequacy_inputs = existing_paths(
+        [
+            project / "slide_plan.json",
+            project / "sources" / "source_manifest.json",
+            project / "sources" / "source_cards.json",
+            project / "visual_asset_manifest.json",
+            project / "style_direction.json",
+            SCRIPT_DIR / "source_adequacy.py",
+        ]
+    )
+    cached = None if args.force else cached_report_step(
+        "source_adequacy",
+        reports / "source_adequacy.json",
+        source_adequacy_inputs,
+        command=source_adequacy_command,
+        project=project,
+        required=args.quality_profile in {"professional", "final"},
+        markdown=reports / "source_adequacy.md",
+    )
     steps.append(
-        run_step(
+        cached
+        or run_step(
             "source_adequacy",
             source_adequacy_command,
             cwd=project,
@@ -877,6 +1095,18 @@ def main() -> int:
             reports / "style_fit_audit.md",
         ),
     ]
+    upstream_inputs = existing_paths(
+        [
+            project / "slide_plan.json",
+            project / "content_contract.json",
+            project / "sources" / "source_cards.json",
+            project / "sources" / "source_manifest.json",
+            project / "visual_asset_manifest.json",
+            project / "style_direction.json",
+            project / "visual_contract.json",
+            project / "spec_lock.json",
+        ]
+    ) + terminal_asset_paths(project)
     for step_name, script_name, output_path, markdown_path in upstream_audits:
         audit_command = [
             sys.executable,
@@ -891,8 +1121,20 @@ def main() -> int:
         ]
         if upstream_required:
             audit_command.append("--enforce")
+        audit_inputs = upstream_inputs + [SCRIPT_DIR / script_name]
+        cached = None if args.force else cached_report_step(
+            step_name,
+            output_path,
+            audit_inputs,
+            command=audit_command,
+            project=project,
+            required=upstream_required,
+            markdown=markdown_path,
+            min_score=upstream_min_score,
+        )
         steps.append(
-            run_step(
+            cached
+            or run_step(
                 step_name,
                 audit_command,
                 cwd=project,
@@ -1120,8 +1362,8 @@ def main() -> int:
             image_command.extend(["--model", args.image_model])
         if args.image_api_key_env:
             image_command.extend(["--api-key-env", args.image_api_key_env])
-        if args.image_limit > 0:
-            image_command.extend(["--limit", str(args.image_limit)])
+        if effective_image_limit > 0:
+            image_command.extend(["--limit", str(effective_image_limit)])
         if args.image_size:
             image_command.extend(["--size", args.image_size])
         if args.image_base_url:
@@ -1184,10 +1426,24 @@ def main() -> int:
 
     svg_output = project / "svg_output"
     command = [sys.executable, SCRIPT_DIR / "svg_deck_from_slide_plan.py", project]
-    command.append("--force")
-    steps.append(run_step("svg_generate", command, cwd=project, timeout=args.timeout, env=env))
+    svg_inputs = svg_generation_inputs(project)
+    if not args.force and directory_fresh(svg_output, svg_inputs, pattern="*.svg", min_count=max(1, len(slides))):
+        steps.append(
+            cached_step(
+                "svg_generate",
+                "svg_output is fresh for unchanged slide/style/asset inputs",
+                command=command,
+                outputs=sorted(svg_output.glob("*.svg")),
+                project=project,
+            )
+        )
+    else:
+        if args.force or svg_output.exists():
+            command.append("--force")
+        steps.append(run_step("svg_generate", command, cwd=project, timeout=args.timeout, env=env))
 
     if svg_output.exists():
+        svg_files = sorted(svg_output.glob("*.svg"))
         steps.append(
             run_step(
                 "svg_quality",
@@ -1204,18 +1460,27 @@ def main() -> int:
                 env=env,
             )
         )
+        rhythm_command = [
+            sys.executable,
+            SCRIPT_DIR / "visual_rhythm_check.py",
+            project,
+            "--source",
+            "svg_output",
+            "--output",
+            reports / "visual_rhythm_report.json",
+        ]
+        cached = None if args.force else cached_report_step(
+            "visual_rhythm_check",
+            reports / "visual_rhythm_report.json",
+            svg_files + [SCRIPT_DIR / "visual_rhythm_check.py"],
+            command=rhythm_command,
+            project=project,
+        )
         steps.append(
-            run_step(
+            cached
+            or run_step(
                 "visual_rhythm_check",
-                [
-                    sys.executable,
-                    SCRIPT_DIR / "visual_rhythm_check.py",
-                    project,
-                    "--source",
-                    "svg_output",
-                    "--output",
-                    reports / "visual_rhythm_report.json",
-                ],
+                rhythm_command,
                 cwd=project,
                 timeout=120,
                 env=env,
@@ -1234,8 +1499,28 @@ def main() -> int:
         ]
         if args.quality_profile in {"professional", "final"}:
             style_audit_command.append("--enforce")
+        style_audit_inputs = svg_files + existing_paths(
+            [
+                reports / "visual_rhythm_report.json",
+                project / "style_direction.json",
+                project / "visual_asset_manifest.json",
+                project / "slide_plan.json",
+                SCRIPT_DIR / "style_execution_audit.py",
+            ]
+        )
+        cached = None if args.force else cached_report_step(
+            "style_execution_audit",
+            reports / "style_execution_audit.json",
+            style_audit_inputs,
+            command=style_audit_command,
+            project=project,
+            required=args.quality_profile in {"professional", "final"},
+            markdown=reports / "style_execution_audit.md",
+            min_score=75 if args.quality_profile in {"professional", "final"} else 60,
+        )
         steps.append(
-            run_step(
+            cached
+            or run_step(
                 "style_execution_audit",
                 style_audit_command,
                 cwd=project,
@@ -1280,7 +1565,24 @@ def main() -> int:
     ]
     if args.no_auto_downsample_images:
         finalize_command.append("--no-auto-downsample-images")
-    steps.append(run_step("svg_finalize", finalize_command, cwd=project, timeout=args.timeout, env=env))
+    svg_final = project / "svg_final"
+    finalize_inputs = sorted(svg_output.glob("*.svg")) + [SCRIPT_DIR / "finalize_svg.py"] + files_under(SCRIPT_DIR / "svg_finalize")
+    if (
+        not args.force
+        and directory_fresh(svg_final, finalize_inputs, pattern="*.svg", min_count=max(1, len(slides)))
+        and previous_step_passed(project, "svg_finalize", finalize_command)
+    ):
+        steps.append(
+            cached_step(
+                "svg_finalize",
+                "svg_final is fresh for unchanged svg_output and finalize options",
+                command=finalize_command,
+                outputs=sorted(svg_final.glob("*.svg")),
+                project=project,
+            )
+        )
+    else:
+        steps.append(run_step("svg_finalize", finalize_command, cwd=project, timeout=args.timeout, env=env))
 
     pptx_path = exports / f"{slug}.pptx"
     pptx_command = [
@@ -1300,21 +1602,48 @@ def main() -> int:
     ]
     if args.workers > 0:
         pptx_command.extend(["--workers", str(args.workers)])
-    steps.append(run_step("pptx_export", pptx_command, cwd=project, timeout=args.timeout, env=env))
+    pptx_svg_dir = project / ("svg_final" if args.svg_source == "final" else "svg_output")
+    pptx_inputs = sorted(pptx_svg_dir.glob("*.svg")) + [SCRIPT_DIR / "svg_to_pptx.py"] + files_under(SCRIPT_DIR / "svg_to_pptx")
+    pptx_trace = exports / f"{slug}.pptx.trace.json"
+    if (
+        not args.force
+        and outputs_fresh([pptx_path, pptx_trace], pptx_inputs)
+        and previous_step_passed(project, "pptx_export", pptx_command)
+    ):
+        steps.append(
+            cached_step(
+                "pptx_export",
+                "PPTX and conversion trace are fresh for unchanged SVG source and export options",
+                command=pptx_command,
+                outputs=[pptx_path, pptx_trace],
+                project=project,
+            )
+        )
+    else:
+        steps.append(run_step("pptx_export", pptx_command, cwd=project, timeout=args.timeout, env=env))
 
     if pptx_path.exists():
+        text_check_command = [
+            sys.executable,
+            SCRIPT_DIR / "pptx_text_check.py",
+            pptx_path,
+            "--slide-plan",
+            project / "slide_plan.json",
+            "--output",
+            project / "pptx_text_check.json",
+        ]
+        cached = None if args.force else cached_report_step(
+            "pptx_text_check",
+            project / "pptx_text_check.json",
+            [pptx_path, project / "slide_plan.json", SCRIPT_DIR / "pptx_text_check.py"],
+            command=text_check_command,
+            project=project,
+        )
         steps.append(
-            run_step(
+            cached
+            or run_step(
                 "pptx_text_check",
-                [
-                    sys.executable,
-                    SCRIPT_DIR / "pptx_text_check.py",
-                    pptx_path,
-                    "--slide-plan",
-                    project / "slide_plan.json",
-                    "--output",
-                    project / "pptx_text_check.json",
-                ],
+                text_check_command,
                 cwd=project,
                 timeout=180,
                 env=env,
@@ -1346,17 +1675,39 @@ def main() -> int:
         export_command.append("--no-html-screenshots")
     steps.append(run_step("export_bundle", export_command, cwd=project, timeout=max(args.timeout, args.keynote_timeout + 60), env=env))
 
-    steps.append(
-        run_step(
+    project_check_command = [
+        sys.executable,
+        SCRIPT_DIR / "check_project.py",
+        project,
+        "--output",
+        project / "project_check.json",
+        *(["--require-real-imagegen"] if policy["require_real_imagegen"] else []),
+    ]
+    project_check_inputs = existing_paths(
+        [
+            project / "slide_plan.json",
+            project / "spec_lock.json",
+            project / "visual_asset_manifest.json",
+            project / "pptx_text_check.json",
+            project / "export_manifest.json",
+            pptx_path,
+            SCRIPT_DIR / "check_project.py",
+        ]
+    ) + sorted(svg_final.glob("*.svg"))
+    cached = None
+    if not args.force and previous_step_passed(project, "project_check", project_check_command):
+        cached = cached_report_step(
             "project_check",
-            [
-                sys.executable,
-                SCRIPT_DIR / "check_project.py",
-                project,
-                "--output",
-                project / "project_check.json",
-                *(["--require-real-imagegen"] if policy["require_real_imagegen"] else []),
-            ],
+            project / "project_check.json",
+            project_check_inputs,
+            command=project_check_command,
+            project=project,
+        )
+    steps.append(
+        cached
+        or run_step(
+            "project_check",
+            project_check_command,
             cwd=project,
             timeout=180,
             env=env,
@@ -1375,16 +1726,43 @@ def main() -> int:
     ]
     if policy["enforce_quality_benchmark"]:
         benchmark_command.append("--enforce")
-    steps.append(
-        run_step(
-            "deck_quality_benchmark",
-            benchmark_command,
-            cwd=project,
-            required=policy["enforce_quality_benchmark"],
-            timeout=120,
-            env=env,
-        )
+    run_benchmark = (
+        args.quality_profile != "draft"
+        or policy["enforce_quality_benchmark"]
+        or policy["fail_on_critical_repairs"]
     )
+    if run_benchmark:
+        benchmark_inputs = project_check_inputs + existing_paths(
+            [
+                reports / "visual_rhythm_report.json",
+                reports / "style_execution_audit.json",
+                project / "export_manifest.json",
+                SCRIPT_DIR / "deck_quality_benchmark.py",
+            ]
+        )
+        cached = None if args.force else cached_report_step(
+            "deck_quality_benchmark",
+            project / "reports" / "deck_quality_benchmark.json",
+            benchmark_inputs,
+            command=benchmark_command,
+            project=project,
+            required=policy["enforce_quality_benchmark"],
+            markdown=project / "reports" / "deck_quality_benchmark.md",
+            min_score=policy["benchmark_min_score"],
+        )
+        steps.append(
+            cached
+            or run_step(
+                "deck_quality_benchmark",
+                benchmark_command,
+                cwd=project,
+                required=policy["enforce_quality_benchmark"],
+                timeout=120,
+                env=env,
+            )
+        )
+    else:
+        steps.append(skip_step("deck_quality_benchmark", "draft profile skips final-quality benchmark by default", required=False))
     repair_command = [
         sys.executable,
         SCRIPT_DIR / "deck_repair_plan.py",
@@ -1402,28 +1780,77 @@ def main() -> int:
     ]
     if policy["fail_on_critical_repairs"]:
         repair_command.append("--fail-on-critical")
-    steps.append(
-        run_step(
-            "deck_repair_plan",
-            repair_command,
-            cwd=project,
-            required=policy["fail_on_critical_repairs"],
-            timeout=120,
-            env=env,
+    run_repair_plan = args.quality_profile != "draft" or policy["fail_on_critical_repairs"]
+    if run_repair_plan:
+        repair_inputs = existing_paths(
+            [
+                project / "reports" / "deck_quality_benchmark.json",
+                project / "reports" / "visual_rhythm_report.json",
+                project / "reports" / "style_execution_audit.json",
+                project / "export_manifest.json",
+                SCRIPT_DIR / "deck_repair_plan.py",
+            ]
         )
+        cached = None if args.force else cached_report_step(
+            "deck_repair_plan",
+            project / "reports" / "deck_repair_plan.json",
+            repair_inputs,
+            command=repair_command,
+            project=project,
+            required=policy["fail_on_critical_repairs"],
+            markdown=project / "reports" / "deck_repair_plan.md",
+            allow_non_json=False,
+        )
+        if cached:
+            try:
+                repair_payload = read_json(project / "reports" / "deck_repair_plan.json")
+                if policy["fail_on_critical_repairs"] and int(repair_payload.get("summary", {}).get("critical_count", 0)) > 0:
+                    cached = None
+            except Exception:
+                cached = None
+        steps.append(
+            cached
+            or run_step(
+                "deck_repair_plan",
+                repair_command,
+                cwd=project,
+                required=policy["fail_on_critical_repairs"],
+                timeout=120,
+                env=env,
+            )
+        )
+    else:
+        steps.append(skip_step("deck_repair_plan", "draft profile skips final-quality repair planning by default", required=False))
+    page_guide_command = [
+        sys.executable,
+        SCRIPT_DIR / "page_content_guide.py",
+        project,
+        "--output",
+        project / "page_content_guide.json",
+        "--markdown",
+        project / "page_content_guide.md",
+    ]
+    cached = None if args.force else cached_report_step(
+        "page_content_guide",
+        project / "page_content_guide.json",
+        existing_paths(
+            [
+                project / "slide_plan.json",
+                project / "visual_asset_manifest.json",
+                project / "reports" / "deck_repair_plan.json",
+                SCRIPT_DIR / "page_content_guide.py",
+            ]
+        ),
+        command=page_guide_command,
+        project=project,
+        markdown=project / "page_content_guide.md",
+        allow_non_json=False,
     )
     steps.append(
-        run_step(
+        cached
+        or run_step(
             "page_content_guide",
-            [
-                sys.executable,
-                SCRIPT_DIR / "page_content_guide.py",
-                project,
-                "--output",
-                project / "page_content_guide.json",
-                "--markdown",
-                project / "page_content_guide.md",
-            ],
+            page_guide_command,
             cwd=project,
             timeout=120,
             env=env,

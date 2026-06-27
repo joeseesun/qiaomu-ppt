@@ -1,0 +1,314 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-06-27",
+  "purpose": "乔木 PPT 的机器可读路线表，用于在不通读全部参考文件的情况下决定路线、最小必读参考、主要脚本、确认边界和质量门。",
+  "global": {
+    "always_keep": [
+      "不要把用户项目产物写进 skill 目录。",
+      "不要把 默认、生成、做个PPT、页数 等初始措辞当成允许直接渲染最终文件。",
+      "整页图片式 PPTX 不能满足通常意义上的可编辑 PPTX 交付。",
+      "缺工具、缺来源权限、缺图片生成、缺原生 Office、缺 Keynote 或缺导出证据时，必须记录为 missing evidence。"
+    ],
+    "default_project_locations": [
+      "当前工作区 outputs/<date>-<slug>/",
+      "~/Documents/Qiaomu PPT/<date>-<slug>/",
+      "用户明确指定的位置"
+    ],
+    "baseline_scripts": [
+      "scripts/bootstrap.py --check",
+      "scripts/content_preflight.py <project> --profile <plan|draft|final>",
+      "scripts/top_quality_plan.py <project> --profile <plan|draft|final>",
+      "scripts/check_project.py <project>"
+    ],
+    "baseline_references": [
+      "references/chinese-typography-layout.md",
+      "references/quality-gates.md",
+      "references/production-contract.md"
+    ],
+    "approval_bypass_phrases": [
+      "不用确认",
+      "无需确认",
+      "跳过方案",
+      "跳过资料确认",
+      "跳过预览",
+      "直接进入生成阶段",
+      "直接生成最终版",
+      "直接出完整 PPT",
+      "一口气生成",
+      "先出草稿不用等我"
+    ],
+    "negative_ppt_phrases": [
+      "不要 ppt",
+      "不做 ppt",
+      "不需要 ppt",
+      "不要生成幻灯片",
+      "只要图片",
+      "只写文章"
+    ]
+  },
+  "routes": [
+    {
+      "id": "source_to_ppt",
+      "label_zh": "资料转 PPT",
+      "priority": 95,
+      "match_terms": ["url", "链接", "网页", "pdf", "epub", "office", "docx", "xlsx", "飞书", "文档", "zip", "资料包", "根据这个", "文章"],
+      "input_patterns": ["http://", "https://", ".pdf", ".docx", ".pptx", ".xlsx", ".epub", ".zip"],
+      "final_delivery": "editable_pptx",
+      "first_action": "先抓取/转换来源材料，生成来源清单和初步来源卡，再做资料与研究档案。",
+      "after_choice_action": "开始来源抓取和资料规划；不要直接渲染最终 PPT。",
+      "confirmation_required": true,
+      "required_references": [
+        "references/source-intake-method.md",
+        "references/url-ingestion.md",
+        "references/model-driven-generation.md"
+      ],
+      "optional_references": [
+        "references/image-text-layout-patterns.md",
+        "references/visual-asset-acquisition.md",
+        "references/pptx-skill-method-adaptation.md"
+      ],
+      "primary_scripts": [
+        "scripts/source_to_markdown.py <inputs...> --output-dir <project>/sources",
+        "scripts/create_deck.py --topic \"<topic>\" <inputs...> --project <project> --slides <n>",
+        "scripts/produce_deck.py <project> --quality-profile final --generate-images --enforce-quality-benchmark --fail-on-critical-repairs --benchmark-min-score 85"
+      ],
+      "required_gates": ["来源证据门", "资料与研究档案门", "逐页计划确认门", "PPTX 可编辑性门", "最终验证门"],
+      "stop_before": "design_proposal_confirmation"
+    },
+    {
+      "id": "paper_to_ppt",
+      "label_zh": "论文转 PPT",
+      "priority": 100,
+      "match_terms": ["论文", "paper", "arxiv", "hugging face paper", "hugging face papers", "tex", "figure", "表格", "图表"],
+      "input_patterns": ["arxiv.org", "huggingface.co/papers", "hf.co/papers"],
+      "final_delivery": "editable_pptx",
+      "first_action": "先解析论文来源，优先提取 arXiv TeX、图、表和缺失证据，再写研究档案和逐页计划。",
+      "after_choice_action": "开始论文来源提取和研究规划；不要直接渲染最终 PPT。",
+      "confirmation_required": true,
+      "required_references": [
+        "references/paper-source-intake.md",
+        "references/source-intake-method.md",
+        "references/model-driven-generation.md"
+      ],
+      "optional_references": [
+        "references/chart-diagram-components.md",
+        "references/ppt-master-grade-execution.md",
+        "references/svg-pptx-compatibility.md"
+      ],
+      "primary_scripts": [
+        "scripts/source_to_markdown.py <paper-url-or-file> --output-dir <project>/sources",
+        "scripts/paper_to_markdown.py <paper-url-or-file> --output-dir <project>/sources/papers",
+        "scripts/create_deck.py --topic \"<paper title>\" <paper-url-or-file> --project <project> --slides <n>"
+      ],
+      "required_gates": ["论文提取门", "来源证据门", "图表/公式证据门", "逐页计划确认门", "最终验证门"],
+      "stop_before": "design_proposal_confirmation"
+    },
+    {
+      "id": "wechat_to_ppt",
+      "label_zh": "微信公众号文章转 PPT",
+      "priority": 98,
+      "match_terms": ["微信公众号", "公众号文章", "微信文章", "mp.weixin.qq.com", "公众号链接"],
+      "input_patterns": ["mp.weixin.qq.com"],
+      "final_delivery": "editable_pptx",
+      "first_action": "先抓取微信文章正文和图片；普通 URL 提取弱时记录缺失证据或请求导出。",
+      "after_choice_action": "开始微信来源抓取和资料规划；不要直接渲染最终 PPT。",
+      "confirmation_required": true,
+      "required_references": [
+        "references/wechat-source-intake.md",
+        "references/source-intake-method.md",
+        "references/model-driven-generation.md"
+      ],
+      "optional_references": [
+        "references/visual-asset-acquisition.md",
+        "references/image-text-layout-patterns.md"
+      ],
+      "primary_scripts": [
+        "scripts/source_to_markdown.py <wechat-url> --output-dir <project>/sources --download-images",
+        "scripts/create_deck.py --topic \"<topic>\" <wechat-url> --project <project> --slides <n>"
+      ],
+      "required_gates": ["微信提取门", "来源图片使用门", "逐页计划确认门", "最终验证门"],
+      "stop_before": "design_proposal_confirmation"
+    },
+    {
+      "id": "broad_topic_ppt",
+      "label_zh": "宽泛主题做 PPT",
+      "priority": 70,
+      "match_terms": ["ppt", "pptx", "powerpoint", "slides", "slide deck", "演示文稿", "幻灯片", "介绍", "主题", "人物", "历史", "文化", "讲一下", "做个ppt", "生成一个ppt", "默认", "不用过多搜索"],
+      "input_patterns": [],
+      "final_delivery": "editable_pptx",
+      "first_action": "先给路线卡和选择卡；用户接受默认后，再做主题研究、资料与研究档案和方案。",
+      "after_choice_action": "按默认值开始主题研究和方案规划；不要直接渲染最终 PPT。",
+      "confirmation_required": true,
+      "required_references": [
+        "references/guided-choice-flow.md",
+        "references/topic-research-method.md",
+        "references/model-driven-generation.md"
+      ],
+      "optional_references": [
+        "references/design-style-library.md",
+        "references/visual-character-and-style-picker.md",
+        "references/visual-asset-acquisition.md"
+      ],
+      "primary_scripts": [
+        "scripts/topic_research.py \"<topic>\" --output-dir <project>/sources --depth fast",
+        "scripts/create_deck.py --topic \"<topic>\" --project <project> --slides <n>"
+      ],
+      "required_gates": ["信息收集门", "主题研究门", "逐页计划确认门", "四页预览门", "最终验证门"],
+      "stop_before": "guided_choice_or_design_proposal"
+    },
+    {
+      "id": "brand_release",
+      "label_zh": "品牌/产品发布 deck",
+      "priority": 90,
+      "match_terms": ["品牌发布", "产品发布", "新品发布", "发布会", "brand launch", "launch deck", "发布主题"],
+      "input_patterns": [],
+      "final_delivery": "editable_pptx",
+      "first_action": "先确认受众、产品事实、发布目标、视觉证据和是否需要预览；不能编造产品事实。",
+      "after_choice_action": "开始品牌资料整理、故事线和视觉方向规划；不要直接渲染最终 PPT。",
+      "confirmation_required": true,
+      "required_references": [
+        "references/routing-playbook.md",
+        "references/model-driven-generation.md",
+        "references/visual-systems.md"
+      ],
+      "optional_references": [
+        "references/ppt-master-grade-execution.md",
+        "references/design-style-library.md",
+        "references/codex-image-backgrounds.md"
+      ],
+      "primary_scripts": [
+        "scripts/create_deck.py --topic \"<product launch topic>\" <inputs...> --project <project> --slides <n>",
+        "scripts/four_slide_preview.py <project>",
+        "scripts/produce_deck.py <project> --quality-profile final --generate-images --enforce-quality-benchmark --fail-on-critical-repairs --benchmark-min-score 85"
+      ],
+      "required_gates": ["品牌事实门", "视觉资产门", "四页预览门", "PPTX 可编辑性门", "最终验证门"],
+      "stop_before": "design_proposal_confirmation"
+    },
+    {
+      "id": "courseware",
+      "label_zh": "课件",
+      "priority": 88,
+      "match_terms": ["课件", "高中", "教学", "课堂", "例题", "练习", "教师备注", "老师", "教材", "考试"],
+      "input_patterns": [],
+      "final_delivery": "editable_pptx",
+      "first_action": "先确认学科、年级、教材/章节、课时、教学目标和正确性边界。",
+      "after_choice_action": "开始教学结构和逐页计划；不要直接渲染最终 PPT。",
+      "confirmation_required": true,
+      "required_references": [
+        "references/routing-playbook.md",
+        "references/model-driven-generation.md",
+        "references/content-copy-method.md"
+      ],
+      "optional_references": [
+        "references/chart-diagram-components.md",
+        "references/layout-pattern-library.md"
+      ],
+      "primary_scripts": [
+        "scripts/create_deck.py --topic \"<lesson topic>\" <inputs...> --project <project> --slides <n>"
+      ],
+      "required_gates": ["教学正确性门", "可读性门", "教师备注门", "PPTX 可编辑性门", "最终验证门"],
+      "stop_before": "design_proposal_confirmation"
+    },
+    {
+      "id": "html_deck",
+      "label_zh": "HTML 演示",
+      "priority": 86,
+      "match_terms": ["html ppt", "网页 ppt", "html deck", "浏览器演示", "互动", "webgl", "gsap", "lottie", "动效", "横向翻页"],
+      "input_patterns": [],
+      "final_delivery": "semantic_html_deck",
+      "first_action": "先确认 HTML 是否为最终交付，是否需要 PPTX 静态伴随版，以及动效等级。",
+      "after_choice_action": "开始 HTML deck 结构、动效和验证规划；不要默认承诺可编辑 PPTX parity。",
+      "confirmation_required": true,
+      "required_references": [
+        "references/html-output.md",
+        "references/html-motion.md",
+        "references/model-driven-generation.md"
+      ],
+      "optional_references": [
+        "references/visual-systems.md",
+        "references/svg-pptx-compatibility.md"
+      ],
+      "primary_scripts": [
+        "scripts/create_deck.py --topic \"<topic>\" <inputs...> --project <project> --formats html",
+        "scripts/validate_html_deck.py <project>/html/index.html --json <project>/reports/html_deck_validation.json --markdown <project>/reports/html_deck_validation.md"
+      ],
+      "required_gates": ["HTML 语义门", "固定舞台门", "动效降级门", "浏览器截图门", "最终验证门"],
+      "stop_before": "design_proposal_confirmation"
+    },
+    {
+      "id": "pptx_beautify",
+      "label_zh": "旧 PPTX 优化",
+      "priority": 84,
+      "match_terms": ["老 powerpoint", "旧 ppt", "已有 ppt", "优化 ppt", "重新设计", "美化", "二次编辑", "二次修改", "改 ppt"],
+      "input_patterns": [".pptx"],
+      "final_delivery": "editable_pptx",
+      "first_action": "先检查原 PPTX 缩略图、文本和版式，再提出保留/重做策略。",
+      "after_choice_action": "开始旧 deck 结构审计和修复计划；不要覆盖原文件。",
+      "confirmation_required": true,
+      "required_references": [
+        "references/pptx-skill-method-adaptation.md",
+        "references/svg-pptx-compatibility.md",
+        "references/quality-gates.md"
+      ],
+      "optional_references": [
+        "references/ppt-visual-failure-patterns.md",
+        "references/content-layout-execution.md"
+      ],
+      "primary_scripts": [
+        "scripts/source_to_markdown.py <old.pptx> --output-dir <project>/sources",
+        "scripts/pptx_preview.py <project>/exports/<slug>.pptx --project <project>",
+        "scripts/pptx_text_check.py <project>/exports/<slug>.pptx --slide-plan <project>/slide_plan.json --output <project>/pptx_text_check.json"
+      ],
+      "required_gates": ["原 deck 检查门", "PPTX 可编辑性门", "预览修复门", "最终验证门"],
+      "stop_before": "design_proposal_confirmation"
+    },
+    {
+      "id": "content_copy_improvement",
+      "label_zh": "PPT 内容/文案优化",
+      "priority": 82,
+      "match_terms": ["文案", "内容", "标题", "说服力", "claim title", "更吸引人", "优化ppt文案", "改得更有说服力"],
+      "input_patterns": [],
+      "final_delivery": "planning_only",
+      "first_action": "先判断是否只改内容/标题；若未要求导出，不进入完整生产流程。",
+      "after_choice_action": "开始文案和标题重写；不要生成 PPTX，除非用户追加要求。",
+      "confirmation_required": false,
+      "required_references": [
+        "references/content-copy-method.md",
+        "references/model-driven-generation.md"
+      ],
+      "optional_references": [
+        "references/routing-playbook.md",
+        "references/quality-gates.md"
+      ],
+      "primary_scripts": [
+        "scripts/source_to_markdown.py <inputs...> --output-dir <project>/sources",
+        "scripts/outline_from_source_cards.py <project> --title \"<topic>\" --audience \"<audience>\" --purpose \"<purpose>\" --slides <n>"
+      ],
+      "required_gates": ["文案门", "具体性门", "来源证据门"],
+      "stop_before": "final_export"
+    },
+    {
+      "id": "planning_only",
+      "label_zh": "只做方案/大纲/审计",
+      "priority": 60,
+      "match_terms": ["只要方案", "只要大纲", "先给方案", "路线", "规划", "审计", "评估", "不要生成", "先看看"],
+      "input_patterns": [],
+      "final_delivery": "planning_only",
+      "first_action": "只输出路线、方案、大纲或审计结论，不生成最终 PPTX/HTML/PDF。",
+      "after_choice_action": "继续规划或审计，不进入生产。",
+      "confirmation_required": false,
+      "required_references": [
+        "references/routing-playbook.md",
+        "references/quality-gates.md"
+      ],
+      "optional_references": [
+        "references/model-driven-generation.md"
+      ],
+      "primary_scripts": [
+        "scripts/plan_run.py --prompt \"<user prompt>\""
+      ],
+      "required_gates": ["路线门", "输出边界门"],
+      "stop_before": "production"
+    }
+  ]
+}

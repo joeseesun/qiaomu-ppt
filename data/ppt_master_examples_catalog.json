@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-06-20",
+  "generated_at": "2026-06-25",
   "source": {
     "repo": "hugohe3/ppt-master",
-    "examples_dir": "research/ppt-master/examples",
-    "examples_json": "research/ppt-master/examples/examples.json",
+    "examples_dir": "/tmp/ppt-master-study/examples",
+    "examples_json": "/tmp/ppt-master-study/examples/examples.json",
     "online_gallery": "https://hugohe3.github.io/ppt-master/index.html",
     "online_examples_json": "https://hugohe3.github.io/ppt-master/examples/examples.json",
     "boundary": "Learning catalog only. Do not copy upstream templates, images, exact wording, or code into Qiaomu-generated decks."

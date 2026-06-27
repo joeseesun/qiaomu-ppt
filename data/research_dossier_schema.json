@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "artifact": "research_dossier.md",
+  "purpose": "把资料收集结果组织成可直接支撑 PPT 页面主张、视觉机会和缺口判断的证据库。",
+  "upstream_artifacts": [
+    "content_brief.json 或 content_contract.json",
+    "research_questions.json",
+    "sources/source_cards.json 或 evidence_matrix.json",
+    "content-preflight.json/md"
+  ],
+  "required_sections": [
+    {
+      "id": "scope",
+      "label_zh": "任务范围",
+      "description": "主题、受众、使用场景、交付格式、资料深度和禁止事项。"
+    },
+    {
+      "id": "question_tree_alignment",
+      "label_zh": "研究问题对齐",
+      "description": "说明哪些核心问题、子问题和反方问题已经被资料覆盖，哪些仍是 missing evidence。"
+    },
+    {
+      "id": "verified_facts",
+      "label_zh": "已验证事实",
+      "description": "可以进入 PPT 的事实，每条都要有来源或用户提供依据。"
+    },
+    {
+      "id": "evidence_cards",
+      "label_zh": "证据卡",
+      "description": "每张证据卡包含 claim、evidence、source_id、confidence、可支撑页面、可视化机会。"
+    },
+    {
+      "id": "interpretations",
+      "label_zh": "解释判断",
+      "description": "基于事实的推断，必须和事实分开标注。"
+    },
+    {
+      "id": "conflicts_and_gaps",
+      "label_zh": "冲突与缺口",
+      "description": "来源矛盾、不可访问资料、低置信结论、需要用户确认的边界。"
+    },
+    {
+      "id": "visual_opportunities",
+      "label_zh": "视觉机会",
+      "description": "候选来源图、可生成主视觉、可做图解/图表/对比的内容。"
+    },
+    {
+      "id": "rights_and_risks",
+      "label_zh": "权利与风险",
+      "description": "版权、品牌、人物肖像、假截图/假数据风险和 missing evidence。"
+    },
+    {
+      "id": "slide_support_map",
+      "label_zh": "页面支撑映射",
+      "description": "每个潜在页面主张对应证据、视觉机会和缺口。"
+    }
+  ],
+  "evidence_card_fields": [
+    "id",
+    "claim",
+    "evidence",
+    "source_id",
+    "source_url_or_path",
+    "confidence",
+    "supports_questions",
+    "supports_slide",
+    "visual_opportunity",
+    "risk"
+  ],
+  "quality_rules": [
+    "先回答研究问题树，再写资料档案；不要边搜边把随机材料堆成摘要。",
+    "不要把来源摘要直接当页面文案。",
+    "不要把没有来源的解释判断写成事实。",
+    "每个核心页面至少有一个具体事实、例子、数据、原文或用户提供证据。",
+    "候选图片要说明用途：证据图、背景、主视觉、图解参考或禁止使用。",
+    "资料不足时要明确 missing evidence，而不是用泛泛背景填充。"
+  ]
+}

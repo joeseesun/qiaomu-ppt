@@ -1,0 +1,179 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-06-25",
+  "source_observation": {
+    "repo": "hugohe3/ppt-master",
+    "remote_main": "850ad1b",
+    "readme_version": "v2.11.0",
+    "boundary": "Qiaomu-owned abstraction of public ppt-master axis catalogs. This file stores ids and workflow lessons only; it does not copy upstream templates, prompts, images, or slide designs."
+  },
+  "principle": "PPT Master quality comes from locking independent axes before page execution: argument mode, deck visual style, image rendering, image palette behavior, and per-image composition type or hero primitive.",
+  "axes": {
+    "modes": [
+      "pyramid",
+      "narrative",
+      "instructional",
+      "showcase",
+      "briefing",
+      "custom"
+    ],
+    "visual_styles": [
+      "swiss-minimal",
+      "soft-rounded",
+      "glassmorphism",
+      "dark-tech",
+      "blueprint",
+      "editorial",
+      "photo-editorial",
+      "data-journalism",
+      "brutalist",
+      "memphis",
+      "zine",
+      "vintage-poster",
+      "paper-cut",
+      "sketch-notes",
+      "ink-notes",
+      "chalkboard",
+      "ink-wash",
+      "pixel-art",
+      "custom"
+    ],
+    "image_renderings": [
+      "vector-illustration",
+      "flat",
+      "minimalist-swiss",
+      "glassmorphism",
+      "3d-isometric",
+      "digital-dashboard",
+      "corporate-photo",
+      "blueprint",
+      "editorial",
+      "sketch-notes",
+      "ink-notes",
+      "chalkboard",
+      "paper-cut",
+      "watercolor",
+      "warm-scene",
+      "screen-print",
+      "vintage-poster",
+      "fantasy-animation",
+      "pixel-art",
+      "nature",
+      "custom"
+    ],
+    "image_palettes": [
+      "cool-corporate",
+      "warm-earth",
+      "tech-neon",
+      "editorial-classic",
+      "macaron",
+      "mono-ink",
+      "vivid-launch",
+      "dark-cinematic",
+      "duotone",
+      "nature-organic",
+      "jewel-tone",
+      "frost-ice",
+      "sunset-gradient",
+      "earthy-dusty",
+      "custom"
+    ],
+    "image_type_templates": [
+      "infographic",
+      "flowchart",
+      "framework",
+      "matrix",
+      "cycle",
+      "funnel",
+      "pyramid",
+      "comparison",
+      "timeline",
+      "map",
+      "scene"
+    ],
+    "hero_primitives": [
+      "single_subject",
+      "portrait",
+      "typographic",
+      "atmospheric",
+      "custom"
+    ],
+    "page_roles": [
+      "hero_page",
+      "local"
+    ],
+    "text_policies": [
+      "none",
+      "embedded"
+    ]
+  },
+  "qiaomu_required_fields": {
+    "design_proposal": [
+      "reference_model.mode",
+      "reference_model.visual_style",
+      "reference_model.image_rendering",
+      "reference_model.image_palette_behavior",
+      "reference_model.image_type_strategy"
+    ],
+    "spec_lock": [
+      "narrative_mode or mode",
+      "visual_style",
+      "image_rendering",
+      "image_palette_behavior",
+      "page_rhythm",
+      "layout_execution_contract"
+    ],
+    "visual_asset_manifest": [
+      "deck_image_model.image_rendering",
+      "deck_image_model.image_palette_behavior",
+      "items[].acquire_via",
+      "items[].asset_role",
+      "items[].page_role",
+      "items[].text_policy for AI rows",
+      "items[].visual_type for local AI rows",
+      "items[].hero_primitive for hero_page AI rows",
+      "items[].composition or layout_pattern",
+      "items[].safe_area or text_safe_area",
+      "items[].foreground_boundary or editable_foreground",
+      "items[].prompt or assets/images/image_prompts.json coverage"
+    ],
+    "design_spec": [
+      "Visualization Reference List or component_selection rationale",
+      "rejected component/template alternatives when a common choice is intentionally skipped",
+      "Image Resource List with dimensions, ratio, purpose, layout pattern, acquire_via, status, text_policy, and page_role"
+    ],
+    "presentation_sidecars": [
+      "notes/total.md or equivalent speaker-notes sidecar for long decks",
+      "animations.json or animation_manifest.json when the output is intended to be presentation-ready",
+      "svg_output as authored source and svg_final as post-processed preview source for SVG-first routes"
+    ]
+  },
+  "case_absorption_updates": {
+    "ppt169_sugar_rush_memphis": {
+      "learned": [
+        "Memphis Pop works when vivid geometry is constrained by a fixed page rhythm: anchor chapter pages, dense guide pages, and breathing visual turns.",
+        "Festival/event decks need guide components such as KPI cards, stage maps, schedules, ticket tiers, and sponsor/market comparisons, not only poster backgrounds.",
+        "High-energy palettes still need an active color budget per page; thumbnails can reveal cropped or over-busy information earlier than full-slide inspection."
+      ],
+      "qiaomu_rule": "Use Memphis Pop only with explicit color-count limits, short body copy, and stable component plans for schedule/map/ticket pages."
+    },
+    "ppt169_indie_bookstore_zine_guide": {
+      "learned": [
+        "Risograph Zine becomes executable when the constraints are mechanical: duotone palette, 1-3px misregistration, halftone/paper grain, hard edges, and no rounded cards.",
+        "Guide decks can stay dense if the page chrome is disciplined: header band, component area, footer/source line, and alternating breathing hero pages.",
+        "Source and culture decks benefit from a sources/credits page plus notes that separate visible guide copy from spoken context."
+      ],
+      "qiaomu_rule": "Treat zine/print styles as production constraints, not decoration; lock forbidden moves such as gradients, soft glass, and rounded cards."
+    }
+  },
+  "quality_lessons": [
+    "Mode is the argument skeleton; visual_style is the layout aesthetic. They must be locked separately.",
+    "Visual_style does not own HEX values. Palette behavior describes color use; actual colors come from the deck contract.",
+    "AI images share one deck-wide rendering and one deck-wide palette behavior. Local image type is per image.",
+    "Hero-page images use primitives such as atmospheric or single_subject, not local infographic types.",
+    "Source, user, web, formula, or chart assets own evidence. AI backgrounds may only provide atmosphere, context, concept, or texture unless the user explicitly supplies the object.",
+    "Image prompt sidecars are part of the design contract: every AI image needs purpose, ratio, composition, safe text area, text policy, and editable foreground boundary before rendering.",
+    "Component choices should include selection rationale and rejected alternatives when several common chart/list/guide components could fit.",
+    "Speaker notes and object-level animation sidecars are not visual polish; they prove the SVG groups, reading path, and presentation delivery layer were planned separately."
+  ]
+}

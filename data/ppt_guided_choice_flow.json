@@ -1,0 +1,264 @@
+{
+  "version": "2026-06-27",
+  "purpose": "Guided choice flow for qiaomu-ppt. It collects essential context before execution, helps users choose topic direction, depth, page count, style, image-generation/API policy, and output formats with short coded replies, then starts research/planning with executable defaults.",
+  "principles": [
+    "Every choice group has a recommended default.",
+    "The user may reply with compact codes such as 1A 2B 3C.",
+    "If the user says generate/default/默认 after a guided choice card, use the recommended defaults and begin research/planning; do not treat that as permission to render the final PPT.",
+    "Initial requests such as 生成一个PPT, 做个PPT, 直接生成, 默认, 越快越好, or a page count do not bypass the context card or later confirmation gates.",
+    "Ask only decision groups that materially affect output; do not show a long form.",
+    "Do not omit production-impact choices such as image generation/API policy and output formats unless the user already specified them.",
+    "Image-generation API setup is useful but optional: ask when relevant, but do not block a deck on provider configuration unless final-quality real image generation is required.",
+    "Public wording is plain and outcome-oriented; internal design terms stay hidden.",
+    "The chosen/default values must become a choice_contract in the deck project."
+  ],
+  "choice_card_policy": {
+    "max_groups_normal": 6,
+    "core_groups_normal": 4,
+    "production_groups_normal": [
+      "image_generation",
+      "delivery"
+    ],
+    "optional_followup_groups_excluded_from_max": true,
+    "max_options_per_group": 4,
+    "option_code_format": "1A, 1B, 2A, 2B",
+    "recommended_marker": "推荐",
+    "accepted_short_replies": [
+      "1A 2B 3C",
+      "1.a 2b 3c",
+      "1a,2b,3c",
+      "默认",
+      "生成",
+      "按默认"
+    ],
+    "do_not_block_on_noncritical_choices": true
+  },
+  "initial_request_policy": {
+    "default_action": "show_route_card_and_guided_choice_card",
+    "complete_brief_fields": [
+      "source_or_topic_scope",
+      "audience_or_use_context",
+      "depth_or_page_count",
+      "style_or_brand_constraints",
+      "image_or_source_policy",
+      "output_format",
+      "approval_bypass_or_previously_approved_plan"
+    ],
+    "first_artifact_after_context": "research_dossier_markdown",
+    "post_choice_short_replies_start": "research_and_design_proposal",
+    "post_choice_short_replies_do_not_skip": [
+      "research_dossier_confirmation",
+      "slide_plan_confirmation",
+      "design_proposal_approval",
+      "four_slide_preview_gate"
+    ],
+    "strict_approval_bypass_phrases": [
+      "不用确认",
+      "无需确认",
+      "跳过方案",
+      "跳过资料确认",
+      "跳过预览",
+      "直接进入生成阶段",
+      "直接生成最终版",
+      "直接出完整 PPT",
+      "一口气生成",
+      "先出草稿不用等我"
+    ]
+  },
+  "default_groups": [
+    {
+      "id": "topic_direction",
+      "label": "主题方向",
+      "when": "Topic is broad or has multiple plausible angles.",
+      "default_option": "A",
+      "options": [
+        {
+          "code": "A",
+          "label": "最佳默认",
+          "description": "自动选择最适合普通听众的主线，兼顾吸引力和科学边界。"
+        },
+        {
+          "code": "B",
+          "label": "案例吸引",
+          "description": "优先用故事、案例、现象切入，适合公开分享。"
+        },
+        {
+          "code": "C",
+          "label": "系统讲解",
+          "description": "优先讲清框架、概念、机制，适合课程和内部培训。"
+        },
+        {
+          "code": "D",
+          "label": "争议辨析",
+          "description": "同时讲解释力、限制和反方观点，适合理性/学术听众。"
+        }
+      ]
+    },
+    {
+      "id": "audience_depth",
+      "label": "听众深度",
+      "when": "Audience is not specified.",
+      "default_option": "A",
+      "options": [
+        {
+          "code": "A",
+          "label": "普通听众",
+          "description": "少术语，多例子，讲完能复述核心观点。"
+        },
+        {
+          "code": "B",
+          "label": "进阶读者",
+          "description": "保留关键概念、研究边界和方法争议。"
+        },
+        {
+          "code": "C",
+          "label": "专业讨论",
+          "description": "强调理论、证据链、可检验性和反驳。"
+        }
+      ]
+    },
+    {
+      "id": "page_count",
+      "label": "页数",
+      "when": "Page count is not specified.",
+      "default_option": "B",
+      "options": [
+        {
+          "code": "A",
+          "label": "8页精简",
+          "description": "适合10分钟以内快速分享。"
+        },
+        {
+          "code": "B",
+          "label": "12页标准",
+          "description": "推荐默认，足够讲清结构、案例和结论。"
+        },
+        {
+          "code": "C",
+          "label": "16页深入",
+          "description": "适合30分钟以上，有更多证据和图解。"
+        }
+      ]
+    },
+    {
+      "id": "style",
+      "label": "视觉风格",
+      "when": "Style is not specified.",
+      "default_option": "A",
+      "options": [
+        {
+          "code": "A",
+          "label": "清晰讲解",
+          "description": "推荐默认，结构清楚、图解友好、投影可读。"
+        },
+        {
+          "code": "B",
+          "label": "演讲故事",
+          "description": "更有节奏和记忆点，适合舞台/分享会。"
+        },
+        {
+          "code": "C",
+          "label": "研究报告",
+          "description": "证据和引用更强，适合严肃汇报。"
+        },
+        {
+          "code": "D",
+          "label": "文化杂志",
+          "description": "更有阅读气质，适合人物、历史、文化主题。"
+        }
+      ]
+    },
+    {
+      "id": "image_generation",
+      "label": "配图/生图",
+      "when": "Image policy is not specified and the deck benefits from visuals, atmosphere, diagrams, or section art.",
+      "default_option": "A",
+      "options": [
+        {
+          "code": "A",
+          "label": "Codex生图优先",
+          "description": "推荐默认：Codex/宿主内置生图可用时直接使用，用于封面、章节/转场、概念隐喻、安静背景和结尾氛围；证据图仍用真实来源。非 Codex 环境再检测已配置 API；都不可用才生成 prompt/占位并记录缺口。"
+        },
+        {
+          "code": "B",
+          "label": "帮我配置生图API",
+          "description": "可选：询问并协助配置 GPT-image、Nanobanana、Seedream、Jimeng 或 OpenAI-compatible API。"
+        },
+        {
+          "code": "C",
+          "label": "只用来源/图解",
+          "description": "不用 AI 氛围图，优先真实图片、截图、图表和自绘示意。"
+        },
+        {
+          "code": "D",
+          "label": "预览后决定",
+          "description": "四页预览里先看版式，再决定是否批量生成图片。"
+        }
+      ]
+    },
+    {
+      "id": "image_api_provider",
+      "label": "生图API",
+      "when": "Ask only if image_generation=B, or when non-Codex runtime has no configured image provider and the user wants final-quality generated images.",
+      "optional": true,
+      "default_option": "A",
+      "options": [
+        {
+          "code": "A",
+          "label": "GPT-image/OpenAI",
+          "description": "使用 OPENAI_API_KEY 或 OpenAI-compatible 配置。"
+        },
+        {
+          "code": "B",
+          "label": "Nanobanana",
+          "description": "使用用户提供的 Nanobanana/Gemini image API 或兼容代理配置。"
+        },
+        {
+          "code": "C",
+          "label": "Seedream/即梦",
+          "description": "使用 Seedream/即梦/火山生态或兼容代理配置。"
+        },
+        {
+          "code": "D",
+          "label": "其他兼容API",
+          "description": "使用用户提供的 base_url、model、auth scheme 和 API key env。"
+        }
+      ]
+    },
+    {
+      "id": "delivery",
+      "label": "生成格式",
+      "when": "Delivery is not specified.",
+      "default_option": "A",
+      "options": [
+        {
+          "code": "A",
+          "label": "PPTX+PDF+HTML",
+          "description": "推荐默认，可编辑、可分享、可网页预览。"
+        },
+        {
+          "code": "B",
+          "label": "只要PPTX",
+          "description": "最快，适合本地继续修改。"
+        },
+        {
+          "code": "C",
+          "label": "HTML优先",
+          "description": "适合动效、网页演示和在线分享。"
+        },
+        {
+          "code": "D",
+          "label": "加Keynote",
+          "description": "在可用的 macOS/Keynote 环境下额外导出 .key，失败则记录证据。"
+        }
+      ]
+    }
+  ],
+  "execution_defaults": {
+    "default_reply_policy": "If user says generate/default/按默认 after the choice card, select all default_option values and start research/planning.",
+    "normal_default_delivery": "editable_pptx + pdf + semantic_html",
+    "normal_default_image_generation": "codex_host_native_first; configured_api_second; source/evidence/product visuals stay real/source-backed; if neither real generation route exists, create image prompts and placeholders, then record missing real image generation evidence instead of blocking.",
+    "normal_default_preview": "For decks over 7 pages, produce design proposal then four-slide preview before full generation unless user explicitly says skip preview.",
+    "direct_generate_override": "If the user explicitly says 直接进入生成阶段/直接生成最终版/不用确认/跳过方案/跳过资料确认/跳过预览/一口气生成, record skipped_by_user and proceed with defaults."
+  }
+}
