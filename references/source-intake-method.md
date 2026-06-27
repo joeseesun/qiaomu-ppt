@@ -116,6 +116,7 @@ NotebookLM is useful when:
 For PPT generation, NotebookLM output should be treated as one analysis source,
 not as the final slide plan. The Qiaomu PPT pipeline still needs:
 
+- a Markdown research dossier that can be reviewed before slide planning
 - source cards
 - content angle confirmation
 - `content_contract.json`
@@ -263,12 +264,36 @@ For long sources, generate 8-12 questions before writing slide claims:
 These questions can be answered by the agent, NotebookLM, or another analysis
 tool, but the answers must be saved in `source_notes.md` or a sidecar JSON.
 
+## Research Dossier Before Slide Plan
+
+Before writing `content_contract.json` or `slide_plan.json`, synthesize the
+cleaned sources into a user-reviewable Markdown dossier. Use
+`research_dossier.md` when the project has multiple sources or a broad topic;
+for small projects, `sources/source_notes.md` may serve this role if it is
+detailed enough.
+
+The dossier should include:
+
+- supplied-source summary and what each source contributes
+- model-knowledge assumptions that need source confirmation
+- web/source research findings with source IDs or URLs
+- source coverage, contradictions, and missing evidence
+- visual asset inventory, image rights notes, and source/image gaps
+- recommended content angle options when the material supports more than one
+  story
+
+After the dossier, create a page-by-page slide plan and ask for confirmation
+unless the user explicitly skipped this gate. Do not use a polished design or
+PPTX export as the first review surface for source-heavy work.
+
 ## Minimum Gate
 
 Before `content_contract.json`, a source-backed PPT should have:
 
 - `source_manifest.json` with every source and extraction route
 - cleaned Markdown/text for each usable source
+- `research_dossier.md` or substantial `source_notes.md` synthesizing the
+  material before slide planning
 - source coverage notes and gaps
 - source cards for main claims
 - image/visual asset candidates when visual material matters

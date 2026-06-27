@@ -1,0 +1,363 @@
+{
+  "version": "2026-06-26",
+  "name": "Qiaomu PPT Design Generation Methodology",
+  "purpose": "Reusable, iterative methodology for source-grounded PPT design generation across PPTX, HTML, PDF, and Keynote routes.",
+  "principle": "Source truth -> audience state change -> story and claims -> proof structure -> composition grammar -> media relationship -> renderer recipe -> verification evidence -> reusable learning.",
+  "productized_choice_principle": {
+    "data_file": "data/ppt_guided_choice_flow.json",
+    "reference": "references/guided-choice-flow.md",
+    "policy": "For broad PPT requests, present compact guided choices with recommended defaults. Users may reply with short codes such as 1A 2B 3C 4A 5A, or say generate/default to use all recommended defaults. Normal cards include content/design choices plus image-generation/API policy and output-format choices when unspecified. Codex/host-native image generation is the recommended default when available because it improves final PPT visual quality; configured API providers are the second route; procedural assets are preview/offline fallback. Image API provider setup is an optional follow-up in non-Codex or no-host-native environments: ask whether to help configure GPT-image/OpenAI, Nanobanana, Seedream/即梦, Jimeng, or another compatible API without blocking the deck on unanswered provider preferences.",
+    "required_output_when_used": "choice_contract.json",
+    "not_allowed": [
+      "asking open-ended preference questions when a good default is available",
+      "showing more than six normal choice groups",
+      "blocking generation on noncritical unanswered choices",
+      "asking users to paste API keys into chat instead of using environment variables or local provider configuration",
+      "hardcoding unverified image-provider endpoints, model names, or auth schemes",
+      "exposing internal style-family jargon in public choices"
+    ]
+  },
+  "slide_ontology_layers": [
+    {
+      "layer": "slide_role",
+      "question": "What job does this slide perform inside the deck?",
+      "examples": [
+        "cover",
+        "chapter_turn",
+        "argument_body",
+        "evidence",
+        "case_story",
+        "method_step",
+        "summary",
+        "closing"
+      ]
+    },
+    {
+      "layer": "intent",
+      "question": "What cognitive move should the audience make?",
+      "examples": [
+        "hook",
+        "explain",
+        "compare",
+        "sequence",
+        "prove",
+        "decide",
+        "reflect"
+      ]
+    },
+    {
+      "layer": "proof_structure",
+      "question": "What kind of logical proof is this?",
+      "id_family": "Lxx",
+      "examples": [
+        "L03.claim_proof_object",
+        "L08.two_column_comparison",
+        "L13.process_flow",
+        "L20.chart_with_takeaway",
+        "L24.concept_map"
+      ]
+    },
+    {
+      "layer": "composition_grammar",
+      "question": "Where should the eye land first, and how should it move?",
+      "id_family": "Cxx",
+      "examples": [
+        "C01.rule_of_thirds",
+        "C02.nine_grid",
+        "C03.golden_ratio",
+        "C04.symmetry",
+        "C05.asymmetry",
+        "C06.vertical_axis",
+        "C07.stair_step",
+        "C08.off_axis",
+        "C09.multi_point",
+        "C10.visual_flow",
+        "C11.static_dynamic_contrast"
+      ]
+    },
+    {
+      "layer": "media_relationship",
+      "question": "How do visual evidence and editable text share the canvas?",
+      "id_family": "ITLxx",
+      "examples": [
+        "ITL03.full_bleed_hero",
+        "ITL10.conclusion_first_proof",
+        "ITL13.before_after",
+        "ITL18.screenshot_annotation",
+        "ITL20.data_context_image"
+      ]
+    },
+    {
+      "layer": "renderer_recipe",
+      "question": "What executable component family should the renderer build?",
+      "field": "component_type",
+      "examples": [
+        "claim_proof_object",
+        "chart_takeaway_context",
+        "source_object_panel",
+        "mechanism_loop",
+        "timeline_nodes",
+        "screenshot_annotation"
+      ]
+    }
+  ],
+  "canonical_slide_contract_required_fields": [
+    "slide_role",
+    "intent",
+    "proof_structure",
+    "composition",
+    "media_relationship",
+    "renderer_recipe",
+    "claim_title",
+    "proof_object",
+    "coordinate_slots",
+    "qa_risks"
+  ],
+  "generation_loop": [
+    {
+      "stage": "source_and_purpose",
+      "outputs": [
+        "deck_brief.md",
+        "sources/source_manifest.json",
+        "sources/source_cards.json",
+        "reports/source_adequacy.json/md"
+      ]
+    },
+    {
+      "stage": "story_and_content",
+      "outputs": [
+        "content_contract.json",
+        "slide_plan.json",
+        "page_content_guide.md",
+        "reports/content_outline_audit.json/md"
+      ]
+    },
+    {
+      "stage": "design_direction",
+      "outputs": [
+        "design_proposal.md",
+        "style_recommendations.json",
+        "style_direction.json/md",
+        "style_brief.md"
+      ]
+    },
+    {
+      "stage": "layout_and_composition",
+      "outputs": [
+        "spec_lock.json.layout_execution_contract",
+        "visual_contract.json",
+        "image_layout_plan.json/md"
+      ]
+    },
+    {
+      "stage": "visual_asset_system",
+      "outputs": [
+        "visual_asset_manifest.json",
+        "assets/images/image_prompts.json/md",
+        "image_art_direction.json",
+        "assets/images/image_generation_queue.json/md"
+      ]
+    },
+    {
+      "stage": "rendering",
+      "outputs": [
+        "svg_generation_manifest.json",
+        "pptx_generation_manifest.json",
+        "html_delivery_manifest.json",
+        "export_manifest.json"
+      ]
+    },
+    {
+      "stage": "verification_and_repair",
+      "outputs": [
+        "reports/style_execution_audit.json/md",
+        "reports/deck_quality_benchmark.json/md",
+        "reports/deck_repair_plan.json/md",
+        "qa_report.md"
+      ]
+    }
+  ],
+  "learning_source_taxonomy": [
+    {
+      "source_type": "ppt_master_examples",
+      "learn_into": [
+        "style execution",
+        "asset density",
+        "page rhythm",
+        "proof design"
+      ],
+      "not_allowed": [
+        "copying templates",
+        "copying assets"
+      ]
+    },
+    {
+      "source_type": "viewer_products",
+      "examples": [
+        "SlideShare",
+        "Scribd",
+        "Google Books"
+      ],
+      "learn_into": [
+        "document conversion",
+        "viewer interaction",
+        "lazy loading",
+        "source text/search layers"
+      ],
+      "not_allowed": [
+        "hiding poor source rendering behind UI chrome"
+      ]
+    },
+    {
+      "source_type": "composition_libraries",
+      "examples": [
+        "nevertoday/100-layout-compositions"
+      ],
+      "learn_into": [
+        "Cxx composition grammar",
+        "coordinate bias",
+        "safe-area rules"
+      ],
+      "not_allowed": [
+        "direct template copying"
+      ]
+    },
+    {
+      "source_type": "html_design_agent_prompts",
+      "examples": [
+        "asgeirtj/system_prompts_leaks/Anthropic/claude-design.md"
+      ],
+      "learn_into": [
+        "design context binding",
+        "targeted edit discipline",
+        "static editable HTML slides",
+        "review anchor labeling",
+        "projection-safe type scale",
+        "variation canvas planning",
+        "verification-to-repair loop"
+      ],
+      "not_allowed": [
+        "copying proprietary runtime APIs",
+        "copying prompt text",
+        "copying tool names",
+        "copying host-specific components",
+        "using screenshot-backed PPTX as the default editable route"
+      ]
+    },
+    {
+      "source_type": "design_reference_libraries",
+      "examples": [
+        "rohitg00/awesome-claude-design"
+      ],
+      "learn_into": [
+        "visual-character family taxonomy",
+        "forced-choice style picker",
+        "style remix arbitration",
+        "anti-slop fingerprint catalog",
+        "task recipes",
+        "showcase and case-study organization",
+        "token and iteration discipline"
+      ],
+      "not_allowed": [
+        "copying exact DESIGN.md files",
+        "copying Claude-specific prompt text",
+        "copying web landing-page templates",
+        "exposing every internal family as a user-facing menu",
+        "treating web UI styles as PPT templates"
+      ]
+    },
+    {
+      "source_type": "user_failure_reports",
+      "learn_into": [
+        "QA gates",
+        "repair rules",
+        "default renderer constraints"
+      ],
+      "not_allowed": [
+        "one-off patching without rule update"
+      ]
+    }
+  ],
+  "pattern_promotion_requirements": [
+    "clear layer",
+    "best_for",
+    "avoid_for",
+    "coordinate_or_safe_area_guidance",
+    "text_density_and_minimum_size_rules",
+    "image_fit_or_crop_rules_when_media_is_involved",
+    "preview_or_regression_case_when_renderer_behavior_changes",
+    "attribution_when_derived_from_external_source",
+    "qa_failure_mode",
+    "repair_move"
+  ],
+  "naming_rule": {
+    "format": "stable-id.slug",
+    "examples": [
+      "L20.chart_with_takeaway",
+      "C03.golden_ratio",
+      "ITL18.screenshot_annotation",
+      "RR.chart_takeaway_context"
+    ],
+    "legacy_policy": "Keep existing Lxx and ITLxx IDs stable; add slugs, aliases, and layer metadata rather than renaming existing IDs in place."
+  },
+  "visual_character_system": {
+    "data_file": "data/visual_character_families.json",
+    "public_choice_file": "data/html_style_archetypes.json",
+    "policy": "Users choose scenarios; internal generation chooses one primary visual family plus at most one counterpoint family.",
+    "required_output_when_material": "style_picker_result.json",
+    "recommendation_shape": [
+      "best_family",
+      "alternative_family",
+      "avoid_family",
+      "plain_language_reasoning"
+    ]
+  },
+  "style_remix_contract": {
+    "allowed_when": "The deck benefits from deliberate tension and ownership can be explained.",
+    "required_fields": [
+      "base_family",
+      "counterpoint_family",
+      "ratio",
+      "base_owns",
+      "counterpoint_owns",
+      "non_negotiables",
+      "conflict_resolution"
+    ],
+    "hard_rules": [
+      "One family owns layout and proof language.",
+      "The counterpoint may own tone, surface, chapter rhythm, or motion.",
+      "Never mix two unrelated accent systems.",
+      "Never use two display-font personalities on the same slide.",
+      "If ownership is unclear, use one family."
+    ]
+  },
+  "anti_slop_audit": {
+    "reference": "references/ppt-anti-slop.md",
+    "fail_fingerprints": [
+      "generic_gradient_orbs",
+      "three_card_default",
+      "nested_card_soup",
+      "fake_glass",
+      "decorative_icon_stack",
+      "fake_source_evidence",
+      "decorative_left_rules",
+      "baked_in_viewer_chrome",
+      "title_image_collision",
+      "tight_cjk_title_leading",
+      "text_overflow"
+    ],
+    "repair_level": "Repair source contracts, style_direction, visual_contract, visual_asset_manifest, or renderer mapping before one-off visual tweaks."
+  },
+  "recipe_system": {
+    "data_file": "data/ppt_generation_recipes.json",
+    "policy": "Recipes are source-to-deck workflow contracts, not slide templates.",
+    "required_output_when_used": "recipe_contract",
+    "default_recipe_ids": [
+      "url_article_to_talk_deck",
+      "readme_to_pitch_deck",
+      "pdf_report_to_research_deck",
+      "html_interactive_deck",
+      "speaker_notes_delivery"
+    ]
+  }
+}

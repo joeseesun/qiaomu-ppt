@@ -9,6 +9,7 @@ Do not generate slides directly from chat memory. Generate from project files:
 ```text
 design_proposal.md       user-facing approved direction
 research_plan.md/json    topic research questions and source strategy when needed
+research_dossier.md      user-reviewable synthesis of model knowledge, supplied sources, web/source findings, image candidates, and gaps
 sources/source_notes.md  topic/source understanding, timeline, quote bank, gaps
 sources/source_cards.json structured evidence units for slide claims
 sources/papers/<id>/paper_manifest.json paper metadata, TeX/PDF route, figures, tables
@@ -41,12 +42,17 @@ Output:
 - cleaned source Markdown and downloaded/copied assets when URLs/files/source packets are present
 - `sources/papers/<id>/paper_manifest.json` when arXiv/Hugging Face paper sources are present
 - `research_plan.md` or `research_plan.json` for broad-topic requests
+- `research_dossier.md` or substantial `sources/source_notes.md` before slide planning
 - `sources/source_notes.md` and `sources/source_cards.json` for topic-researched decks
 
 Rules:
 
 - Source Markdown owns text facts.
 - Image/PPT/PDF metadata owns geometry and media facts.
+- A source-grounded Markdown dossier is the first reviewable production
+  artifact after context intake. It should synthesize model prior knowledge,
+  supplied material, and web/source research; mark assumptions and missing
+  evidence; and list visual/image options before slide planning.
 - Broad topic requests are source tasks first, not writing tasks. Follow `topic-research-method.md` before generating an outline.
 - Mixed source requests are source-intake tasks first. Use `source-intake-method.md` and `source_to_markdown.py` to preserve source identity across URLs, arXiv/Hugging Face papers, WeChat articles, PDFs, EPUBs, Office docs, Feishu exports, images, ZIPs, and folders.
 - Paper requests use `paper-source-intake.md`: normalize to arXiv, prefer TeX/e-print, extract figure/table evidence, and bind paper cards to `slide_plan.json.source_card_ids`.
@@ -61,6 +67,8 @@ Rules:
 Output:
 
 - `design_proposal.md`
+- page-by-page slide plan for user confirmation, either inside the proposal or
+  as `slide_plan.json` plus a readable Markdown/table summary
 
 It must contain:
 
@@ -68,16 +76,34 @@ It must contain:
 - source research summary, including coverage, gaps, and selected/user-confirmed angle when the deck started from a topic
 - audience state change
 - story arc
-- 3 style candidates
-- selected direction
+- style system: deck mode, visual system, palette, typography, image policy, and why the chosen direction fits the audience and evidence
+- layout rhythm: the planned sequence of `anchor`, `dense`, and `breathing` pages, plus the layout families used so the deck is not a repeated outline template
+- per-slide title/claim, visible content, source anchors, proof object, layout
+  pattern, image/background plan, speaker-note goal, and QA risk
+- 3 visibly different style candidates: conservative fit, distinctive fit, and wildcard/interesting alternative
+- selected default direction, plus an explicit hybrid direction when combining two candidates would produce the strongest result
 - layout mix with concrete pattern IDs from `layout-pattern-library.md`
+- page-by-page layout contract as a readable table. Each row must include slide number, claim/title, proof job, `Lxx` layout pattern, `ITLxx` image-text pattern when media matters, visual component, background or media plan, reading path, and QA risk
+- image-generation layout brief: every Codex/AI visual row names the selected
+  `Lxx`/`ITLxx`, focal subject position, negative space, text overlay or
+  callout zone, crop/safe-area policy, and thumbnail rhythm role
+- image-text integration brief: every media-heavy row names the
+  `integration_move`, annotation targets when labels are used, and the
+  thumbnail/mobile failure risk to watch for
 - chart/diagram/image plan
 - image generation decision
 - background rhythm
 - font and compatibility plan
 - deliverables
 
-Normal user-facing PPT generation stops here for approval.
+A proposal that only lists slide topics or content bullets is incomplete. If the
+first proposal omits style system, layout rhythm, or the page-by-page layout
+contract, correct it before asking the user for approval or moving to preview.
+
+Normal user-facing PPT generation stops here for approval. A user reply of
+`生成`, `默认`, or partial option codes before this phase accepts guided-choice
+defaults only; it does not skip this approval unless the strict bypass phrase
+was recorded.
 
 ### Phase 2.5: Four-Slide Preview Gate
 
@@ -114,6 +140,11 @@ Default preview slide selection:
 Rules:
 
 - Do not render the remaining slides while `user_decision` is `pending`.
+- If the user explicitly required Codex/host-native image generation, generate
+  or import the selected preview pages' Codex bitmap assets before producing the
+  preview PPTX/HTML/SVG. Do not substitute procedural backgrounds or
+  placeholders; if the assets cannot be created, stop and record the blocker in
+  `preview_gate.json` or `qa_report.md`.
 - If the user approves with revisions, update `design_spec.md`, `spec_lock.md`, and relevant policies before full generation.
 - If the preview reveals a systemic issue, change the generator/rules, not only the affected page.
 - Batch mode or explicit "skip preview" requests must set `skipped_by_user: true` and record the exact instruction.
@@ -285,6 +316,7 @@ Every page in `slide_plan.json` should include:
   "claim_title": "...",
   "rhythm": "dense",
   "layout_pattern": "L20",
+  "image_text_pattern_id": "ITL20",
   "reading_path": "title -> chart -> takeaway",
   "proof_object": "bar chart of ...",
   "component_plan": ["chart_with_takeaway", "source_note_in_speaker_notes"],
@@ -362,6 +394,13 @@ Avoid:
 - source screenshots cropped so facts disappear
 - meaningless decorative frames around every image
 
+For Codex/AI-generated visuals, this contract is the prompt source of truth.
+Generate the image after `layout_pattern_id`, `image_text_pattern_id`,
+foreground safe areas, focal position, crop policy, and thumbnail rhythm role
+are known. If these values are missing, update the contract before asking for
+an image. A high-design image that ignores the selected layout is a failed
+asset, not a slide you should rescue with pasted text panels.
+
 ## Chart and Diagram Contract
 
 Every chart/diagram page must identify:
@@ -400,6 +439,9 @@ For concept diagrams:
 - Generate pages sequentially after the lock is written.
 - Before each page, use only the current page's entries from `slide_plan.json` and `spec_lock.md`.
 - Do not let the last generated page dictate the next page's layout.
+- Do not generate Codex/AI visuals from generic topic prompts. Prompts must be
+  derived from the current page's `Lxx`/`ITLxx`, proof object, safe text zones,
+  crop policy, and desired thumbnail role.
 - If context is compacted or a long pause occurs, re-read `design_spec.md`, `spec_lock.md`, and the current page entry before continuing.
 - For substantial decks, create and inspect a thumbnail grid before export.
 
@@ -411,6 +453,19 @@ Before export, verify:
 - `design_spec.md` exists.
 - `spec_lock.md` exists and includes page rhythm, layouts, backgrounds, typography, colors.
 - `slide_plan.json` pages match the generated pages.
+- Major visual pages have explicit `Lxx` and, when media matters, `ITLxx`
+  mappings in the plan/lock/visual contract.
+- Major visual pages declare an `integration_move`; labels/chips/callouts have
+  concrete targets or are removed from the slide.
+- Thumbnail grid shows intentional rhythm: no accidental run of identical
+  layout fingerprints, identical split panels, identical overlay cards, or
+  generic background-plus-text slides.
+- Thumbnail/mobile review does not collapse into repeated black/white text
+  slabs beside images, bottom chip bars, awkward narrow title wraps, or
+  unreadable captions.
+- When SVG output exists, `visual_rhythm_check.py` has run or an equivalent
+  thumbnail-rhythm review is recorded, and any repeated-structure findings have
+  been repaired in the layout/image prompt contract before final export.
 - No exact background repeats on adjacent pages.
 - No slide uses more than three active colors unless source images require it.
 - No slide uses unsupported background structure baked into an image.

@@ -15,6 +15,7 @@
 - 多源资料到 PPT：用户给 URL、飞书导出、PDF、EPUB、Office、Markdown、图片、ZIP 或文件夹时，内置 `scripts/source_to_markdown.py` 会统一提取正文、图片候选、PDF 页面图和缺口，保存 `source_manifest.json`，并默认生成 `source_notes.md` / `source_cards.json` 作为第一版证据卡。
 - 多源摄取回归矩阵：`source_intake_matrix_smoke.py` 会离线生成 Markdown、HTML、DOCX、PPTX、XLSX、图片和 ZIP fixtures，逐个跑 `source_to_markdown.py`，检查 `source_manifest.json`、extracted Markdown、source cards、图片候选和 missing-evidence 标记，防止文件/资料入口被后续迭代改坏。
 - 证据侧面卡：`scripts/source_cards.py` 会把短资料拆成去重后的事实、文本、机制、冲突、影响等证据侧面；文件名、来源标题留在 metadata，不进入可见页面。
+- 上下文先行：用户只说“做/生成一个 PPT”时，默认先给 1A 2B 3C 这样的选择卡，推荐最佳默认项；`生成/默认` 只表示按默认进入资料研究和方案阶段，不直接渲染最终 PPT。
 - 角色化大纲：`scripts/outline_from_source_cards.py` 会把证据卡匹配到语境、核心文本、机制、冲突、社会解读、比较、影响、反驳、综合等叙事角色，同时把 `component_plan.component_type` 写成 Lxx 对应的可执行版式家族，例如 `process_flow`、`concept_map`、`chart_with_takeaway`，避免为了凑页数反复复读同一条 claim，也避免版式计划写了 L13/L24、实际合同仍是普通卡片页。
 - 标题不截断：可见 claim title 必须是短判断，长证据留在 `source_anchor`、正文或备注；`check_project.py` 会拒绝带 `...` / `…` 的标题和过长中文标题，避免 PPTX/HTML 渲染时标题被截断。
 - 一键项目准备：`scripts/prepare_deck_project.py` 把主题、文件或链接先变成标准项目骨架，自动串起资料摄取、证据卡、大纲种子、风格/版式推荐、视觉契约、入选 source visual 定向解析、设计提案和预览闸门；只有主题时默认先跑 fast topic research，抓取可用来源并生成 source cards，失败或显式跳过时才只生成研究 brief。
@@ -32,6 +33,7 @@
 - 图像版式防劣化：正文页优先使用逐页图片资产，不再静默复用第一张图；图像页用局部文字遮罩/文字面板保留图片质感，避免整页灰洗；中文长标题默认使用更宽松行高，避免 AI HTML/PPT 常见的标题挤压。
 - 低清源图不拉伸：SVG 渲染会读取本地 source/user/web 图片尺寸，低分辨率证据图会按安全尺寸作为档案物件展示，不再硬拉成封面、结尾或证据页的大背景。
 - HTML 是真网页：用户要 HTML 版本时，正式交付必须是语义化 DOM/SVG/Canvas/CSS/JS 网页 PPT；整页截图嵌入只能作为 `html_parity_preview` 质检预览，不能冒充 HTML 成品。
+- HTML 动效增强：HTML 版可按 `none / subtle / expressive / cinematic` 选择动效档位；GSAP 负责精细 timeline 编排，Lottie/dotLottie 负责播放 AE/Bodymovin 动画资产。动效必须写入 `html_motion_manifest.json`，并保留 reduced-motion 与静态可读 fallback；极致 HTML 动效不自动承诺 editable PPTX 像素级等价。
 - 多格式交付总线：`scripts/export_bundle.py` 会把同一项目整理为 PPTX、PDF、正式 HTML、PPTX parity HTML，并在 macOS 可行时尝试 Keynote；`produce_deck.py` 的 professional/final 生产会在检测到 macOS Keynote 自动化可用时自动补 `.key`，默认走更快的 Keynote 09 兼容导出。成功、缺失、失败都会增量写入 `export_manifest.json`，单独补跑某个格式不会抹掉其它格式状态，且 PDF/parity/Keynote 证据必须不早于当前 PPTX，不靠旧文件或口头承诺。
 - 生产复跑稳定：`produce_deck.py` 会强制刷新派生的 SVG 页面，避免旧 `svg_output` 目录让后续导出看似成功、总报告却失败。
 - 内容先赢：用受众状态变化、claim title、证据策略和 speaker notes 组织材料，避免“资料搬运式 PPT”。
@@ -46,12 +48,12 @@
 - 高级杂志风格：内置 `Magazine Art Direction` 方向，把 Vogue/Elle 式数字杂志美学抽象成 PPT 可用的 headline、folio、pull quote、sidebar、editor note 和 image-as-context 组件。
 - 单页三色预算：默认每页只允许“中性底 + 可读文字 + 一个强调色”，源图片/图表色彩不计入周边 UI。
 - 背景降噪：默认 `visual_noise_budget: quiet`，限制大色块、霓虹边栏、复杂装饰、无意义线条和图表背后噪声。
-- 背景双引擎：有 Codex 生图时生成 5 张安静的 16:9 氛围背景图；无生图环境时用 CSS/Canvas/SVG 程序化生成 5 张角色背景。背景只负责颜色、渐变、光感、纹理和抽象装饰，不生成方框、卡片、面板、文字或图表占位。
+- 背景双引擎：有 Codex/宿主内置生图时默认优先生成 5 张安静的 16:9 氛围背景图；无宿主生图时再走已配置 API；都不可用时才用 CSS/Canvas/SVG 程序化生成 5 张角色背景作为预览/离线 fallback。背景只负责颜色、渐变、光感、纹理和抽象装饰，不生成方框、卡片、面板、文字或图表占位。
 - 图表和图示更丰富：按信息任务选择 ECharts、Observable Plot、Vega-Lite、Mermaid、Graphviz、Excalidraw-style SVG、D3/SVG 等路线，图表源文件和渲染资产保存在项目目录，保持可复现和可检查。
 - 组件不出框：卡片、标签、公式块、图示节点和连接符都有 `shape_component_policy`，文字必须留在容器内；关系连接优先细线、简单箭头或留白，不用粗箭头里塞符号。连接线必须接在节点边界/端口，不得穿过节点和文字。
 - 语义图标能力：可按每页主题搜索本地 QM 图标、Lucide、Heroicons、Tabler、Phosphor 等 SVG 图标，用作标签、锚点，或在适合的风格中作为 opt-in 的低噪声语义水印；不是默认背景装饰，也不是每页复用同一个图标。
 - 长 PPT 先预览：超过 7 页的正式 PPT 不再一次性全量生成，先产出 4 页代表性预览并等待确认，确认后再生成全量。
-- Codex 配图策略：有内置生图能力时，用于章节氛围、概念隐喻、场景插图、对象剖面、情绪板和安静 texture pack；不把文字、图表、UI、卡片或证据伪造进图片里。生图前必须先形成逐页图像导演 brief，而不是让模型随机铺背景。
+- Codex 配图策略：有内置生图能力时默认推荐并优先使用，用于封面/结尾氛围、章节转场、概念隐喻、场景插图、对象剖面、情绪板和安静 texture pack；证据图、真实截图、图表、UI、logo、产品物料和来源对象仍必须用真实来源，不让 AI 伪造。生图前必须先形成逐页图像导演 brief，而不是让模型随机铺背景。
 - 视觉资产获取清单：把图片、图表、公式、图标和 placeholder 统一登记为 `ai` / `web` / `user` / `source` / `formula` / `placeholder` 六类资产，记录 prompt、来源、权利、状态和真实文件路径；漂亮图必须先有证据链，才能进入最终 PPT。
 - 自动视觉资产规划：`prepare_deck_project.py` 会调用 `plan_visual_assets.py`，从 `slide_plan.json`、source cards 和 source images 自动生成 `visual_asset_rows.json`，再归一化为 `visual_asset_manifest.json` 和 `assets/images/image_prompts.json`；当 slide 有 `source_card_ids`，或 `media_need` / 页面角色需要 source 图片、截图、figure、PDF 页面图时，会优先把 `sources/images/...` 作为 `source` 证据图进入 manifest，而不是默认走 AI；候选图会先过滤站点 UI、logo、wordmark、edit icon、footer、1x1 tracking 和小尺寸装饰图，避免把 Wikipedia chrome 当作资料配图，同一 source_id 下也必须重新过质量阈值；如果某页自己的 source cards 没有可用图片，会先用已解析的主题级 source 图补位，再考虑 AI；多个 source image candidates 会先均衡分配，确保 Office、EPUB、PDF、URL 等来源抽出的图片不会被闲置到最后或被同一张图反复覆盖；同一张 source 图在短 deck 中会被限制重复使用，并优先用已经落盘的 source 图替换过度重复项，而不是马上新建 AI 行；未下载到本地的远程 source 图会先保留为 `Needs-Manual` 证据采购项，再由 `resolve_source_visuals.py` 只下载已被选中用于页面的少量 source visuals：它会重试瞬时失败、对 Wikimedia 缩略图尝试原图变体、记录每次尝试诊断，并回填 `source_cards.json`、`source_manifest.json`、`visual_asset_rows.json` 和 `visual_asset_manifest.json`；仍无法解析时才追加同页 AI fallback，保证预览不空，但 `professional` / `final` 会把未解析 source visual 单独作为失败原因，不允许用 AI fallback 冒充证据图；当 `ITL13/ITL14` 或 comparison/before-after 页有多张 source image candidates，会为同一页生成额外 source rows，避免对照页只拿到一张图；长 deck 没有视觉资产清单会被检查器拦下。
 - Source-aware 版式执行：`svg_deck_from_slide_plan.py` 会按 layout/component 把源图证据路由到封面/结尾、左右证据、流程、概念图、顶部主视觉、截图注释、数据证据等不同 SVG 骨架，避免有图页面全部长成同一种左右面板；`visual_rhythm_check.py` 会把 image slot 和结构指纹纳入节奏检查。
@@ -105,6 +107,12 @@ python3 scripts/bootstrap.py --install-system --include-optional-system
 LibreOffice 官方下载页：<https://www.libreoffice.org/download/>。正常 agent 工作流应优先执行 `python3 scripts/bootstrap.py --install-system`，让脚本用包管理器安装；只有 Homebrew/apt 不可用、权限不足或用户明确不要自动安装时，才退到官方下载页手动安装。
 
 仓库内置一组 PPT 字体包：Noto Sans CJK SC、Noto Serif CJK SC、Inter Variable、IBM Plex Sans，以及可选的 Smiley Sans、LXGW WenKai、Sarasa Mono SC、JetBrains Mono；`--download-fonts` 用于修复或重新下载字体文件。
+
+HTML 动效不是全局必需依赖。需要自托管 GSAP/Lottie 资产时，可在具体项目里用 npm 获取浏览器库，再复制到项目 `html/assets/vendor/` 等本地目录；最终交付要在 `html_motion_manifest.json` 中记录本地路径，或明确列出外部依赖：
+
+```bash
+npm install gsap lottie-web @lottiefiles/dotlottie-web
+```
 
 ## 快速使用
 
@@ -756,14 +764,16 @@ python3 scripts/keynote_probe.py \
 
 ## 工作流
 
-1. 资料入口：读取用户材料；如果有 URL/arXiv/Hugging Face 论文/微信公众号文章/PDF/EPUB/Office/飞书导出/ZIP/文件夹，先生成 Markdown、图片候选、source cards 和 `source_manifest.json`。如果只有主题，先做主题研究。
-2. 主题研究：围绕人物/作品/时代/影响/图片素材等维度联网搜索，生成 `research_plan`、`source_notes.md`、`source_cards.json` 和图片候选。
-3. 用户确认：给出 2-3 个内容角度、资料缺口和图片策略，请用户确认方向；素材不足时先补资料或改视觉策略，不硬写空泛 PPT。
-4. 路线判断：品牌发布、课件、商务汇报、演讲 deck、旧 PPT 美化或 HTML 预览。
-5. 内容契约：定义受众、目的、目标动作、当前状态、期望状态、stakes、结构框架和逐页主张。
-6. 视觉契约：定义风格 thesis、字体、配色、背景节奏、视觉噪声预算、图片槽位、资产获取清单和来源显示策略。
-7. 生产导出：默认用 `scripts/produce_deck.py` 走可编辑 PPTX 主路径；用户要 HTML 时生成真正网页 PPT；PPTX 截图同步版只作为 QA 预览；最终由生产编排器调用 `scripts/export_bundle.py` 收拢 PPTX/PDF/HTML/parity/Keynote 状态。
-8. 质量门：检查来源、叙事、文案、视觉、图片溢出、内部元数据泄漏、备注和导出证据。
+1. 上下文入口：如果用户只说“做/生成 PPT”，先给路线卡和 1A 2B 3C 选择卡，带推荐默认项；除非用户明确说“直接生成最终版/不用确认/一口气生成”等严格跳过词，不直接开始渲染。
+2. 资料入口：读取用户材料；如果有 URL/arXiv/Hugging Face 论文/微信公众号文章/PDF/EPUB/Office/飞书导出/ZIP/文件夹，先生成 Markdown、图片候选、source cards 和 `source_manifest.json`。如果只有主题，先做主题研究。
+3. 资料文档：把模型已有知识、用户材料和联网/资料搜索结果合成 `research_dossier.md` 或足够详细的 `source_notes.md`，标出来源、图片候选、权利状态、矛盾和缺口。
+4. 主题研究：围绕人物/作品/时代/影响/图片素材等维度联网搜索，生成 `research_plan`、`source_notes.md`、`source_cards.json` 和图片候选。
+5. 拆页确认：基于资料文档拆成每页标题、可见内容、来源锚点、proof object、布局、背景/图片计划、备注目标和 QA 风险，请用户确认；素材不足时先补资料或改视觉策略，不硬写空泛 PPT。
+6. 路线判断：品牌发布、课件、商务汇报、演讲 deck、旧 PPT 美化或 HTML 预览。
+7. 内容契约：定义受众、目的、目标动作、当前状态、期望状态、stakes、结构框架和逐页主张。
+8. 视觉契约：定义风格 thesis、字体、配色、背景节奏、视觉噪声预算、图片槽位、资产获取清单和来源显示策略。
+9. 生产导出：默认用 `scripts/produce_deck.py` 走可编辑 PPTX 主路径；用户要 HTML 时生成真正网页 PPT；PPTX 截图同步版只作为 QA 预览；最终由生产编排器调用 `scripts/export_bundle.py` 收拢 PPTX/PDF/HTML/parity/Keynote 状态。
+10. 质量门：检查来源、叙事、文案、视觉、图片溢出、内部元数据泄漏、备注和导出证据。
 
 例如“制作一个 PPT 介绍蒲松龄”，不应直接生成“生平、作品、影响”的模板页。更好的前置流程是：
 
@@ -780,6 +790,7 @@ python3 scripts/keynote_probe.py \
 
 - `deck_brief.md`
 - `research_plan.md` 或 `research_plan.json`，当用户只给主题时存在
+- `research_dossier.md` 或足够详细的 `sources/source_notes.md`，在拆页和生成前给出资料综合、来源覆盖、图片候选和缺口
 - `sources/source_manifest.json`
 - `sources/papers/<arxiv_id>/paper_manifest.json`，当使用 arXiv/Hugging Face 论文来源时存在
 - `sources/source_notes.md` 和 `sources/source_cards.json`，当主题需要联网研究时存在
@@ -800,6 +811,7 @@ python3 scripts/keynote_probe.py \
 - `exports/*.pdf`，当 PDF 导出或 PPTX preview PDF 可复用时存在
 - `exports/*.key`，仅当 macOS Keynote 自动化实际保存成功且不旧于当前 PPTX 时存在或被复用
 - `html_delivery_manifest.json`，当正式交付 HTML 网页 PPT 时必须存在
+- `html_motion_manifest.json`，当 HTML 使用 GSAP、Lottie/dotLottie 或其它 authored motion 时必须存在
 - `preview_gate.json`，当 PPT 超过 7 页时必须存在，记录四页预览、QA 关注点和用户确认状态
 - `html_parity_manifest.json`，仅当生成 PPTX 截图同步预览时存在
 - `export_manifest.json`，当运行统一导出总线时存在，逐项记录 PPTX/PDF/HTML/parity/Keynote 的 `exported` / `existing` / `missing` / `failed` 状态
@@ -823,6 +835,7 @@ python3 scripts/keynote_probe.py \
 - 无意义装饰线：只为了“科技感”而加的细线、网格、边栏、光轨，默认都算视觉噪声。
 - 图示线条穿过节点：连接线必须走边界/端口，线宽克制；如果线穿过文字或节点内部，属于硬缺陷。
 - HTML 不可读：正式 HTML 必须是真网页、同源内容、可读可导航；有 `readability_qa`，不能只是“有个 html 文件”。
+- HTML 动效喧宾夺主：动效必须服务阅读路径；GSAP/Lottie 只作为增强层，必须有静态可读状态、`prefers-reduced-motion` 分支和 `html_motion_manifest.json`。
 
 长 deck 必须声明：
 
@@ -935,7 +948,7 @@ Python 包在 `requirements.txt` 中声明。外部工具在 `data/dependency_ma
 - Poppler / `pdftotext` / `pdftoppm`：PDF 抽取和缩略图渲染。
 - ImageMagick：可选图片优化和 contact sheet。
 - Playwright Chromium：可选 JS 重页面抓取。
-- Node.js：可选 CSS/Canvas/WebGL 程序化背景渲染；缺失时使用内置 SVG fallback。
+- Node.js：可选 CSS/Canvas/WebGL 程序化背景渲染，以及项目级 GSAP/Lottie 浏览器库自托管；缺失时使用内置 SVG fallback 或已打包本地 JS 资产。
 - Keynote / AppleScript：macOS 可选 `.key` 导出与兼容性验证；失败要写入 `export_manifest.json`，不能由 LibreOffice 成功替代。
 
 检查当前环境：
@@ -961,6 +974,10 @@ python3 /Users/joe/.agents/skills/qiaomu-meta-skill/scripts/trigger_eval.py . \
   --output reports/trigger-eval.json
 python3 scripts/url_to_markdown.py "https://example.com" --output-dir /tmp/qiaomu-ppt-url-test
 python3 scripts/export_bundle.py /path/to/generated-project --formats pptx,pdf,html,html-parity
+# 仅当项目使用 authored HTML motion 时：
+python3 scripts/validate_html_deck.py /path/to/generated-project/html/index.html \
+  --motion-manifest /path/to/generated-project/html_motion_manifest.json \
+  --strict
 python3 scripts/export_bundle.py /path/to/generated-project --formats pptx,pdf,html,html-parity,keynote --keynote-strategy auto
 python3 scripts/check_project.py /path/to/generated-project
 ```
@@ -970,6 +987,7 @@ python3 scripts/check_project.py /path/to/generated-project
 - 不内置、不调用 `ppt-master`、`baoyu-design`、`frontend-slides`、`guizang-ppt-skill` 或 `humanize-ppt` 的代码。
 - 不依赖 `qiaomu-markdown-proxy` 运行；URL 能力已经内置为轻量脚本。
 - 不承诺正式 HTML/WebGL 与 PPTX 像素级一致。需要像素一致时生成 `html_parity_preview`，但它不是正式 HTML 版本。
+- 不承诺 `cinematic` 级 GSAP/Lottie HTML 动效能完整转换为可编辑 PPTX；需要两者都交付时，PPTX 是可编辑静态/轻动效主件，HTML 是增强演示层。
 - 不把抓取工具、模型名、QA 状态默认打印到每页 slide footer。
 - 不授予第三方商标、专有字体、产品截图或页面布局的使用权。
 
@@ -987,6 +1005,7 @@ python3 scripts/check_project.py /path/to/generated-project
 - 箭头里还有箭头、`x`、`=` 或 `≠`：这是 connector grammar 错误。改成细连接线、独立小标签或直接用空间关系表达。
 - 框框和分割线太多：减少卡片/药丸/阴影/分割线的组合，保留一个主视觉系统；分割线只用于真实阅读分区。
 - HTML 版本只是整页图片：这是把 parity preview 当成正式 HTML 了。正式 HTML 应有 `html_delivery_manifest.json`，可见层应由 DOM/SVG/Canvas/CSS/JS 构成；截图同步版只能放在 `html-parity/` 或 `*.parity.html`。
+- HTML 动效校验失败：检查 `html_motion_manifest.json` 的 `level`、`engines`、本地 GSAP/Lottie 文件路径、Lottie `.json`/`.lottie` 资产、`autoplay: false`、静态 fallback 和 `data-motion-id` / `data-screen-label` 目标是否真实存在。
 - URL 没图片：确认 `source_manifest.json` 的 `images` 字段；Jina fallback 会从 Markdown 图片链接里补图。
 - 飞书文档没读到：确认是否提供了导出的 Markdown/DOCX/PDF/ZIP，或当前环境是否有认证连接器；只有私有链接时会标记 `feishu_content_not_fetched`。
 - EPUB 只有零散文字：检查 `source_manifest.json` 的 `fetch_route` 和 `text_chars`；长书需要再做 `source_notes.md` / `source_cards.json`，不要直接按章节机械做 PPT。
@@ -1028,7 +1047,7 @@ Qiaomu PPT does not depend on upstream presentation skills at runtime. Inspirati
 
 ## License
 
-MIT
+GNU Affero General Public License v3.0 only (`AGPL-3.0-only`).
 
 Copyright (c) 向阳乔木
 

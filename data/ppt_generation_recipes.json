@@ -1,0 +1,118 @@
+{
+  "version": "2026-06-26",
+  "purpose": "Reusable task recipes for qiaomu-ppt. These turn source types into deck workflows without depending on external skills at runtime.",
+  "recipes": [
+    {
+      "id": "url_article_to_talk_deck",
+      "label": "URL or article to talk deck",
+      "best_for": ["X article", "blog post", "WeChat article", "newsletter", "opinion essay"],
+      "route": "talk_deck",
+      "required_steps": [
+        "fetch_or_extract_markdown",
+        "source_cards",
+        "audience_state_change",
+        "claim_title_outline",
+        "visual_character_picker",
+        "four_slide_preview",
+        "semantic_html_or_editable_pptx"
+      ],
+      "quality_rules": [
+        "Do not summarize paragraph by paragraph.",
+        "Each body slide needs a concrete example, contradiction, mechanism, or consequence from the source.",
+        "Use generated images only for atmosphere/concept, not fake evidence.",
+        "No visible default page-number strip or generic footer."
+      ],
+      "default_archetype": "talk_story",
+      "preferred_visual_families": ["editorial_minimal", "warm_editorial", "cinematic_product"]
+    },
+    {
+      "id": "readme_to_pitch_deck",
+      "label": "README to pitch deck",
+      "best_for": ["open-source project", "developer tool", "internal champion pitch", "investor or partner deck"],
+      "route": "brand_release",
+      "required_steps": [
+        "read_readme_and_repo_assets",
+        "tighten_one_line_pitch",
+        "problem_alternatives_proof_ask",
+        "brand_or_visual_character_picker",
+        "diagram_and_product_screenshot_plan",
+        "speaker_notes",
+        "export_bundle"
+      ],
+      "quality_rules": [
+        "Do not invent metrics, customers, GitHub stars, dates, or competitors.",
+        "Slide 1 has one precise pitch sentence.",
+        "Slide 4 names existing alternatives without strawman copy.",
+        "Slide 11 contains a specific ask.",
+        "Speaker notes exist and sound spoken, not marketing-generic."
+      ],
+      "default_archetype": "product_launch",
+      "preferred_visual_families": ["technical_terminal", "data_dense_pro", "cinematic_product"]
+    },
+    {
+      "id": "pdf_report_to_research_deck",
+      "label": "PDF or report to evidence deck",
+      "best_for": ["white paper", "annual report", "research PDF", "public-domain paper/book excerpt"],
+      "route": "business_report",
+      "required_steps": [
+        "pdf_text_and_page_image_intake",
+        "source_cards_and_visual_inventory",
+        "finding_based_outline",
+        "chart_table_source_object_plan",
+        "data_dense_or_editorial_picker",
+        "formal_html_or_pptx_export"
+      ],
+      "quality_rules": [
+        "Do not replace source pages/charts with fake procedural charts.",
+        "PDF page images are evidence objects and should preserve aspect ratio.",
+        "Charts must have visible takeaways and sidecar provenance.",
+        "Source URLs belong in notes or references, not on every slide by default."
+      ],
+      "default_archetype": "research_report",
+      "preferred_visual_families": ["data_dense_pro", "editorial_minimal", "warm_editorial"]
+    },
+    {
+      "id": "html_interactive_deck",
+      "label": "Interactive HTML presentation",
+      "best_for": ["motion demo", "web-native talk", "interactive product walkthrough", "animation-heavy explainer"],
+      "route": "html_deck",
+      "required_steps": [
+        "source_and_content_contract",
+        "interaction_purpose_plan",
+        "fixed_stage_contract",
+        "asset_performance_budget",
+        "keyboard_navigation",
+        "html_validation_and_browser_screenshots"
+      ],
+      "quality_rules": [
+        "Motion must communicate state, hierarchy, sequence, or comparison.",
+        "Visible text should be selectable/searchable where practical.",
+        "Viewer chrome stays outside the fixed slide stage.",
+        "Images are compressed to display size and not embedded as multi-MB base64."
+      ],
+      "default_archetype": "product_launch",
+      "preferred_visual_families": ["cinematic_product", "soft_futurism", "technical_terminal"]
+    },
+    {
+      "id": "speaker_notes_delivery",
+      "label": "Deck to speaker notes",
+      "best_for": ["pitch rehearsal", "talk delivery", "teleprompter script", "co-presenter handoff"],
+      "route": "talk_deck",
+      "required_steps": [
+        "confirm_notes_per_slide",
+        "extract_or_generate_notes",
+        "spoken_voice_rewrite",
+        "transition_and_pause_marks",
+        "read_time_estimate"
+      ],
+      "quality_rules": [
+        "Notes should be readable aloud, not bullet dumps.",
+        "Cut hype words and generated filler.",
+        "Add transitions between topic shifts.",
+        "Mark pauses for opening, section turns, and closing."
+      ],
+      "default_archetype": "talk_story",
+      "preferred_visual_families": ["editorial_minimal", "warm_editorial"]
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0.0",
+  "tool": "qiaomu-ppt/scripts/plan_run.py",
+  "generated_at": "2026-06-26T19:07:17+00:00",
+  "ok": true,
+  "is_qiaomu_ppt_task": true,
+  "stage": "initial",
+  "approval_bypass_phrase": "",
+  "production_authorized": false,
+  "stop_before": "guided_choice_or_design_proposal",
+  "next_action": "先给路线卡和选择卡；用户接受默认后，再做主题研究、资料与研究档案和方案。",
+  "validation_profile": "plan",
+  "check_plan": {
+    "profile": "plan",
+    "profile_label": "方案档",
+    "run_now": [
+      "路线卡与最终交付门",
+      "来源/事实缺口判断",
+      "确认边界门",
+      "content_preflight.py <project> --profile plan（进入正式大纲前）",
+      "top_quality_plan.py <project> --profile plan（已有资料/大纲/视觉计划时）",
+      "选择卡或默认路线门"
+    ],
+    "defer_until_final": [
+      "PPTX/HTML 导出验证",
+      "原生 Office/Keynote/WPS 验证",
+      "图片生成完整性验证",
+      "质量基准评分",
+      "PPTX 可编辑性检查",
+      "PPTX 预览缩略图",
+      "LibreOffice 导出证据"
+    ],
+    "skip_by_default": [
+      "bootstrap.py --check",
+      "check_project.py <project>",
+      "pptx_preview.py",
+      "pptx_text_check.py",
+      "validate_html_deck.py",
+      "HTML 动效验证，除非同时交付 HTML deck"
+    ],
+    "expensive_checks": [
+      "LibreOffice 导出/预览转换",
+      "浏览器截图",
+      "图片生成",
+      "完整质量基准"
+    ],
+    "notes": [
+      "方案档只证明路线和边界正确，不证明最终文件质量。",
+      "承诺可编辑 PPTX 时，最终档必须有 PPTX 预览或等价导出证据。"
+    ]
+  },
+  "route_card": {
+    "route": "broad_topic_ppt",
+    "route_label": "宽泛主题做 PPT",
+    "final_delivery": "editable_pptx",
+    "confidence": "high",
+    "matched_terms": [
+      "ppt",
+      "介绍",
+      "默认",
+      "不用过多搜索"
+    ],
+    "matched_inputs": [],
+    "assumptions": [
+      "未发现会改变路线的额外约束。"
+    ]
+  },
+  "required_references": [
+    "references/guided-choice-flow.md",
+    "references/topic-research-method.md",
+    "references/model-driven-generation.md"
+  ],
+  "optional_references": [
+    "references/design-style-library.md",
+    "references/visual-character-and-style-picker.md",
+    "references/visual-asset-acquisition.md"
+  ],
+  "primary_scripts": [
+    "scripts/topic_research.py \"<topic>\" --output-dir <project>/sources --depth fast",
+    "scripts/create_deck.py --topic \"<topic>\" --project <project> --slides <n>"
+  ],
+  "required_gates": [
+    "信息收集门",
+    "主题研究门",
+    "逐页计划确认门",
+    "四页预览门",
+    "最终验证门"
+  ],
+  "global_reminders": [
+    "不要把用户项目产物写进 skill 目录。",
+    "不要把 默认、生成、做个PPT、页数 等初始措辞当成允许直接渲染最终文件。",
+    "整页图片式 PPTX 不能满足通常意义上的可编辑 PPTX 交付。",
+    "缺工具、缺来源权限、缺图片生成、缺原生 Office、缺 Keynote 或缺导出证据时，必须记录为 missing evidence。"
+  ]
+}

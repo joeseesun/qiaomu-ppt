@@ -4,7 +4,9 @@
   "notes": [
     "Provider presets are execution contracts for scripts/run_image_generation.py. They are safe to inspect because secrets are referenced only by environment variable name.",
     "Dry-runs never require API keys. Real calls require --execute and a configured key unless auth_scheme is none.",
-    "Generated images must be text-free visual assets for backgrounds, atmosphere, concepts, scenarios, objects, textures, or moodboards. Evidence images must come from source/user/web routes instead."
+    "Generated images must be text-free visual assets for backgrounds, atmosphere, concepts, scenarios, objects, textures, or moodboards. Evidence images must come from source/user/web routes instead.",
+    "Provider names such as Nanobanana or Seedream/即梦 may appear as optional user-facing setup choices, but do not hardcode their endpoint, model name, or auth scheme here until verified. Configure them through a local provider override, OpenAI-compatible HTTP preset, Jimeng/Qiaomu proxy, or async-task preset as appropriate.",
+    "Never ask users to paste API keys into chat, project reports, slide files, or shell history snippets. Ask for an environment variable name or provide local setup instructions."
   ],
   "providers": {
     "openai": {

@@ -13,6 +13,43 @@ The formal HTML output is not a screenshot replacement. It is useful for:
 - preserving motion effects that PPTX export may not support
 - selectable/searchable text and semantic structure
 
+## Qiaomu HTML Deck System
+
+Use upstream web-deck projects only as research evidence. Do not copy their
+templates, class names, CSS recipes, fixed layout catalogs, or visual presets
+into generated Qiaomu artifacts. The Qiaomu implementation should exceed a
+single-template deck by keeping one source contract across PPTX, PDF, formal
+HTML, parity preview, Keynote, and website viewing.
+
+For formal HTML, write these contracts before full generation:
+
+- `layout_registry`: every slide has a stable `data-slide-id` and
+  `data-layout-id` that maps to the approved `Lxx` / `ITLxx` /
+  `component_type` in `slide_plan.json`, `spec_lock.json`, or
+  `visual_contract.json`.
+- `image_slot_registry`: every non-decorative local image has
+  `data-image-slot` plus a manifest row recording role, intended ratio, fit
+  policy, safe area, source/generator, final format, and final file size.
+- `viewer_chrome_boundary`: progress, search, page position, keyboard hints,
+  download/share, and thumbnails belong outside the fixed slide stage.
+- `performance_budget`: package and per-image budgets are declared before
+  packaging, then validated against actual files.
+- `user_facing_archetype`: when the deck is created for HTML/web sharing or a
+  style selector is shown, record the selected id/label from
+  `data/html_style_archetypes.json` plus the hidden internal style families used
+  to execute it.
+- `interaction_fallback`: if the HTML deck uses canvas/WebGL/animations, it
+  must also have a readable static state or low-power mode. Motion should
+  serve the reading path; it is not a decoration layer.
+- `motion_system`: when GSAP, Lottie, dotLottie, or custom authored motion is
+  used, record the level, engines, manifest path, reduced-motion policy, static
+  fallback, and browser QA evidence. See [html-motion.md](html-motion.md).
+- `point_review_map`: every major visible title, proof, media object, chart,
+  diagram, callout, and note control has `data-screen-label` or a stable id.
+
+This makes the formal HTML deck a multi-format presentation surface, not a
+one-off web page.
+
 ## Formal HTML Contract
 
 Save formal HTML under one of:
@@ -28,6 +65,8 @@ Also write:
 
 ```text
 <project>/html_delivery_manifest.json
+<project>/html_source_map.json
+<project>/html_motion_manifest.json      # only when authored motion is used
 ```
 
 The manifest should declare:
@@ -37,9 +76,20 @@ The manifest should declare:
 - slide count
 - source contracts used: `slide_plan.json`, `content_contract.json`, `visual_contract.json`
 - component strategy: DOM/SVG/Canvas/CSS/JS
+- user-facing style archetype: selected id/label from
+  `data/html_style_archetypes.json`, plus internal execution mapping
 - accessibility/searchability notes
 - `whole_slide_screenshot_policy: forbidden_for_formal_html`
 - `readability_qa`: checked viewport sizes, minimum font size, overflow policy, stage scale strategy, and content parity policy
+- `point_review_policy`: stable slide ids, `data-screen-label` usage, local HTTP preview path/URL, screenshot evidence, and review status when browser iteration is part of the route
+- `asset_performance`: local asset strategy, converted image formats, package size, largest image size, lazy-loading policy, and any justified exceptions
+- `slide_chrome_policy`: whether progress/search/navigation/page counters are outside the slide stage; default is `host_chrome_only`
+- `motion_system`: `none` when no authored motion is used; otherwise level,
+  engines, `html_motion_manifest.json`, reduced-motion policy, fallback policy,
+  and browser QA evidence
+- `layout_registry`: slide ids, layout ids, component types, and proof/image-text pattern ids
+- `image_slot_registry`: image slot ids, ratios, fit policy, compression format, and file-size evidence
+- `validation`: `validate_html_deck.py` command, status, report paths, and unresolved warnings/errors
 
 Example:
 
@@ -49,7 +99,51 @@ Example:
   "html_outputs": ["html/index.html", "exports/talk.html"],
   "slide_count": 12,
   "component_strategy": "DOM text + SVG diagrams + CSS stage + JS keyboard navigation",
+  "user_facing_archetype": {
+    "id": "talk_story",
+    "label": "演讲故事型",
+    "internal_style_families": ["editorial_argument"]
+  },
   "whole_slide_screenshot_policy": "forbidden_for_formal_html",
+  "point_review_policy": {
+    "slide_ids": "stable data-slide-id values",
+    "element_labels": "data-screen-label on title, proof, image, chart, callout",
+    "preview_url": "http://localhost:PORT/html/index.html",
+    "review_status": "needs-review"
+  },
+  "asset_performance": {
+    "strategy": "local assets folder, no multi-MB base64 images",
+    "preferred_formats": ["webp", "avif", "jpg"],
+    "largest_image_kb": 212,
+    "package_size_mb": 2.8,
+    "lazy_loading": "non-critical images use loading=lazy decoding=async"
+  },
+  "slide_chrome_policy": {
+    "stage": "content_only_canvas",
+    "viewer_chrome": "progress/search/page position outside stage",
+    "visible_footer": "none unless explicitly requested"
+  },
+  "motion_system": {
+    "level": "subtle",
+    "engines": ["css"],
+    "manifest": "",
+    "reduced_motion": "respect prefers-reduced-motion",
+    "fallback": "static final-state readable without playback"
+  },
+  "layout_registry": {
+    "slide_id_attr": "data-slide-id",
+    "layout_id_attr": "data-layout-id",
+    "source": "slide_plan.json + visual_contract.json"
+  },
+  "image_slot_registry": {
+    "slot_attr": "data-image-slot",
+    "manifest": "visual_asset_manifest.json",
+    "policy": "all non-decorative local images have declared role, ratio, fit, format, and file size"
+  },
+  "validation": {
+    "command": "python3 <skill>/scripts/validate_html_deck.py html/index.html --json reports/html_deck_validation.json --markdown reports/html_deck_validation.md",
+    "status": "passed"
+  },
   "readability_qa": {
     "viewports_checked": ["1440x900", "1280x720"],
     "stage_strategy": "fixed 16:9 inner stage scaled to viewport",
@@ -60,18 +154,48 @@ Example:
 }
 ```
 
+## Web Asset Performance Contract
+
+Formal HTML decks should load like a real website, not like a design file dump.
+
+- Resize generated, source, or screenshot images to their actual maximum display size before packaging. Avoid shipping 2x-4x oversized PNGs unless zoom inspection is a declared feature.
+- Prefer WebP or AVIF for generated/concept/photographic images. Use JPEG for broad compatibility when AVIF/WebP is unavailable, and keep PNG only for transparency, crisp line art, or tiny UI/icon assets where it is truly smaller.
+- Do not embed multi-MB images as base64 data URIs in final HTML. Use `html/index.html` plus an `assets/` folder, or a ZIP package with local assets, so the browser can cache and stream them.
+- Target ordinary conceptual/background images at `<= 250 KB` each, first-view critical images at `<= 500 KB` total, and the full formal HTML package at `<= 3 MB` unless source evidence or high-resolution zoom explicitly requires more. Record justified exceptions in `html_delivery_manifest.json`.
+- Use `loading="lazy"` and `decoding="async"` for non-critical images. Preload only the first visible hero/background image when it materially improves the first slide.
+- Check actual file sizes before delivery. A formal HTML deck with huge PNGs, repeated uncompressed assets, or base64-bundled generated images fails this gate even if it renders correctly.
+
+## Slide Chrome Boundary
+
+The fixed slide stage is the presentation content, not the viewer UI.
+
+- Do not place top progress bars, page indicator strips, floating page counters, navigation pills, search boxes, download/share controls, or duplicated viewer buttons inside the slide canvas by default.
+- Do not add visible generic footers, page numbers, date stamps, source URLs, model/tool names, or production labels to every slide by default. Keep provenance in `html_source_map.json`, speaker notes, QA reports, manifests, or an optional references page.
+- If the user explicitly asks for visible page numbers, citations, or a formal report footer, reserve layout space for it in `slide_chrome_policy` and verify it does not crowd title/body/proof areas.
+- Browser viewer controls may show progress, search, page position, or keyboard hints outside the slide stage. Those controls should not be exported as part of PPTX/SVG slide content.
+
 ## Formal HTML Requirements
 
 - Fixed 16:9 stage with responsive fit.
 - Keyboard navigation: arrow keys, space, Home/End.
-- Visible progress indicator.
+- Optional progress/page position only in host viewer chrome outside the fixed slide stage. Do not draw a visible top progress strip or page counter on the slide canvas by default.
+- Every slide must have a stable slide id and registered layout id: prefer `data-slide-id` plus `data-layout-id` that points back to `Lxx`, `ITLxx`, and the executable `component_type`. This is a Qiaomu-owned layout registry, not an upstream template catalog.
+- Stable slide ids and element labels: major title, subtitle, proof, image, chart, diagram, source object, callout, and notes controls should have `data-screen-label` or a stable id so a screenshot comment can be located in the source.
+- Every non-decorative local image should have `data-image-slot`; the slot should match the declared ratio/fit/compression row in `visual_asset_manifest.json` or `html_delivery_manifest.json`.
 - HTML must be generated from the same slide plan and visual contract as the PPTX. Do not hand-write a simplified second presentation that drops proof text, changes titles, or invents sparse filler content.
 - HTML must preserve the same title hierarchy, proof objects, concrete anchors, and speaker-facing slide sequence as the PPTX. Implementation can differ; content cannot become hollow.
 - The visible slide layer must be semantic DOM/SVG/Canvas/CSS/JS, not a full-slide JPG/PNG/PDF screenshot.
 - Text should be selectable/searchable where practical. If a chart or diagram is rasterized, only that chart/diagram should be an image, not the whole slide.
+- Ordinary title, subtitle, body, callout, caption, and label text should be static DOM/SVG text whenever feasible. Avoid generating every slide's visible copy from opaque JS loops; direct markup is easier to inspect, edit, and map back to the slide plan.
 - Motion is optional and content-led: fade, reveal, pan, count-up, chart emphasis, or section transition.
+- For authored motion beyond basic CSS transitions, choose a level from
+  `data/html_motion_presets.json`, write `html_motion_manifest.json`, and run
+  the validator with `--motion-manifest`. Use GSAP for timeline orchestration
+  and Lottie/dotLottie for prepared After Effects animation assets; both must
+  have a readable static state and reduced-motion behavior.
 - Source/provenance metadata stays off visible slides unless the user requests citations.
 - All assets should be local or clearly listed as external dependencies.
+- All local image assets should follow the web asset performance contract above.
 - Use a real stage scaler: either CSS `aspect-ratio: 16 / 9` with a stable inner stage, or a 1920x1080/1280x720 coordinate stage scaled to fit. Do not let viewport units alone resize text into unreadability.
 - If using a fixed coordinate stage, position the stage from the scaled dimensions: `scale = min(viewportW / stageW, viewportH / stageH)`, `left = (viewportW - stageW * scale) / 2`, `top = (viewportH - stageH * scale) / 2`, and `transform-origin: top left`. Do not center the unscaled 1920px DOM box with flex/grid and then apply `transform: scale(...)`; that can push the visible canvas sideways and crop right or left content.
 - Do not use `vw`, `%`, or `clamp()` as the primary layout system for final slide geometry when PPTX parity matters. They are acceptable for outer UI chrome, but slide text and components should come from the locked coordinate system or stable aspect-ratio tokens.
@@ -79,6 +203,17 @@ Example:
 - Define title line-height tokens explicitly. For Chinese/CJK multi-line titles, normal h1/h2 leading should be `1.14-1.30`; very large cover or closing titles may tighten to `1.06-1.16` only after screenshot review. Do not use `line-height: .9`, `font: .../.9`, or negative letter-spacing as a generic "cinematic" shortcut for CJK titles.
 - Check at least two viewport sizes before reporting completion: 1440x900 or similar desktop, and 1280x720 or similar laptop/projector. For a four-slide preview, screenshot every slide at one desktop viewport and at least slide 1 plus the densest slide at 1280x720.
 - No unplanned clipping. If a slide needs overflow, it must be an intentional scrollable notes/speaker pane, never hidden content on the slide canvas.
+- Run `python3 <skill>/scripts/validate_html_deck.py <html> --json <project>/reports/html_deck_validation.json --markdown <project>/reports/html_deck_validation.md` before claiming a formal HTML deck is done. The script does not replace browser review; it catches structural failures before visual QA.
+
+## Browser Iteration Contract
+
+For high-design/editorial/brand decks, HTML deliverables, or user requests to preview before final export:
+
+- Serve the preview over local HTTP, not `file://`.
+- Record the preview path/URL, screenshot paths, checked viewport sizes, and review status in `deck_project_meta.json`, `preview_gate.json`, or `html_delivery_manifest.json`.
+- Keep a source map from visible slide elements to `slide_plan.json`, `visual_contract.json`, source cards, or asset rows. A lightweight `html_source_map.json` is enough.
+- Use review status values such as `needs-review`, `approved`, or `changes-requested`; do not rely on chat memory as the only state.
+- When the user points at a visual issue in a screenshot, patch the source contract or reusable renderer whenever the issue is systemic. Patch a single HTML element only for a truly one-off visual correction.
 
 ## Four-Slide HTML Preview
 
@@ -88,6 +223,46 @@ For any final deliverable that includes formal HTML and is expected to exceed 7 
 - Open the preview in a browser or use an equivalent screenshot/render check.
 - If the preview is hard to read, clipped, hollow, or visually unrelated to PPTX, stop and fix the HTML generator/contract before generating all slides.
 - Record the decision in `preview_gate.json`; do not continue from memory.
+
+## Qiaomu HTML Validator
+
+Use the validator for formal semantic HTML decks and web-deck previews:
+
+```bash
+python3 <skill>/scripts/validate_html_deck.py \
+  <project>/html/index.html \
+  --json <project>/reports/html_deck_validation.json \
+  --markdown <project>/reports/html_deck_validation.md
+```
+
+When authored motion is used:
+
+```bash
+python3 <skill>/scripts/validate_html_deck.py \
+  <project>/html/index.html \
+  --motion-manifest <project>/html_motion_manifest.json \
+  --json <project>/reports/html_deck_validation.json \
+  --markdown <project>/reports/html_deck_validation.md
+```
+
+The validator checks:
+
+- slide sections exist and carry stable `data-slide-id`/`id`
+- each slide has a registered `data-layout-id`/`data-layout`
+- point-review anchors exist through `data-screen-label`
+- forbidden viewer chrome/progress/footer/source labels are not inside the slide canvas
+- non-decorative images have `data-image-slot`
+- large base64 data URIs are rejected
+- local image and package size budgets are respected
+- obvious tiny inline text is flagged
+- a fixed stage/scaler marker exists
+- optional `html_motion_manifest.json` declares valid motion level/engines,
+  local GSAP/Lottie/dotLottie assets, static fallback, reduced-motion policy,
+  and existing per-slide motion targets
+
+Run with `--strict` when generating final/professional HTML. A passing
+validator report is necessary but not sufficient; still do browser screenshots
+and visual inspection.
 
 ## PPTX Parity Preview
 
@@ -114,11 +289,25 @@ HTML may add:
 
 - keyboard-driven reveals
 - animated transitions
+- GSAP timelines for staged DOM/SVG motion
+- Lottie/dotLottie players for packaged AE-exported motion assets
 - hover details
 - speaker view affordances
 - chapter progress
 
 HTML must not hide content that exists in PPTX unless it is a deliberate reveal with accessible fallback.
+
+## Structured HTML-To-PPTX Boundary
+
+Editable PPTX export from HTML is credible only for slide-structured decks:
+
+- fixed canvas size such as 1920x1080 or a declared 16:9 coordinate system
+- discrete slide selector and stable order
+- navigation or `goTo(slideIndex)` behavior that can reset the active slide before capture/export
+- known selectors for active slide content
+- separate text, image, shape, chart, and diagram regions rather than one flattened screenshot layer
+
+If the source is an arbitrary scrolling page, WebGL scene, animation-heavy prototype, or screenshot collage, do not promise editable PPTX. Rebuild it as a slide deck first, or export a clearly labelled screenshot/parity artifact.
 
 ## Failure Patterns
 
@@ -127,5 +316,7 @@ HTML must not hide content that exists in PPTX unless it is a deliberate reveal 
 - If a project has `html_parity_manifest.json` but no `html_delivery_manifest.json`, report that only the QA preview exists, not the formal HTML version.
 - If the HTML title, subtitle, bullets, examples, or evidence do not match the PPTX/slide plan, regenerate it from the common source or switch to parity preview mode.
 - If HTML feels hollow because it only keeps slogans while PPTX has proof, it fails the content-parity gate.
+- If formal HTML lacks stable slide ids or element labels, screenshot feedback cannot be mapped back to the deck source; add the labels before asking for detailed visual review.
+- If a browser preview is opened through `file://`, rerun it through a local HTTP server before claiming preview evidence.
 - Do not put internal production words such as `deck`, `route`, `artifact`, or tool/model provenance in visible HTML.
 - If the 1280x720 screenshot cuts off the right side of a fixed-stage deck, check whether the unscaled coordinate stage is being centered by layout before scaling. Fix with explicit scaled `left/top` and `transform-origin: top left`.

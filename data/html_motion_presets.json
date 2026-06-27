@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Motion presets for qiaomu-ppt formal HTML decks. Use these as execution contracts, not as visual decorations.",
+  "levels": [
+    {
+      "id": "none",
+      "label": "No Authored Motion",
+      "best_for": ["static PPTX parity", "print-first decks", "compliance reviews"],
+      "engines": ["css"],
+      "allowed_effects": ["active slide state"],
+      "required_fallback": "the visible slide is already the final static state"
+    },
+    {
+      "id": "subtle",
+      "label": "Subtle Reading Path",
+      "best_for": ["business reports", "research decks", "courseware", "internal talks"],
+      "engines": ["css", "gsap"],
+      "allowed_effects": ["fade", "small translate", "progressive reveal", "count-up", "chart emphasis"],
+      "duration_budget_seconds_per_slide": 1.2,
+      "required_fallback": "all text and proof objects are readable without playback"
+    },
+    {
+      "id": "expressive",
+      "label": "Expressive Timeline",
+      "best_for": ["product launches", "public talks", "story decks", "interactive browser presentations"],
+      "engines": ["gsap", "lottie-web"],
+      "allowed_effects": ["timeline labels", "staggered title/proof reveal", "path motion", "scene transition", "finite lottie accent"],
+      "duration_budget_seconds_per_slide": 3.0,
+      "required_fallback": "final static state plus reduced-motion branch"
+    },
+    {
+      "id": "cinematic",
+      "label": "Cinematic HTML-First",
+      "best_for": ["brand hero decks", "launch keynotes", "AE-assisted visual storytelling", "browser-first performances"],
+      "engines": ["gsap", "lottie-web", "dotlottie"],
+      "allowed_effects": ["multi-object timeline", "hero scene choreography", "AE-exported lottie sequence", "parallax", "chapter transition"],
+      "duration_budget_seconds_per_slide": 6.0,
+      "required_fallback": "poster or final readable state; editable PPTX parity is not guaranteed"
+    }
+  ],
+  "engine_policy": {
+    "gsap": {
+      "role": "Timeline choreography for DOM/SVG/CSS slide elements.",
+      "preferred_targets": ["data-motion-id", "data-screen-label", "id"],
+      "rules": [
+        "Prefer timeline labels over chained delays.",
+        "Animate transform and opacity before layout properties.",
+        "Respect prefers-reduced-motion.",
+        "Reset state when jumping between slides."
+      ]
+    },
+    "lottie-web": {
+      "role": "Browser playback for After Effects JSON exported through Bodymovin.",
+      "preferred_targets": ["fixed-size lottie container", "data-motion-id"],
+      "rules": [
+        "Use local JSON assets.",
+        "Set autoplay false for deterministic review.",
+        "Set loop false unless a finite ambient loop is explicitly justified.",
+        "Declare poster or static fallback for cinematic use."
+      ]
+    },
+    "dotlottie": {
+      "role": "Packaged Lottie playback for .lottie assets.",
+      "preferred_targets": ["canvas container", "data-motion-id"],
+      "rules": [
+        "Use local .lottie assets.",
+        "Set autoplay false.",
+        "Declare fallback poster for cinematic use."
+      ]
+    }
+  },
+  "manifest": {
+    "path": "html_motion_manifest.json",
+    "required_when": ["level is expressive", "level is cinematic", "lottie_assets are used", "GSAP timeline is used"],
+    "fields": [
+      "schema_version",
+      "mode",
+      "level",
+      "reduced_motion",
+      "engines",
+      "fallback",
+      "slides",
+      "lottie_assets",
+      "qa"
+    ]
+  },
+  "validation": {
+    "command": "python3 scripts/validate_html_deck.py <project>/html/index.html --motion-manifest <project>/html_motion_manifest.json --strict",
+    "browser_review": "Required for final/professional motion decks; record screenshots or clips and console error status."
+  }
+}

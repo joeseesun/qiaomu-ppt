@@ -10,6 +10,25 @@ Procedural backgrounds obey the same separation as image-generated backgrounds:
 - Forbidden: text, letters, numbers, logos, icons, UI chrome, boxes, rectangles used as content containers, cards, panels, frames, windows, chart areas, image slots, grids, neon rails, dashboards, screenshots, mockups, and layout scaffolding.
 - All titles, body copy, callouts, chart frames, picture masks, diagrams, and cards must be editable foreground objects added after the background.
 
+## Decoration Budget
+
+Before drawing procedural lines, grids, streaks, particles, or orbital paths,
+choose a budget from `data/background_decoration_budgets.json` and record it in
+`visual_contract.json`, `spec_lock.json`, or `html_delivery_manifest.json`.
+
+- Use `quiet` for normal body slides: 0-1 decorative line family, no global
+  tech-line overlay, and no decorative line crossing title/body/proof zones.
+- Use `moderate` only when linework expresses a map, timeline, process, orbit,
+  or reading path.
+- Use `cinematic` mainly for cover, chapter, and closing slides. Body slides
+  may use it only when the line itself is the proof object.
+- If the preview feels busy, remove whole line families first. Do not fix noisy
+  backgrounds by only lowering opacity.
+- Procedural linework still needs a semantic purpose from
+  `data/line_semantics_policy.json`. Mood words such as energy, speed, tech,
+  atmosphere, texture, and decoration are not acceptable purposes. CSS border
+  rings, pseudo-element rays, and gradient stripes follow the same rule.
+
 ## Default Pack
 
 Generate 5 roles per deck:

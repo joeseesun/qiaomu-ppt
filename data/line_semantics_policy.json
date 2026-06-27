@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "allowed_purposes": [
+    "chart-axis",
+    "chart-series",
+    "table-rule",
+    "connector",
+    "diagram-edge",
+    "process-flow",
+    "timeline",
+    "map-route",
+    "separator",
+    "focus-underline",
+    "shape-border"
+  ],
+  "forbidden_purpose_terms": [
+    "decorative",
+    "decoration",
+    "ornament",
+    "energy",
+    "speed",
+    "tech",
+    "atmosphere",
+    "texture",
+    "noise",
+    "effect",
+    "background",
+    "motion-only"
+  ],
+  "html_contract": {
+    "line_like_elements": ["line", "polyline", "path with stroke", "ellipse with stroke", "class names containing line/curve/connector/orbit/ring/route/path/ray/burst/streak/whisker", "CSS border rings, pseudo-element rays, and gradient stripes"],
+    "required_attribute": "data-line-purpose",
+    "strict_validator": "scripts/validate_html_deck.py"
+  },
+  "replacement_policy": [
+    "Use spacing, typography, and object placement for hierarchy before adding lines.",
+    "Use bitmap atmosphere or soft color fields for mood, not SVG speed/energy lines.",
+    "Use connectors only when a relationship cannot be made clear through proximity or labels.",
+    "Use chart/table/timeline/map lines only when the slide content explicitly requires that structure."
+  ]
+}

@@ -50,6 +50,7 @@ DEFAULT_MAX_CARDLIKE_CONTAINERS = 4
 DEFAULT_MAX_COVER_METRIC_CHIPS = 3
 DEFAULT_MIN_BACKGROUND_ASSETS_LONG_DECK = 8
 DEFAULT_UNIQUE_BACKGROUND_TARGET = 12
+DEFAULT_MAX_PICTURE_ASPECT_DISTORTION = 0.03
 MIN_CJK_TITLE_LINE_HEIGHT = 1.03
 WARN_CJK_TITLE_LINE_HEIGHT = 1.08
 REQUIRED_TYPOGRAPHY_POLICY_FIELDS = {
@@ -197,6 +198,14 @@ VISIBLE_PRODUCTION_JARGON = [
     ("pipeline", r"\bpipeline\b"),
     ("source_fetch", r"\bsource_fetch\b"),
     ("pptx export", r"\bPPTX\s+export\b"),
+    ("路线卡", r"路线卡"),
+    ("制作方法", r"制作方法|工作流|方法论|质量门|检查报告"),
+    ("版式术语", r"版式|布局模式|\bL\d{2}\b|\bITL\d{2}\b"),
+    ("生成术语", r"生成策略|生图策略|图片生成|生成图|提示词|负面提示"),
+    ("交付术语", r"交付格式|可编辑\s*PPTX|导出状态"),
+    ("图版标签", r"(?:复原|化石|骨骼|证据)?图版[：:]?"),
+    ("讲解顺序", r"讲解顺序[：:]?"),
+    ("证据编号栏", r"证据\s*\d{1,2}\s*/"),
 ]
 VISUAL_ASSET_REQUIRED_FIELDS = [
     "asset_id",
@@ -652,6 +661,17 @@ def check_topic_research_artifacts(
         message = "topic-researched deck needs research_plan.md or research_plan.json"
         (warnings if skipped else failures).append(message)
     evidence["research_plan"] = next((path.name for path in research_plan_paths if path.exists()), "")
+
+    research_dossier_path = root / "research_dossier.md"
+    evidence["research_dossier"] = (
+        str(research_dossier_path.relative_to(root))
+        if research_dossier_path.exists()
+        else ""
+    )
+    if not research_dossier_path.exists() and not skipped:
+        warnings.append(
+            "topic-researched deck should include research_dossier.md as the reviewable Markdown synthesis before slide planning"
+        )
 
     sources_dir = root / "sources"
     required_source_files = ["source_manifest.json", "source_notes.md", "source_cards.json"]
@@ -1558,14 +1578,20 @@ def scan_visible_metadata_text(text: str) -> list[str]:
 def visible_policy_patterns(root: Path) -> list[tuple[str, str]]:
     patterns = list(VISIBLE_INTERNAL_METADATA)
     policy_path = root / "visible_provenance_policy.json"
+    policy = None
     if not policy_path.exists():
+        patterns.extend(VISIBLE_PRODUCTION_JARGON)
         return patterns
     try:
         policy = load_json(policy_path)
     except Exception:
+        patterns.extend(VISIBLE_PRODUCTION_JARGON)
         return patterns
     if not isinstance(policy, dict):
+        patterns.extend(VISIBLE_PRODUCTION_JARGON)
         return patterns
+    if not truthy(policy.get("allow_visible_production_jargon")):
+        patterns.extend(VISIBLE_PRODUCTION_JARGON)
     forbidden = policy.get("forbidden_visible_strings")
     if not isinstance(forbidden, list):
         return patterns
@@ -1689,6 +1715,30 @@ def check_html_delivery_manifest(root: Path, slides: list[dict[str, Any]]) -> tu
     screenshot_policy = str(manifest.get("whole_slide_screenshot_policy") or "").lower()
     if not any(term in screenshot_policy for term in ("forbid", "forbidden", "no", "not")):
         failures.append("html_delivery_manifest.json whole_slide_screenshot_policy must forbid whole-slide screenshots")
+    motion_system = manifest.get("motion_system")
+    motion_manifest_default = root / "html_motion_manifest.json"
+    if isinstance(motion_system, dict):
+        level = str(motion_system.get("level") or "none").lower()
+        manifest_rel = str(motion_system.get("manifest") or "").strip()
+        engines = motion_system.get("engines")
+        if level not in {"none", "subtle", "expressive", "cinematic"}:
+            failures.append("html_delivery_manifest.motion_system.level must be none, subtle, expressive, or cinematic")
+        if level != "none":
+            if not manifest_rel:
+                failures.append("html_delivery_manifest.motion_system.manifest must point to html_motion_manifest.json")
+            else:
+                motion_manifest_path = root / manifest_rel
+                if not motion_manifest_path.exists():
+                    failures.append(f"html_delivery_manifest.motion_system manifest missing file: {manifest_rel}")
+                else:
+                    evidence["html_motion_manifest"] = manifest_rel
+            if not isinstance(engines, list) or not engines:
+                failures.append("html_delivery_manifest.motion_system.engines must list the authored motion engines")
+            fallback = str(motion_system.get("fallback") or "").lower()
+            if not any(term in fallback for term in ("static", "fallback", "reduced", "readable")):
+                failures.append("html_delivery_manifest.motion_system.fallback must describe readable static/reduced-motion behavior")
+    elif motion_manifest_default.exists():
+        warnings.append("html_motion_manifest.json exists but html_delivery_manifest.json has no motion_system block")
     readability = manifest.get("readability_qa")
     if not isinstance(readability, dict):
         failures.append("html_delivery_manifest.json needs readability_qa for formal HTML")
@@ -1706,6 +1756,26 @@ def check_html_delivery_manifest(root: Path, slides: list[dict[str, Any]]) -> tu
             failures.append(
                 "html_delivery_manifest.readability_qa.stage_strategy must describe explicit positioning when using a 1920px coordinate stage"
             )
+        decoration_budget = readability.get("background_decoration_budget")
+        if not isinstance(decoration_budget, dict):
+            warnings.append(
+                "html_delivery_manifest.readability_qa.background_decoration_budget should record line/noise caps for formal HTML backgrounds"
+            )
+        else:
+            level = str(decoration_budget.get("level") or "").lower()
+            if level and level not in {"quiet", "moderate", "cinematic"}:
+                failures.append(
+                    "html_delivery_manifest.readability_qa.background_decoration_budget.level must be quiet, moderate, or cinematic"
+                )
+            for field in (
+                "decorative_line_families_max_body",
+                "standalone_line_segments_max_body",
+                "safe_area_clearance_px_min_1280x720",
+            ):
+                if field not in decoration_budget:
+                    warnings.append(
+                        f"html_delivery_manifest.readability_qa.background_decoration_budget missing {field}"
+                    )
         try:
             min_body = int(readability.get("min_body_px_at_1280_stage", 0))
         except Exception:
@@ -1982,6 +2052,63 @@ def inspect_pptx_editability(path: Path) -> tuple[dict[str, Any], str | None]:
     }, None
 
 
+def inspect_pptx_picture_aspects(path: Path) -> tuple[dict[str, Any], str | None]:
+    try:
+        from pptx import Presentation as PptxPresentation
+        from pptx.enum.shapes import MSO_SHAPE_TYPE
+    except Exception as exc:
+        return {}, f"python-pptx unavailable; cannot inspect picture aspect ratios in {path.name}: {exc}"
+
+    try:
+        presentation = PptxPresentation(str(path))
+    except Exception as exc:
+        return {}, f"cannot inspect picture aspect ratios in {path.name}: {exc}"
+
+    pictures: list[dict[str, Any]] = []
+    distorted: list[dict[str, Any]] = []
+    for slide_idx, slide in enumerate(presentation.slides, start=1):
+        picture_idx = 0
+        for shape in slide.shapes:
+            if getattr(shape, "shape_type", None) != MSO_SHAPE_TYPE.PICTURE:
+                continue
+            picture_idx += 1
+            width = int(getattr(shape, "width", 0))
+            height = int(getattr(shape, "height", 0))
+            if width <= 0 or height <= 0:
+                continue
+            try:
+                image_width, image_height = shape.image.size
+            except Exception:
+                continue
+            if image_width <= 0 or image_height <= 0:
+                continue
+            shape_ratio = width / height
+            image_ratio = image_width / image_height
+            distortion = abs(shape_ratio - image_ratio) / image_ratio
+            record = {
+                "slide_no": slide_idx,
+                "picture_no": picture_idx,
+                "shape_ratio": round(shape_ratio, 4),
+                "image_ratio": round(image_ratio, 4),
+                "distortion_ratio": round(distortion, 4),
+                "shape_inches": {
+                    "w": round(width / 914400, 3),
+                    "h": round(height / 914400, 3),
+                },
+                "image_px": {"w": image_width, "h": image_height},
+            }
+            pictures.append(record)
+            if distortion > DEFAULT_MAX_PICTURE_ASPECT_DISTORTION:
+                distorted.append(record)
+    return {
+        "max_allowed_distortion_ratio": DEFAULT_MAX_PICTURE_ASPECT_DISTORTION,
+        "picture_count": len(pictures),
+        "distorted_count": len(distorted),
+        "distorted": distorted,
+        "pictures": pictures,
+    }, None
+
+
 def detect_quality_intent(root: Path, slide_count: int) -> dict[str, Any]:
     evidence: dict[str, Any] = {"mode": "normal", "threshold": 0, "signals": []}
     if slide_count <= 7:
@@ -2046,19 +2173,26 @@ def check_quality_benchmark_gate(root: Path, slide_count: int) -> tuple[list[str
         return [f"invalid reports/deck_quality_benchmark.json: {exc}"], warnings, evidence
     if not isinstance(benchmark, dict):
         return ["reports/deck_quality_benchmark.json must be an object"], warnings, evidence
+    if benchmark.get("schema_version") != "1.0.0" or not isinstance(benchmark.get("categories"), list) or not isinstance(benchmark.get("stats"), dict):
+        return [
+            "reports/deck_quality_benchmark.json is not an official qiaomu-ppt deck_quality_benchmark.py report; rerun the skill script instead of hand-writing a benchmark sidecar"
+        ], warnings, evidence
     score = int(benchmark.get("score") or 0)
+    benchmark_target = int(benchmark.get("target_score") or 0)
     readiness = str(benchmark.get("readiness") or "")
     ppt_master_ready = bool(benchmark.get("ppt_master_ready"))
     evidence.update(
         {
             "score": score,
-            "target_score": benchmark.get("target_score"),
+            "target_score": benchmark_target,
             "readiness": readiness,
             "ppt_master_ready": ppt_master_ready,
         }
     )
-    if high_intent and score < threshold:
-        failures.append(f"deck_quality_benchmark score {score} below required {threshold} for {intent['mode']}")
+    effective_threshold = max(threshold, benchmark_target if benchmark_target >= 75 else 0)
+    benchmark_enforced = high_intent or benchmark_target >= 75
+    if benchmark_enforced and score < effective_threshold:
+        failures.append(f"deck_quality_benchmark score {score} below required {effective_threshold} for {intent['mode']}")
     elif not high_intent and score < 70:
         warnings.append(f"deck_quality_benchmark score {score} is weak; review repair plan before final delivery")
     if intent.get("mode") == "ppt_master_grade" and not ppt_master_ready:
@@ -2077,7 +2211,7 @@ def check_quality_benchmark_gate(root: Path, slide_count: int) -> tuple[list[str
             if isinstance(item, dict) and str(item.get("severity") or "").lower() == "critical"
         ] if isinstance(actions, list) else []
         evidence["critical_repair_count"] = len(critical)
-        if high_intent and critical:
+        if benchmark_enforced and critical:
             failures.append(
                 "deck_repair_plan contains critical repair actions: "
                 + ", ".join(str(item.get("action_id") or item.get("title") or "critical") for item in critical[:5])
@@ -2336,6 +2470,7 @@ def check_project(root: Path, *, require_real_imagegen: bool = False) -> dict[st
             failures.append("PPTX export exists but pptx_text_check.json is missing")
         visible_metadata_hits: list[str] = []
         editability_reports: dict[str, Any] = {}
+        picture_aspect_reports: dict[str, Any] = {}
         for export in exports:
             editability, editability_warning = inspect_pptx_editability(export)
             if editability_warning:
@@ -2345,6 +2480,22 @@ def check_project(root: Path, *, require_real_imagegen: bool = False) -> dict[st
                 if editability.get("image_backed_ratio", 0) >= 0.8:
                     failures.append(
                         f"{export.relative_to(root)} is mostly whole-slide raster images; label it as image-backed preview/social output, not editable PPTX"
+                    )
+            picture_aspects, picture_aspect_warning = inspect_pptx_picture_aspects(export)
+            if picture_aspect_warning:
+                warnings.append(picture_aspect_warning)
+            else:
+                picture_aspect_reports[str(export.relative_to(root))] = picture_aspects
+                distorted = picture_aspects.get("distorted")
+                if isinstance(distorted, list) and distorted:
+                    examples = "; ".join(
+                        f"slide {item.get('slide_no')} picture {item.get('picture_no')} "
+                        f"shape={item.get('shape_ratio')} image={item.get('image_ratio')}"
+                        for item in distorted[:6]
+                    )
+                    failures.append(
+                        "PPTX contains stretched picture(s); crop/contain to the slot aspect ratio instead of resizing non-proportionally: "
+                        + examples
                     )
             visible_text, inspection_warning = iter_pptx_visible_text(export)
             if inspection_warning:
@@ -2358,6 +2509,8 @@ def check_project(root: Path, *, require_real_imagegen: bool = False) -> dict[st
                     )
         if editability_reports:
             evidence["pptx_editability"] = editability_reports
+        if picture_aspect_reports:
+            evidence["pptx_picture_aspects"] = picture_aspect_reports
         evidence["visible_metadata_hits"] = visible_metadata_hits
         if visible_metadata_hits:
             failures.append(

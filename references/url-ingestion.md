@@ -7,7 +7,9 @@ Use this when the user says something like:
 - `把这篇文章/报告/PDF 生成幻灯片`
 - `读这个网页里的图片和内容做 deck`
 
-The workflow is inspired by `qiaomu-markdown-proxy`, but this skill is self-contained and does not depend on that external skill at runtime.
+The workflow uses a built-in proxy cascade inspired by prior Markdown proxy
+work, but this skill is self-contained and does not depend on any external
+Markdown-proxy skill at runtime.
 
 For mixed source packets, Feishu exports, EPUB books, Office files, folders, ZIP
 archives, or image/OCR sources, use [source-intake-method.md](source-intake-method.md)
@@ -32,6 +34,7 @@ python3 <skill>/scripts/url_to_markdown.py "<url>" --output-dir <project>/source
 | Input | Built-In Handling | Notes |
 |---|---|---|
 | ordinary article URL | direct fetch, metadata extraction, Markdown conversion, image discovery | falls back to Jina Reader when direct fetch is weak |
+| X/Twitter status, X Article, `t.co` | proxy-first cascade inside `url_to_markdown.py`: Jina Reader, defuddle, then `npx agent-fetch` when available | filters X JavaScript/login/error pages; records `proxy_cascade_failed` instead of pretending content was fetched |
 | image-rich page | downloads candidate images with source metadata | every image still needs an image slot before deck use |
 | remote PDF | downloads and extracts text with `pdftotext` or `pypdf` when available | keep PDF path in manifest |
 | local PDF | extract text with `pdftotext` or `pypdf` | path is recorded |

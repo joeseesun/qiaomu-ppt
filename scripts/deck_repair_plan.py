@@ -214,6 +214,37 @@ def build_repair_plan(project: Path, report: dict[str, Any], *, min_score: int, 
             ],
         )
 
+    if score_of(categories, "primary_media_evidence") < 80 and slide_count >= 4:
+        media_expectation = stats.get("media_expectation") if isinstance(stats.get("media_expectation"), dict) else {}
+        add_action(
+            actions,
+            action_id="repair-primary-media-evidence",
+            priority=35,
+            severity="critical",
+            category="visual_assets",
+            title="Add real primary media, not only atmosphere backgrounds",
+            reason=evidence_of(categories, "primary_media_evidence"),
+            target_artifacts=[
+                "sources/source_cards.json",
+                "visual_asset_manifest.json",
+                "assets/images/image_sources.json",
+                "slide_plan.json",
+                "visual_contract.json",
+            ],
+            steps=[
+                "Identify the topic's inspectable visual evidence: album cover, artist/producer photos, product/place images, source screenshots, figures, charts, or original document/page images.",
+                "Add source/web/user rows for those assets with acquire_via=source/web/user, terminal file paths, slide_no or allowed_pages, rights/provenance notes, and fit/crop policy.",
+                "Use AI generation for mood, chapter art, concept metaphors, object studies, or textures only after real evidence assets are planned; do not let full-slide background assets count as the deck's proof layer.",
+                "Regenerate the representative preview pages so at least one dense/source page and one breathing/editorial page integrate primary media with editable foreground annotations or captions.",
+                "Media expectation tokens: " + ", ".join(str(item) for item in media_expectation.get("matched_tokens", [])[:10]),
+            ],
+            verification=[
+                "python3 scripts/visual_asset_manifest.py validate --manifest <project>/visual_asset_manifest.json --project <project> --require-terminal",
+                "python3 scripts/deck_quality_benchmark.py <project> --min-score " + str(min_score),
+                "Inspect <project>/previews/thumbnail-grid.jpg for real primary media beyond background art.",
+            ],
+        )
+
     if score_of(categories, "real_image_generation") < 80 and int(assets.get("ai_count") or 0):
         severity = "critical" if int(assets.get("procedural_fallback_count") or 0) else "high"
         add_action(

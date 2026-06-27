@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "default": "quiet",
+  "levels": {
+    "quiet": {
+      "use_for": ["business", "research", "courseware", "body slides", "text-heavy slides"],
+      "decorative_line_families_max_body": 1,
+      "decorative_line_families_max_cover": 2,
+      "standalone_line_segments_max_body": 3,
+      "standalone_line_segments_max_cover": 6,
+      "animated_line_families_max_body": 0,
+      "animated_line_families_max_cover": 1,
+      "global_grid_opacity_max": 0.035,
+      "hard_line_opacity_max": 0.16,
+      "safe_area_clearance_px_min_1280x720": 56,
+      "rules": [
+        "No global tech-line overlay on body slides.",
+        "No decorative line may cross title, body, proof, chart, or image-label safe areas.",
+        "Prefer texture, light, and soft depth over repeated linework."
+      ]
+    },
+    "moderate": {
+      "use_for": ["public talks", "editorial decks", "light storytelling"],
+      "decorative_line_families_max_body": 2,
+      "decorative_line_families_max_cover": 3,
+      "standalone_line_segments_max_body": 5,
+      "standalone_line_segments_max_cover": 8,
+      "animated_line_families_max_body": 1,
+      "animated_line_families_max_cover": 1,
+      "global_grid_opacity_max": 0.045,
+      "hard_line_opacity_max": 0.20,
+      "safe_area_clearance_px_min_1280x720": 64,
+      "rules": [
+        "Linework must reveal a semantic path, map, orbit, timeline, process, or proof relationship.",
+        "If linework is only atmosphere, keep it outside the main reading corridor.",
+        "Do not stack grid, streak, orbit, connector, and particle systems on the same slide."
+      ]
+    },
+    "cinematic": {
+      "use_for": ["HTML-first cover", "chapter openers", "closing pages", "product launch moments"],
+      "decorative_line_families_max_body": 1,
+      "decorative_line_families_max_cover": 3,
+      "standalone_line_segments_max_body": 4,
+      "standalone_line_segments_max_cover": 10,
+      "animated_line_families_max_body": 1,
+      "animated_line_families_max_cover": 2,
+      "global_grid_opacity_max": 0.04,
+      "hard_line_opacity_max": 0.24,
+      "safe_area_clearance_px_min_1280x720": 72,
+      "rules": [
+        "Cinematic linework belongs mainly on cover, divider, and closing slides.",
+        "Body slides fall back to quiet unless the line itself is the proof object.",
+        "Motion paths count as decoration unless they directly guide the reading order."
+      ]
+    }
+  },
+  "preview_rejection_signals": [
+    "background lines are noticed before the title",
+    "more than one unrelated line direction competes on a body slide",
+    "decorative lines cross text, chart labels, or proof objects",
+    "the same hard diagonal or stripe system repeats across consecutive slides",
+    "lowering opacity is the only proposed fix"
+  ]
+}

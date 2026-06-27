@@ -38,6 +38,41 @@ Additional local style pack:
   with reason, palette, typography, fit, and risk. Do not hide the decision only
   in `style_recommendations.json`.
 
+## User-Facing HTML Style Selector
+
+For HTML decks, website sharing, and any product UI where the user chooses a
+style, expose scene/outcome choices from `data/html_style_archetypes.json`
+instead of design-history labels. The question is "你要做什么场景的 PPT?" rather
+than "你喜欢哪种主义?"
+
+Primary choices:
+
+| Label | Use When | Hidden Execution Mapping |
+|---|---|---|
+| 演讲故事型 | X 长文、公众号文章、个人观点、复盘、公开分享 | editorial argument, cinematic reveal, magazine pacing |
+| 知识讲解型 | 论文、课程、技术概念、方法论、教材式解释 | minimal precision, blueprint/technical evidence |
+| 研究报告型 | PDF、白皮书、行业趋势、投资/市场研究 | trust/report systems, data/chart evidence, consulting structure |
+| 产品发布型 | 产品介绍、功能发布、项目路演、Demo Day | product reveal, real screenshots, workflow/architecture proof |
+| 人物/品牌故事型 | 自我介绍、个人 IP、创始人故事、公司故事、作品集 | editorial/portfolio pacing, timeline, documentary assets |
+| 文化美学型 | 文学、历史、艺术、公版书、东方文化 | cultural narrative, artifact/source-object framing |
+
+Rules:
+
+- Show no more than 6 primary choices in a general selector and no more than 3
+  recommended choices in a design proposal.
+- Do not expose internal style names such as Swiss, blueprint, brutalist,
+  glassmorphism, data journalism, Memphis, Bauhaus, or constructivism as
+  ordinary user-facing labels. They may remain in `style_direction.json`,
+  `style_brief.md`, and QA reports as execution vocabulary.
+- If the user does not choose, recommend one best archetype from source type,
+  route, audience state, media density, and explicit intent.
+- Every selected archetype must produce or plan a four-slide preview covering:
+  cover, body/evidence, visual/diagram, and closing.
+- The selected archetype must affect asset planning, layout rhythm, chart
+  policy, image policy, and validation requirements. It is not a color theme.
+- Store the selection in `style_direction.json` as
+  `user_facing_archetype_id` and `user_facing_archetype_label`.
+
 ## Archetype Clusters
 
 - `cinematic_product_reveal` (17): Cinematic Product Reveal -> Launch Editorial.

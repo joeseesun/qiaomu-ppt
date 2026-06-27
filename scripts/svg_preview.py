@@ -15,15 +15,11 @@ def write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def render_svgs(project: Path, source: str = "svg_output") -> list[Path]:
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError as exc:
-        raise SystemExit(
-            "Playwright is required for SVG previews. Install with: "
-            "python3 -m pip install playwright && python3 -m playwright install chromium"
-        ) from exc
+def is_fresh(output: Path, source: Path) -> bool:
+    return output.exists() and output.stat().st_mtime >= source.stat().st_mtime
 
+
+def render_svgs(project: Path, source: str = "svg_output", *, force: bool = False) -> tuple[list[Path], dict[str, int]]:
     svg_dir = project / source
     if not svg_dir.is_dir():
         raise SystemExit(f"SVG source directory not found: {svg_dir}")
@@ -33,34 +29,52 @@ def render_svgs(project: Path, source: str = "svg_output") -> list[Path]:
 
     out_dir = project / "previews" / source
     out_dir.mkdir(parents=True, exist_ok=True)
-    outputs: list[Path] = []
+    outputs_by_index: dict[int, Path] = {}
+    jobs: list[tuple[int, Path, Path]] = []
+    reused = 0
 
-    with sync_playwright() as p:
-        candidates = [
-            Path(p.chromium.executable_path),
-            Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
-        ]
-        cache_root = Path.home() / "Library/Caches/ms-playwright"
-        if cache_root.exists():
-            candidates.extend(cache_root.glob("chromium_headless_shell-*/chrome-headless-shell-mac-arm64/chrome-headless-shell"))
-            candidates.extend(cache_root.glob("chromium-*/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"))
-        executable = next((path for path in candidates if path.exists()), None)
-        launch_kwargs = {"executable_path": str(executable)} if executable else {}
-        browser = p.chromium.launch(**launch_kwargs)
+    for idx, svg in enumerate(svgs, start=1):
+        out = out_dir / f"slide-{idx:02d}.png"
+        outputs_by_index[idx] = out
+        if not force and is_fresh(out, svg):
+            reused += 1
+            continue
+        jobs.append((idx, svg, out))
+
+    if jobs:
         try:
-            context = browser.new_context(viewport={"width": 1280, "height": 720}, device_scale_factor=1)
-            page = context.new_page()
-            for idx, svg in enumerate(svgs, start=1):
-                page.goto(svg.resolve().as_uri(), wait_until="load")
-                page.wait_for_timeout(120)
-                out = out_dir / f"slide-{idx:02d}.png"
-                page.screenshot(path=str(out), full_page=False)
-                outputs.append(out)
-            page.close()
-            context.close()
-        finally:
-            browser.close()
-    return outputs
+            from playwright.sync_api import sync_playwright
+        except ImportError as exc:
+            raise SystemExit(
+                "Playwright is required for SVG previews. Install with: "
+                "python3 -m pip install playwright && python3 -m playwright install chromium"
+            ) from exc
+
+        with sync_playwright() as p:
+            candidates = [
+                Path(p.chromium.executable_path),
+                Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+            ]
+            cache_root = Path.home() / "Library/Caches/ms-playwright"
+            if cache_root.exists():
+                candidates.extend(cache_root.glob("chromium_headless_shell-*/chrome-headless-shell-mac-arm64/chrome-headless-shell"))
+                candidates.extend(cache_root.glob("chromium-*/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"))
+            executable = next((path for path in candidates if path.exists()), None)
+            launch_kwargs = {"executable_path": str(executable)} if executable else {}
+            browser = p.chromium.launch(**launch_kwargs)
+            try:
+                context = browser.new_context(viewport={"width": 1280, "height": 720}, device_scale_factor=1)
+                page = context.new_page()
+                for _idx, svg, out in jobs:
+                    page.goto(svg.resolve().as_uri(), wait_until="load")
+                    page.wait_for_timeout(120)
+                    page.screenshot(path=str(out), full_page=False)
+                page.close()
+                context.close()
+            finally:
+                browser.close()
+    outputs = [outputs_by_index[idx] for idx in range(1, len(svgs) + 1)]
+    return outputs, {"rendered": len(jobs), "reused": reused}
 
 
 def build_grid(images: list[Path], out_path: Path, cols: int = 5, thumb_w: int = 320) -> Path:
@@ -96,10 +110,11 @@ def main() -> int:
     parser.add_argument("project", type=Path)
     parser.add_argument("--source", default="svg_output")
     parser.add_argument("--cols", type=int, default=5)
+    parser.add_argument("--force", action="store_true", help="Rerender all preview images even when cached images are fresh")
     args = parser.parse_args()
 
     project = args.project
-    images = render_svgs(project, args.source)
+    images, cache_stats = render_svgs(project, args.source, force=args.force)
     grid = build_grid(images, project / "previews" / args.source / "thumbnail-grid.jpg", cols=args.cols)
     write_json(
         project / "svg_preview_manifest.json",
@@ -110,9 +125,10 @@ def main() -> int:
             "slide_count": len(images),
             "slide_images": [str(path.relative_to(project)) for path in images],
             "thumbnail_grid": str(grid.relative_to(project)),
+            "cache": cache_stats,
         },
     )
-    print(json.dumps({"slide_count": len(images), "thumbnail_grid": str(grid)}, ensure_ascii=False, indent=2))
+    print(json.dumps({"slide_count": len(images), "thumbnail_grid": str(grid), "cache": cache_stats}, ensure_ascii=False, indent=2))
     return 0
 
 

@@ -65,7 +65,7 @@ Recommended shape:
           {"slot_id": "hero", "x": 0, "y": 0, "w": 1920, "h": 1080},
           {"slot_id": "title", "x": 120, "y": 140, "w": 940, "h": 220}
         ],
-        "group_ids": ["hero", "title-block", "proof-chips", "footer"]
+        "group_ids": ["hero", "title-block", "proof-chips"]
       }
     ]
   }
@@ -111,8 +111,8 @@ Layer order:
 3. `title-*`: title, subtitle, eyebrow, section mark.
 4. `proof-*`: chart/table/process/diagram groups.
 5. `annotation-*`: callouts, labels, legends.
-6. `footer`: page number, optional section label, or visible citations when
-   explicitly requested.
+6. `footer` or `chrome-*`: optional only when the user explicitly requests
+   visible page numbers, citations, report footers, or other slide chrome.
 
 Top-level groups should be named with stable semantic IDs:
 
@@ -134,6 +134,22 @@ The same IDs may be referenced by:
 Avoid anonymous piles of shapes. If an object should move, animate, be edited,
 or be checked as one unit, it needs a group ID.
 
+## Slide Chrome Defaults
+
+Normal user-facing slides use a content-only canvas.
+
+- Do not reserve a default footer slot for page numbers, source URLs, dates,
+  model names, toolchain labels, or production notes.
+- Do not draw top page counters, progress strips, navigation pills, or viewer
+  controls as part of the SVG/PPTX slide. Those belong in the host viewer UI or
+  sidecar metadata.
+- If a visible footer or page number is explicitly requested, declare it in
+  `slide_chrome_policy`, reserve real layout space for it, and verify it does
+  not reduce title/body/proof clearance.
+- Keep provenance, citations, and source traceability in speaker notes,
+  `html_source_map.json`, QA reports, manifests, or a final references page
+  unless visible citation is part of the presentation brief.
+
 ## Text Layout
 
 - Use real SVG `<text>` and `<tspan>` nodes.
@@ -144,6 +160,34 @@ or be checked as one unit, it needs a group ID.
 - Do not rely on browser wrapping, CSS classes, `<foreignObject>`, or hidden
   overflow to make text fit.
 - Put nuance, caveats, and extra examples into speaker notes.
+
+## Layout Guard Strategy
+
+Do not place title, body, card, and image objects as independent fixed boxes.
+Use a small constraint pass before drawing:
+
+1. Estimate the title's rendered height from font size, box width, explicit line
+   breaks, and CJK character count.
+2. Set every dependent body/proof/card region from `title.bottom + min_gap`
+   rather than from a hardcoded y-coordinate.
+3. Reserve protected rectangles for title, subtitle, proof labels, captions, and
+   source notes before placing image slots.
+4. If the image or content cannot fit after those protected rectangles are
+   reserved, change the layout pattern or split the slide. Shrinking the title
+   is the last resort.
+
+Default PPTX clearance budget:
+
+- Title to normal body/proof/card: fail below `0.18in`, warn below `0.28in`.
+- Title to foreground/source image: fail below `0.18in`.
+- Image overlap with a title/content protected rectangle is always a hard
+  failure unless the image is explicitly a full-slide background with a declared
+  copy-space/scrim strategy.
+
+Run `scripts/layout_guard.py` or `scripts/pptx_text_check.py` after export. If
+the guard fails, repair the content contract or coordinate slots and regenerate;
+do not manually nudge only the rendered artifact unless this is a one-off
+user-edited PPTX.
 
 ## Image And Texture Treatment
 

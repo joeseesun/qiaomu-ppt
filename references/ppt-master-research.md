@@ -8,6 +8,17 @@ Upstream studied locally at:
 /Users/joe/Documents/Qiaomu PPT Skill/research/ppt-master
 ```
 
+Latest refresh for this learning note also inspected a fresh sparse shallow
+clone at `/tmp/ppt-master-latest-study` on 2026-06-25, remote `main` at
+`850ad1b`, with the public README reporting `v2.11.0`. The online gallery
+manifest reported 21 examples, 280 pages, and 21 templates in the prior catalog
+refresh. Local example statistics from that clone found 260 image files across the 280 pages
+(about 0.93 image files per slide), with image-rich cases such as
+`ppt169_liziqi_plant_dye_colors` (12 slides / 32 images),
+`ppt169_pritzker_2026` (11 slides / 25 images), and
+`ppt169_fashion_weekly_digest` (16 slides / 23 images). Treat these numbers as
+learning signals, not a requirement to copy upstream assets.
+
 Primary files inspected:
 
 - `README.md`, `README_CN.md`
@@ -26,8 +37,137 @@ Primary files inspected:
 - `skills/ppt-master/references/visual-styles/*`
 - `skills/ppt-master/references/image-renderings/*`
 - `skills/ppt-master/references/image-palettes/*`
+- `skills/ppt-master/references/image-type-templates/*`
+- `skills/ppt-master/references/image-generator.md`
+- `skills/ppt-master/references/image-base.md`
+- `skills/ppt-master/references/visual-review.md`
 - `examples/*/design_spec.md`
 - `examples/*/spec_lock.md`
+
+## 2026-06-25 Correction: The Essence Is the Axis System
+
+The earlier Qiaomu absorption was directionally useful but incomplete. It
+learned the visible nouns: editorial examples, source images, visual rhythm,
+style execution audits, and benchmark categories. It did not sufficiently
+enforce the upstream mechanism that makes those examples cohere.
+
+The current upstream code splits the design decision into independent catalogs:
+
+- `mode`: narrative or persuasion skeleton.
+- `visual_style`: deck layout aesthetic.
+- `image_rendering`: deck-wide generated-image look.
+- `image_palette`: behavior for how the deck colors are distributed in images.
+- `image_type_templates`: per-image local infographic geometry; hero-page
+  images instead use composition primitives.
+
+Qiaomu now records this as `data/ppt_master_axis_catalog.json` and audits it via
+`scripts/ppt_master_axis_audit.py`. The audit is intentionally about execution
+artifacts, not style prose: it checks that the axes exist in project contracts,
+that image rows carry page role and text policy, that local AI images declare a
+type while hero images declare a primitive, that image-rich subjects have
+inspectable source/user/web/formula primary-media rows, and that page rhythm and
+layout locks exist before rendering.
+
+The practical consequence: a deck may be beautiful without `ppt-master` labels,
+but a deck should not claim `ppt_master_grade` if it only says "magazine style",
+uses generic AI backgrounds, or lacks real primary media for an image-rich
+subject. More images are not enough; the axes must be locked and then executed.
+
+## 2026-06-27 Case Refresh: Sugar Rush + Indie Bookstore
+
+This refresh inspected the live viewer URLs for:
+
+- `ppt169_sugar_rush_memphis`
+- `ppt169_indie_bookstore_zine_guide`
+
+The viewer itself is only a static gallery shell. It reads
+`examples/examples.json` and displays `examples/<folder>/svg_final/*.svg` through
+SVG `<object>` embeds. The interesting generation evidence lives in each example
+folder:
+
+```text
+README.md
+design_spec.md
+spec_lock.md
+animations.json
+notes/total.md + per-page notes
+images/image_prompts.json + image_prompts.md
+svg_output/
+svg_final/
+exports/*.pptx
+```
+
+The direct lesson for Qiaomu is that `ppt-master` quality is a bundle of sidecar
+contracts, not a single renderer. `svg_output` is the authored SVG source;
+`svg_final` is the post-processed preview source with image/icon expansion; the
+PPTX export is the editable delivery artifact; notes and animation manifests are
+separate delivery layers.
+
+### Sugar Rush Memphis
+
+Observed shape:
+
+- 14-slide fictional festival guide.
+- Style: Memphis / Pop.
+- Deck image lock: `flat` rendering + `vivid-launch` palette behavior.
+- 9 generated images: 6 hero-page assets and 3 local assets.
+- Components: KPI cards, vertical pillars, icon grid, quadrant bullets,
+  hub-spoke stage map, timeline schedule, comparison columns.
+- Rhythm: anchor cover/closing, dense guide pages, breathing chapter pages.
+
+Transfer:
+
+- Event and youth-brand decks need real guide objects: schedule, map, ticket
+  tiers, lineup, zones, market/installations, not only a poster skin.
+- Bright palettes require a per-page active-color budget and thumbnail review;
+  the case is energetic, but some dense pages show how quickly edge cropping and
+  small text can creep in.
+- Memphis motifs should be controlled accents with thick editable foreground
+  geometry; generated images should carry atmosphere and scene only.
+
+### Indie Bookstore Zine Guide
+
+Observed shape:
+
+- 18-slide culture/guide deck.
+- Style: Risograph Zine.
+- Deck image lock: `screen-print` rendering + `duotone` palette behavior.
+- 10 generated images: print studio, object portrait, process banner, folding
+  hands, bookstore/place scenes, fair scene, outro.
+- Components: agenda list, timeline, vertical list, numbered steps, icon grid,
+  vertical pillars, basic table, labeled cards.
+- Hard visual constraints: duotone, paper grain, halftone, 1-3px
+  misregistration, hard edges, no rounded cards.
+
+Transfer:
+
+- A "style" becomes reliable only when it is translated into mechanical
+  constraints and forbidden moves. For zine/print styles, gradients, soft glass,
+  rounded cards, and generic digital polish should be blocked unless the user
+  explicitly asks for a hybrid.
+- Dense guide decks can still feel designed when every page keeps a stable
+  chrome rhythm: header band, component area, footer/source line, and recurring
+  source/credit discipline.
+- A sources/credits slide and long-form speaker notes are part of the trust
+  system, especially for culture or place-based guides.
+
+### New Qiaomu Absorption From This Refresh
+
+- `ppt_master_axis_audit.py` should not only check the five axes. It should also
+  check AI-image prompt sidecars, prompt-level composition/safe-area/foreground
+  boundaries, component selection rationale, and presentation sidecars when a
+  deck claims `ppt_master_grade`.
+- `visual_asset_manifest.json` plus `assets/images/image_prompts.json|md` are
+  a contract pair. The manifest says what assets exist and where they are used;
+  the prompt sidecar says how each AI image is generated without baking slide
+  claims, labels, charts, or source text into pixels.
+- Component selection should record rejected alternatives when there is a
+  likely wrong-but-plausible choice, such as using numbered steps for a fixed
+  date timeline or using a dense table where marketing tier cards are clearer.
+- For presentation-ready decks, `notes/total.md` and `animations.json` should be
+  treated as first-class optional-to-required artifacts depending on the route.
+  They prove spoken delivery and object groups were planned separately from the
+  static visual.
 
 ## References Directory Absorption Map
 
@@ -283,6 +423,14 @@ charts, figures, tables, screenshots, maps, or diagrams, do not pick a
 high-image case style by wishful thinking. First fetch more source material,
 request user assets, choose rights-clear public images, generate
 atmosphere-only concept art, or move to a typography/diagram-led style.
+
+The 2026-06-25 refresh sharpened this lesson: background images are not the same
+as primary media. A music, culture, architecture, fashion, biography, product,
+or brand deck needs inspectable objects such as an album cover, artist/product
+photo, place photo, source screenshot, figure, chart, or document/page image.
+Generated atmosphere can make the page beautiful, but it should not be the only
+visual layer on every slide. Qiaomu's benchmark therefore tracks
+`primary_media_evidence` separately from generic image presence.
 
 ### The Chart Lesson
 
