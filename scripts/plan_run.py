@@ -278,6 +278,9 @@ def plan_run(
     if not assumptions:
         assumptions.append("未发现会改变路线的额外约束。")
 
+    global_reminders = list(global_rules.get("always_keep", []))
+    append_unique(global_reminders, list(route.get("route_reminders", [])))
+
     return {
         "schema_version": "1.0.0",
         "tool": "qiaomu-ppt/scripts/plan_run.py",
@@ -304,7 +307,7 @@ def plan_run(
         "optional_references": list(route.get("optional_references", [])),
         "primary_scripts": list(route.get("primary_scripts", [])),
         "required_gates": list(route.get("required_gates", [])),
-        "global_reminders": list(global_rules.get("always_keep", [])),
+        "global_reminders": global_reminders,
     }
 
 
@@ -334,6 +337,9 @@ def render_markdown(report: dict[str, Any]) -> str:
     if report.get("required_gates"):
         lines.extend(["", "## 必过质量门", ""])
         lines.extend(f"- {item}" for item in report["required_gates"])
+    if report.get("global_reminders"):
+        lines.extend(["", "## 全局提醒", ""])
+        lines.extend(f"- {item}" for item in report["global_reminders"])
     if check_plan.get("run_now"):
         lines.extend(["", "## 现在要跑", ""])
         lines.extend(f"- {item}" for item in check_plan["run_now"])

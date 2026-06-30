@@ -4,9 +4,9 @@ Use icons when they clarify a concept, label a repeated semantic role, or create
 
 ## Sources
 
-Primary local source:
+Optional local source:
 
-- `/Users/joe/Documents/qm-icon-studio`
+- a local `qm-icon-studio` checkout, when available
 
 That project provides:
 
@@ -24,13 +24,13 @@ Network-capable source:
 Search local built-ins only:
 
 ```bash
-python3 ~/.agents/skills/qiaomu-ppt/scripts/icon_search.py "增长 用户 传播" --limit 8
+python3 scripts/icon_search.py "增长 用户 传播" --limit 8
 ```
 
 Search local plus preferred public icon sets and export SVGs:
 
 ```bash
-python3 ~/.agents/skills/qiaomu-ppt/scripts/icon_search.py "pencil writing edit" \
+python3 scripts/icon_search.py "pencil writing edit" \
   --iconify \
   --sets lucide,heroicons,tabler \
   --limit 12 \

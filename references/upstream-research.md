@@ -43,10 +43,16 @@ What to borrow:
 - Fixed 1920 x 1080 stage is a good preview discipline.
 - Zero-dependency HTML is fast for style exploration and web sharing.
 - Anti-generic design language is useful, especially against default purple-gradient decks.
+- Progressive disclosure is useful: keep a compact style index, inspect only
+  shortlisted preview cards, then open the full template details only after a
+  direction is chosen.
 
 Boundary:
 
 - HTML slides are not automatically real editable PPTX. Treat the idea as a preview/final-web route, or translate the chosen style system into Qiaomu's PPTX-oriented route.
+- Do not copy the stage CSS, presets, prompt text, or template pack. Qiaomu
+  uses the method: concrete previews, fixed stage, anti-slop gate, and
+  source-backed style choice.
 
 ## guizang-ppt-skill
 
@@ -57,10 +63,52 @@ What to borrow:
 - Chinese deck production benefits from named visual systems, layout discipline, image slots, and explicit suitability rules.
 - Editorial magazine and Swiss routes are useful defaults for brand/talk decks.
 - Low-performance fallback and screenshot/image slot thinking matter for real presentation use.
+- A locked layout registry and image-slot ratio contract are stronger than
+  freeform page-by-page HTML. Each slide should carry a registered layout id.
 
 Boundary:
 
 - Dense training courseware and collaboration-heavy editing are not ideal for a static HTML route. For high school courseware, use the visual principles sparingly and keep editable PPTX as the default final delivery.
+- Do not copy its magazine/Swiss templates, theme class names, or visual
+  recipes. Qiaomu uses its own `Lxx` / `ITLxx` ids and design kernel.
+
+## Open Design
+
+Source: https://github.com/nexu-io/open-design
+
+What to borrow:
+
+- Treat a deck as a skill plus design-system plus export surface, not just an
+  HTML file.
+- `DESIGN.md`-style token contracts and artifact manifests make agent work
+  easier to review and repeat.
+- A stable deck skeleton should own stage scaling, keyboard navigation, print
+  mode, and host chrome so generation focuses on slide content.
+- Deterministic layout QA catches stage/scaler regressions before visual review.
+
+Boundary:
+
+- Do not depend on Open Design as a runtime or copy its scaffold. Qiaomu keeps
+  a smaller native `html_design_kernel.json`, `html_source_map.json`, and
+  `html_delivery_manifest.json`.
+
+## html-ppt-skill
+
+Source: https://github.com/lewislulu/html-ppt-skill
+
+What to borrow:
+
+- Tokenized themes, component/layout catalogs, presenter notes, keyboard
+  navigation, deep links, and optional presenter mode are valuable HTML deck
+  affordances.
+- Themes should be variable contracts rather than a pile of ad hoc colors.
+- Notes and presenter-only controls must remain off the visible slide canvas.
+
+Boundary:
+
+- Do not copy its themes, layouts, animations, or presenter implementation.
+  Qiaomu may implement equivalent concepts with its own tokens, components,
+  manifests, and validation rules.
 
 ## humanize-ppt
 

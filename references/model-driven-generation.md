@@ -7,6 +7,8 @@ Use this reference after the user approves the `PPT Design Proposal`. It turns t
 Do not generate slides directly from chat memory. Generate from project files:
 
 ```text
+README.md                human-readable task archive index
+task_manifest.json       machine-readable stages and file locations
 design_proposal.md       user-facing approved direction
 research_plan.md/json    topic research questions and source strategy when needed
 research_dossier.md      user-reviewable synthesis of model knowledge, supplied sources, web/source findings, image candidates, and gaps
@@ -38,27 +40,36 @@ Full generation may proceed only when `preview_gate.json.user_decision` is `appr
 Output:
 
 - `route_card.md`
+- `README.md` and `task_manifest.json` in the project root
 - `sources/source_manifest.json`
 - cleaned source Markdown and downloaded/copied assets when URLs/files/source packets are present
 - `sources/papers/<id>/paper_manifest.json` when arXiv/Hugging Face paper sources are present
 - `research_plan.md` or `research_plan.json` for broad-topic requests
-- `research_dossier.md` or substantial `sources/source_notes.md` before slide planning
+- `research_dossier.md` or substantial `sources/source_notes.md` before content synthesis
+- `content_report.md` or `内容母稿-<主题>.md` before slide planning
 - `sources/source_notes.md` and `sources/source_cards.json` for topic-researched decks
 
 Rules:
 
 - Source Markdown owns text facts.
 - Image/PPT/PDF metadata owns geometry and media facts.
-- A source-grounded Markdown dossier is the first reviewable production
-  artifact after context intake. It should synthesize model prior knowledge,
-  supplied material, and web/source research; mark assumptions and missing
-  evidence; and list visual/image options before slide planning.
+- A source-grounded Markdown dossier is the first reviewable research archive
+  after context intake. It preserves model prior knowledge, supplied material,
+  web/source research, assumptions, missing evidence, and visual/image options.
+- For broad-topic decks, the next reviewable content artifact is a
+  source-synthesis article (`content_report.md` or `内容母稿-<主题>.md`). It turns
+  the research archive into a coherent argument. Slide plans should be extracted
+  from this article, not directly from links or raw source summaries.
+- The research archive must remain useful if no deck is generated: links,
+  downloaded/extracted images, source cards, and the dossier belong in the
+  project folder, defaulting to `~/Downloads/Qiaomu PPT/<date>-<slug>/`.
 - Broad topic requests are source tasks first, not writing tasks. Follow `topic-research-method.md` before generating an outline.
 - Mixed source requests are source-intake tasks first. Use `source-intake-method.md` and `source_to_markdown.py` to preserve source identity across URLs, arXiv/Hugging Face papers, WeChat articles, PDFs, EPUBs, Office docs, Feishu exports, images, ZIPs, and folders.
 - Paper requests use `paper-source-intake.md`: normalize to arXiv, prefer TeX/e-print, extract figure/table evidence, and bind paper cards to `slide_plan.json.source_card_ids`.
 - WeChat article requests use `wechat-source-intake.md`: treat generic URL conversion as a baseline, and do not plan image-backed slides from empty image placeholders.
-- NotebookLM/Anything-to-NotebookLM analysis may be used as an optional source analysis layer, but its output must be saved into source notes/cards before slide planning.
+- NotebookLM analysis may be used as an optional source analysis layer for the normal Qiaomu editable route, but its output must be saved into source notes/cards before slide planning. When the user explicitly asks for NotebookLM-native PPTX/PDF or NotebookLM search/deep research generation, use `references/notebooklm-native-deck.md` and `scripts/notebooklm_deck.py` as a separate image-backed/native route with its own evidence and watermark-cleanup gates.
 - Source cards are the bridge from research to slides; each mainline slide should cite source-card ids.
+- The content report is the bridge from research to story; each mainline slide should trace back to a paragraph or argument in the content report.
 - If source coverage or images are weak, record the gap and discuss it before style selection.
 - QA notes and provenance stay out of visible slide canvases unless the user explicitly asks.
 
@@ -69,6 +80,9 @@ Output:
 - `design_proposal.md`
 - page-by-page slide plan for user confirmation, either inside the proposal or
   as `slide_plan.json` plus a readable Markdown/table summary
+- per-page script and narration artifacts such as `page_content_guide.md/json`,
+  `speaker_notes_plan.md`, or `notes/total.md`
+- PPT execution config such as `spec_lock.json` or `ppt_config.json`
 
 It must contain:
 
@@ -80,6 +94,8 @@ It must contain:
 - layout rhythm: the planned sequence of `anchor`, `dense`, and `breathing` pages, plus the layout families used so the deck is not a repeated outline template
 - per-slide title/claim, visible content, source anchors, proof object, layout
   pattern, image/background plan, speaker-note goal, and QA risk
+- per-slide script intent and word-for-word narration requirements when the
+  user needs a presentation-ready deck
 - 3 visibly different style candidates: conservative fit, distinctive fit, and wildcard/interesting alternative
 - selected default direction, plus an explicit hybrid direction when combining two candidates would produce the strongest result
 - layout mix with concrete pattern IDs from `layout-pattern-library.md`

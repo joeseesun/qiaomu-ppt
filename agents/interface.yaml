@@ -1,8 +1,8 @@
 interface:
   display_name: Qiaomu PPT
-  short_description: Chinese-first URL/PDF-to-PPT workflow router with built-in editable PPTX generation, semantic HTML decks, optional GSAP/Lottie HTML motion manifests, PPTX preview QA, brand launch decks, courseware, speaker notes, persuasive content strategy, visual asset acquisition manifests, per-slide image art-direction briefs, image-text layout pattern selection, max-three color budgets, atmosphere-only imagegen or procedural CSS/Canvas/SVG background packs, image-slot containment, and verified slide production.
+  short_description: Chinese-first qiaomu-ppt workflow for source-grounded planning, editable PPTX generation, visual-asset direction, and final delivery verification. NotebookLM, HTML motion, Keynote, and social-image decks are optional route packs.
   default_prompt: |
-    Use qiaomu-ppt to route this presentation task, create the narrative and visual plan, then produce the appropriate deck deliverable with verification evidence.
+    Use qiaomu-ppt to route this presentation task, create the narrative and visual plan, then produce the appropriate deliverable with final_status verification evidence.
 
 compatibility:
   canonical_format: agent-skill
@@ -44,6 +44,7 @@ compatibility:
     shell: bash
     filesystem: required
     browser_preview: recommended
+    cli_facade: scripts/qiaomu_ppt.py
     upstream_skills: not_required
     bootstrap: scripts/bootstrap.py
     url_ingester: scripts/url_to_markdown.py
@@ -52,9 +53,13 @@ compatibility:
     image_generation_stager: scripts/stage_image_generation.py
     image_generation_runner: scripts/run_image_generation.py
     image_generation_provider_config: data/image_generation_providers.json
+    notebooklm_native_deck: scripts/notebooklm_deck.py
+    notebooklm_watermark_cleaner: scripts/strip_notebooklm_watermark.py
+    notebooklm_raster_watermark_cleaner: scripts/notebooklm_raster_watermark.py
     html_motion_presets: data/html_motion_presets.json
     html_motion_validator: scripts/validate_html_deck.py
     production_orchestrator: scripts/produce_deck.py
+    final_status: scripts/final_status.py
     visual_rhythm_checker: scripts/visual_rhythm_check.py
     deck_quality_benchmark: scripts/deck_quality_benchmark.py
     svg_deck_executor: scripts/svg_deck_from_slide_plan.py
@@ -74,6 +79,12 @@ compatibility:
     layout_recommender: scripts/recommend_layout.py
     visual_contract_checker: scripts/check_project.py
     content_contract_checker: scripts/check_project.py
+    optional_route_tools:
+      notebooklm_native_deck: scripts/notebooklm_deck.py
+      notebooklm_watermark_cleaner: scripts/strip_notebooklm_watermark.py
+      html_motion_validator: scripts/validate_html_deck.py
+      keynote_smoke: scripts/keynote_smoke.py
+      keynote_probe: scripts/keynote_probe.py
   trust:
     license: AGPL-3.0-only
     source_tier: local
@@ -82,7 +93,8 @@ compatibility:
     secret_handling: never store or print API keys; mark paid providers and missing credentials as missing evidence
     upstream_code: MIT-derived SVG/PPTX conversion code may be vendored with NOTICE attribution; upstream skills remain research-only and are not runtime dependencies
     pptx_skill_runtime_dependency: forbidden; qiaomu-ppt uses project-local SVG-first scripts for final-quality PPTX generation and QA
-    design_style_source: data/design_style_presets.json, data/magazine_art_styles.json, data/ppt_master_case_styles.json, and data/ppt_master_examples_catalog.json are derived PPT abstractions and learning indexes, not licenses to third-party brand assets or upstream templates
+    notebooklm_skill_runtime_dependency: forbidden; qiaomu-ppt may call the local notebooklm CLI directly for explicit NotebookLM-native runs but must not depend on qiaomu-anything-to-notebooklm skill files at runtime
+    design_style_source: data/style_packs.json declares default and optional style packs; data/design_style_presets.json, data/magazine_art_styles.json, data/ppt_master_case_styles.json, data/32kw_bento_style_presets.json, and data/ppt_master_examples_catalog.json are derived PPT abstractions and learning indexes, not licenses to third-party brand assets or upstream templates
     layout_pattern_source: data/image_text_layout_patterns.json and references/image-text-layout-patterns.md are practical image/text layout abstractions, not third-party templates or copyrighted slide designs
     visual_asset_source: visual_asset_manifest.json must record whether assets are ai, web, user, source, formula, or placeholder; public URLs and generated files are not evidence unless provenance, rights notes, and file status are recorded
     source_image_usage: source_cards.json image_candidates should be promoted into source/web/user visual assets when relevant; AI images are not substitutes for fetched evidence images
@@ -122,14 +134,19 @@ gates:
   production_reports:
     - reports/trigger-eval.json
     - reports/skill-ir.json
+    - final_status.json
   runtime_data:
+    - data/style_packs.json
     - data/design_style_presets.json
     - data/magazine_art_styles.json
     - data/ppt_master_case_styles.json
-    - data/ppt_master_examples_catalog.json
     - data/image_text_layout_patterns.json
     - data/visual_asset_acquisition_taxonomy.json
     - data/image_generation_providers.json
-    - data/html_motion_presets.json
     - data/dependency_manifest.json
     - data/font_manifest.json
+  optional_runtime_data:
+    - data/32kw_bento_style_presets.json
+    - data/ppt_master_examples_catalog.json
+    - data/notebooklm_style_prompts.json
+    - data/html_motion_presets.json

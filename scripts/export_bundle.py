@@ -3,7 +3,8 @@
 
 The exporter is intentionally conservative: it records missing evidence instead
 of pretending that every target format was produced. Formal HTML is generated
-from inline SVG pages when available; screenshot-based browser output remains a
+as native semantic HTML from slide_plan.json when available; inline SVG pages
+are only a compatibility fallback. Screenshot-based browser output remains a
 separate parity preview.
 """
 
@@ -136,6 +137,198 @@ def slide_text(slide: dict[str, Any], idx: int) -> str:
     return " ".join(part for part in parts if part)
 
 
+def safe_attr_id(value: Any, fallback: str, *, lower: bool = True) -> str:
+    text = str(value or "").strip()
+    text = re.sub(r"[^0-9A-Za-z_-]+", "-", text).strip("-_")
+    if lower:
+        text = text.lower()
+    return text or fallback
+
+
+def slide_stable_id(slide: dict[str, Any], idx: int) -> str:
+    for key in ("slide_id", "page_id", "id", "slug"):
+        value = slide.get(key)
+        if value:
+            return safe_attr_id(value, f"s{idx:02d}")
+    return f"s{idx:02d}"
+
+
+def slide_layout_id(slide: dict[str, Any]) -> str:
+    for key in (
+        "layout_id",
+        "layout_pattern_id",
+        "layout_pattern",
+        "image_text_layout_id",
+        "page_layout_id",
+        "page_layout",
+        "layout",
+    ):
+        value = slide.get(key)
+        if value:
+            match = re.search(r"\bL\d{2}\b", str(value).upper())
+            if match:
+                return match.group(0)
+            return safe_attr_id(value, "L00", lower=False)
+    return "L00"
+
+
+def slide_component_type(slide: dict[str, Any]) -> str:
+    component_plan = slide.get("component_plan")
+    if isinstance(component_plan, dict) and component_plan.get("component_type"):
+        return safe_attr_id(component_plan.get("component_type"), "generic")
+    for key in ("component_type", "page_role", "visual_role", "content_type"):
+        value = slide.get(key)
+        if value:
+            return safe_attr_id(value, "generic")
+    return "generic"
+
+
+def slide_screen_labels(slide: dict[str, Any], idx: int) -> list[dict[str, str]]:
+    slide_id = slide_stable_id(slide, idx)
+    labels: list[dict[str, str]] = []
+    for key in (
+        "claim_title",
+        "title",
+        "subtitle",
+        "audience_takeaway",
+        "visible_title",
+        "visible_body",
+        "concrete_anchor",
+        "source_anchor",
+    ):
+        value = str(slide.get(key) or "").strip()
+        if value:
+            labels.append({"id": f"{slide_id}-{safe_attr_id(key, key)}", "field": key, "label": value})
+    points = slide.get("content_points") or slide.get("bullets") or slide.get("points")
+    if isinstance(points, list):
+        for point_idx, point in enumerate(points, start=1):
+            value = str(point).strip()
+            if value:
+                labels.append({"id": f"{slide_id}-point-{point_idx}", "field": "content_points", "label": value})
+    if not labels:
+        labels.append({"id": f"{slide_id}-title", "field": "title", "label": slide_title(slide, idx)})
+    return labels
+
+
+def existing_source_contracts(project: Path) -> list[str]:
+    return [
+        path
+        for path in ("slide_plan.json", "content_contract.json", "visual_contract.json", "spec_lock.json")
+        if (project / path).exists()
+    ]
+
+
+def build_html_source_map(
+    project: Path,
+    slides: list[dict[str, Any]],
+    svgs: list[Path],
+    source_dir: Path,
+) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    count = max(len(slides), len(svgs))
+    for idx in range(1, count + 1):
+        slide = slides[idx - 1] if idx - 1 < len(slides) else {}
+        svg_path = svgs[idx - 1] if idx - 1 < len(svgs) else None
+        title_text = slide_title(slide, idx) if slide else f"Slide {idx}"
+        row: dict[str, Any] = {
+            "slide_no": idx,
+            "slide_id": slide_stable_id(slide, idx),
+            "layout_id": slide_layout_id(slide),
+            "component_type": slide_component_type(slide),
+            "title": title_text,
+            "source_slide_plan_index": idx - 1 if idx - 1 < len(slides) else None,
+            "screen_labels": slide_screen_labels(slide, idx),
+            "render_mode": "native_semantic_dom" if slide else "svg_compatibility_fallback",
+        }
+        if svg_path:
+            row["source_svg"] = rel(project, svg_path)
+        rows.append(
+            row
+        )
+    return {
+        "schema_version": "1.0.0",
+        "mode": "html_source_map",
+        "render_strategy": "native_semantic_html_primary",
+        "source_svg_dir": rel(project, source_dir) if svgs else "",
+        "source_contracts": existing_source_contracts(project),
+        "slide_count": len(rows),
+        "slides": rows,
+    }
+
+
+def build_html_design_kernel(
+    project: Path,
+    title: str,
+    source_map: dict[str, Any],
+) -> dict[str, Any]:
+    rows = source_map.get("slides") if isinstance(source_map.get("slides"), list) else []
+    layout_rows = [
+        {
+            "slide_id": str(row.get("slide_id") or ""),
+            "layout_id": str(row.get("layout_id") or "L00"),
+            "component_type": str(row.get("component_type") or "generic"),
+        }
+        for row in rows
+        if isinstance(row, dict)
+    ]
+    return {
+        "schema_version": "1.0.0",
+        "mode": "html_design_kernel",
+        "kernel_id": "qiaomu-html-deck-kernel-v1",
+        "title": title,
+        "render_strategy": "native_semantic_html_primary",
+        "stage_model": {
+            "width": 1920,
+            "height": 1080,
+            "aspect_ratio": "16:9",
+            "scaler": "top-left explicit 1920x1080 coordinate stage scaled by viewport fit; SVG may appear only as local component or compatibility fallback",
+            "host_chrome": "outside_slide_stage",
+            "min_body_px_at_1280_stage": 18,
+        },
+        "style_discovery": {
+            "status": "derived_from_project_contracts",
+            "candidate_roles": ["safe_fit", "distinctive_fit", "wildcard_risk"],
+            "source": "design_proposal.md/style_direction.json when present; otherwise project renderer fallback",
+        },
+        "token_contract": {
+            "status": "fallback_export_tokens",
+            "groups": ["color", "typography", "spacing", "surface", "motion"],
+            "evidence": "source_backed tokens should be supplied by style_direction.json or visual_contract.json for custom formal HTML",
+        },
+        "layout_registry": {
+            "slide_id_attr": "data-slide-id",
+            "layout_id_attr": "data-layout-id",
+            "source": "html_source_map.json",
+            "slides": layout_rows,
+        },
+        "image_slot_registry": {
+            "slot_attr": "data-image-slot",
+            "source": "visual_asset_manifest.json or html_delivery_manifest.json",
+            "status": "native DOM export uses no raster image slots by default" if not (project / "visual_asset_manifest.json").exists() else "see visual_asset_manifest.json",
+        },
+        "semantic_component_registry": {
+            "slide_selector": "section.slide",
+            "screen_label_attr": "data-screen-label",
+            "component_types": sorted({row["component_type"] for row in layout_rows}) if layout_rows else ["generic"],
+        },
+        "motion_policy": {
+            "level": "none",
+            "engines": [],
+            "fallback": "static deck remains readable without playback",
+        },
+        "review_model": {
+            "source_map": "html_source_map.json",
+            "validator": "reports/html_deck_validation.json",
+            "patch_back_rule": "systemic visual comments should patch slide_plan/spec/renderers, not one-off DOM output",
+        },
+        "non_copy_policy": {
+            "upstream_role": "research_evidence_only",
+            "forbidden": "no copied upstream templates, CSS class systems, long prompts, or complete page designs",
+            "qiaomu_owned": "stage contract, source map, manifest, and layout ids",
+        },
+    }
+
+
 def latest_pptx(project: Path) -> Path | None:
     exports = project / "exports"
     if not exports.is_dir():
@@ -213,7 +406,7 @@ def find_preview_images(project: Path) -> list[Path]:
     return sorted((preview_dir / "render").glob("page-*.png"))
 
 
-def find_chromium_executable(playwright_obj: Any) -> str | None:
+def chromium_executable_candidates(playwright_obj: Any) -> list[str | None]:
     candidates: list[Path] = []
     cache_root = Path.home() / "Library/Caches/ms-playwright"
     if cache_root.exists():
@@ -231,8 +424,22 @@ def find_chromium_executable(playwright_obj: Any) -> str | None:
             Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
         ]
     )
-    executable = next((path for path in candidates if path.exists()), None)
-    return str(executable) if executable else None
+    ordered: list[str | None] = []
+    seen: set[str] = set()
+    for path in candidates:
+        if not path.exists():
+            continue
+        key = str(path)
+        if key in seen:
+            continue
+        seen.add(key)
+        ordered.append(key)
+    ordered.append(None)
+    return ordered
+
+
+def find_chromium_executable(playwright_obj: Any) -> str | None:
+    return chromium_executable_candidates(playwright_obj)[0]
 
 
 def convert_pptx_to_pdf(project: Path, pptx: Path, slug: str) -> dict[str, Any]:
@@ -288,73 +495,278 @@ def convert_pptx_to_pdf(project: Path, pptx: Path, slug: str) -> dict[str, Any]:
     }
 
 
-def render_formal_html(slides: list[dict[str, Any]], svgs: list[Path], title: str) -> str:
-    sections: list[str] = []
-    for idx, svg_path in enumerate(svgs, start=1):
-        svg_text = svg_path.read_text(encoding="utf-8", errors="replace")
-        svg_text = re.sub(r"<\?xml[^>]*>\s*", "", svg_text)
-        svg_text = re.sub(r"<!DOCTYPE[^>]*>\s*", "", svg_text, flags=re.IGNORECASE)
-        slide = slides[idx - 1] if idx - 1 < len(slides) else {}
-        title_text = slide_title(slide, idx)
-        accessible = slide_text(slide, idx)
-        sections.append(
-            f'''<section class="page" aria-label="{escape(title_text)}" data-page="{idx}">
-        <div class="svg-layer" aria-hidden="false">
+def compact_html_text(value: Any, max_chars: int = 420) -> str:
+    if isinstance(value, list):
+        value = " ".join(str(item) for item in value if str(item).strip())
+    elif isinstance(value, dict):
+        value = " ".join(str(item) for item in value.values() if str(item).strip())
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    if len(text) > max_chars:
+        return text[: max_chars - 1].rstrip() + "..."
+    return text
+
+
+def html_text_list(value: Any, max_items: int = 5, max_chars: int = 140) -> list[str]:
+    if isinstance(value, list):
+        raw = value
+    elif isinstance(value, dict):
+        raw = [f"{key}: {val}" for key, val in value.items()]
+    elif str(value or "").strip():
+        raw = re.split(r"\n+|[;；]\s*", str(value))
+    else:
+        raw = []
+    items: list[str] = []
+    for item in raw:
+        text = compact_html_text(item, max_chars)
+        if text:
+            items.append(text)
+        if len(items) >= max_items:
+            break
+    return items
+
+
+def slide_visible_title(slide: dict[str, Any], idx: int) -> str:
+    return str(slide.get("visible_title") or slide.get("claim_title") or slide.get("title") or f"Slide {idx}").strip()
+
+
+def slide_kicker(slide: dict[str, Any], idx: int) -> str:
+    for key in ("section", "chapter", "kicker"):
+        value = compact_html_text(slide.get(key), 72)
+        if value:
+            return value
+    return f"{idx:02d}"
+
+
+def slide_body_copy(slide: dict[str, Any]) -> str:
+    for key in ("visible_body", "visible_content", "audience_takeaway", "subtitle", "concrete_anchor", "intent"):
+        value = compact_html_text(slide.get(key), 260)
+        if value:
+            return value
+    return ""
+
+
+def slide_point_items(slide: dict[str, Any]) -> list[str]:
+    for key in ("visible_labels", "content_points", "points", "bullets", "evidence"):
+        items = html_text_list(slide.get(key), max_items=5)
+        if items:
+            return items
+    body = slide_body_copy(slide)
+    return html_text_list(body, max_items=3, max_chars=160) if body else []
+
+
+def screen_label_attr(value: str) -> str:
+    return f' data-screen-label="{escape(compact_html_text(value, 110), quote=True)}"'
+
+
+def render_point_list(slide_id: str, items: list[str], *, ordered: bool = False) -> str:
+    if not items:
+        return ""
+    tag = "ol" if ordered else "ul"
+    cls = "sequence-list" if ordered else "point-list"
+    rendered = []
+    for idx, item in enumerate(items, start=1):
+        rendered.append(
+            f'<li id="{escape(slide_id)}-point-{idx}"{screen_label_attr(item)}>'
+            f"<span>{escape(item)}</span></li>"
+        )
+    return f'<{tag} class="{cls}">' + "".join(rendered) + f"</{tag}>"
+
+
+def render_compare(slide_id: str, items: list[str]) -> str:
+    left = items[0::2] or items[:1]
+    right = items[1::2] or items[1:2] or items[:1]
+    return (
+        '<div class="compare-grid">'
+        '<div class="compare-panel"><h3>当前判断</h3>'
+        + render_point_list(f"{slide_id}-left", left[:3])
+        + '</div><div class="compare-panel strong"><h3>关键变化</h3>'
+        + render_point_list(f"{slide_id}-right", right[:3])
+        + "</div></div>"
+    )
+
+
+def render_metrics(slide_id: str, items: list[str]) -> str:
+    rendered: list[str] = []
+    for idx, item in enumerate(items[:4], start=1):
+        match = re.search(r"([+-]?\d+(?:\.\d+)?\s*(?:%|倍|x|X|万|亿|ms|s|天|页|个)?)", item)
+        number = match.group(1) if match else f"{idx:02d}"
+        label = item.replace(number, "", 1).strip(" ：:-") if match else item
+        rendered.append(
+            f'<article class="metric-card" id="{escape(slide_id)}-metric-{idx}"{screen_label_attr(item)}>'
+            f'<strong>{escape(number)}</strong><span>{escape(label or item)}</span></article>'
+        )
+    return '<div class="metric-grid">' + "".join(rendered) + "</div>" if rendered else ""
+
+
+def render_native_slide(slide: dict[str, Any], idx: int, total: int) -> str:
+    slide_id = slide_stable_id(slide, idx)
+    layout_id = slide_layout_id(slide)
+    component_type = slide_component_type(slide)
+    title_text = slide_visible_title(slide, idx)
+    kicker = slide_kicker(slide, idx)
+    body = slide_body_copy(slide)
+    points = slide_point_items(slide)
+    component_l = component_type.lower()
+    layout_l = layout_id.lower()
+    section_classes = ["slide", "native-slide", f"rhythm-{safe_attr_id(slide.get('rhythm') or 'body', 'body')}"]
+    if idx == 1 or "hero" in component_l or "cover" in component_l:
+        section_classes.append("slide-hero")
+    elif idx == total or "closing" in component_l:
+        section_classes.append("slide-closing")
+    elif any(token in component_l + " " + layout_l for token in ("compare", "comparison", "objection")):
+        section_classes.append("slide-compare")
+    elif any(token in component_l + " " + layout_l for token in ("process", "roadmap", "sequence", "architecture", "mechanism")):
+        section_classes.append("slide-process")
+    elif any(token in component_l + " " + layout_l for token in ("chart", "kpi", "metric", "data")):
+        section_classes.append("slide-metric")
+    elif "quote" in component_l:
+        section_classes.append("slide-quote")
+
+    if "slide-compare" in section_classes:
+        main = render_compare(slide_id, points)
+    elif "slide-process" in section_classes:
+        main = render_point_list(slide_id, points, ordered=True)
+    elif "slide-metric" in section_classes:
+        main = render_metrics(slide_id, points) or render_point_list(slide_id, points)
+    elif "slide-quote" in section_classes and points:
+        quote = points[0]
+        main = f'<blockquote{screen_label_attr(quote)}>{escape(quote)}</blockquote>'
+    else:
+        main = render_point_list(slide_id, points)
+
+    body_html = f'<p class="lead"{screen_label_attr(body)}>{escape(body)}</p>' if body else ""
+    proof = compact_html_text(slide.get("concrete_anchor"), 120)
+    proof_html = (
+        f'<aside class="proof-card"{screen_label_attr(proof)}><b>核心依据</b><span>{escape(proof)}</span></aside>'
+        if proof and proof not in body
+        else ""
+    )
+    return f'''<section class="{" ".join(section_classes)}" id="{escape(slide_id)}" data-slide-id="{escape(slide_id)}" data-layout-id="{escape(layout_id)}" data-component-type="{escape(component_type)}" aria-label="{escape(title_text, quote=True)}">
+        <div class="slide-bg" aria-hidden="true"></div>
+        <header class="slide-header">
+          <p class="kicker"{screen_label_attr(kicker)}>{escape(kicker)}</p>
+          <h1{screen_label_attr(title_text)}>{escape(title_text)}</h1>
+          {body_html}
+        </header>
+        <div class="slide-content">
+          {main}
+          {proof_html}
+        </div>
+      </section>'''
+
+
+def render_svg_fallback_slide(svg_path: Path, idx: int) -> str:
+    svg_text = svg_path.read_text(encoding="utf-8", errors="replace")
+    svg_text = re.sub(r"<\?xml[^>]*>\s*", "", svg_text)
+    svg_text = re.sub(r"<!DOCTYPE[^>]*>\s*", "", svg_text, flags=re.IGNORECASE)
+    slide_id = f"s{idx:02d}"
+    title_text = f"Slide {idx}"
+    return f'''<section class="slide svg-compat-slide" id="{slide_id}" data-slide-id="{slide_id}" data-layout-id="L00" data-component-type="svg_compatibility_fallback" aria-label="{escape(title_text, quote=True)}">
+        <div class="svg-layer" data-screen-label="{escape(title_text, quote=True)}" aria-hidden="false">
 {svg_text}
         </div>
-        <div class="visually-hidden">{escape(accessible)}</div>
       </section>'''
-        )
+
+
+def render_formal_html(slides: list[dict[str, Any]], svgs: list[Path], title: str) -> str:
+    sections: list[str] = []
+    if slides:
+        total = len(slides)
+        sections = [render_native_slide(slide, idx, total) for idx, slide in enumerate(slides, start=1)]
+    else:
+        sections = [render_svg_fallback_slide(svg_path, idx) for idx, svg_path in enumerate(svgs, start=1)]
     return f'''<!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-qiaomu-html-deck="native-semantic-primary">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="qiaomu-reference-stage" content="1920x1080">
   <title>{escape(title)}</title>
   <style>
-    :root {{ --bg: #11100e; --accent: #c8472c; }}
+    :root {{ --bg: #151412; --paper: #f7f1e3; --ink: #191817; --muted: #6e695f; --red: #c43d2b; --blue: #245b9d; --green: #1f7a5a; --gold: #c18a2a; }}
     * {{ box-sizing: border-box; }}
-    html, body {{ margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: #f8f4ea; font-family: Inter, "Noto Sans SC", system-ui, sans-serif; }}
-    .presentation {{ position: fixed; inset: 0; background: var(--bg); }}
-    .stage {{ position: absolute; left: 50%; top: 50%; width: min(100vw, calc(100vh * 16 / 9)); aspect-ratio: 16 / 9; transform: translate(-50%, -50%); overflow: hidden; background: #0f1116; box-shadow: 0 24px 88px rgba(0,0,0,.42); }}
-    .page {{ position: absolute; inset: 0; opacity: 0; transform: scale(.992); transition: opacity .28s ease, transform .28s ease; pointer-events: none; }}
-    .page.active {{ opacity: 1; transform: scale(1); pointer-events: auto; z-index: 2; }}
+    html, body {{ margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: Inter, "Noto Sans SC", "PingFang SC", system-ui, sans-serif; }}
+    .presentation {{ position: fixed; inset: 0; background: radial-gradient(circle at 78% 8%, rgba(193,138,42,.20), transparent 32%), linear-gradient(135deg, #161514, #22211e 64%, #111315); }}
+    .stage {{ position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: top left; overflow: hidden; background: var(--paper); box-shadow: 0 30px 90px rgba(0,0,0,.44); }}
+    .slide {{ position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr; gap: 42px; padding: 92px 110px 86px; opacity: 0; transform: translateY(14px); transition: opacity .26s ease, transform .26s ease; pointer-events: none; background: var(--paper); }}
+    .slide.active {{ opacity: 1; transform: translateY(0); pointer-events: auto; z-index: 2; }}
+    .slide-bg {{ position: absolute; inset: 0; opacity: .8; background: linear-gradient(90deg, rgba(196,61,43,.10), transparent 34%), linear-gradient(180deg, rgba(36,91,157,.11), transparent 46%); }}
+    .slide-header, .slide-content {{ position: relative; z-index: 1; }}
+    .slide-header {{ max-width: 1280px; }}
+    .kicker {{ margin: 0 0 24px; color: var(--red); font-size: 25px; font-weight: 800; letter-spacing: 0; }}
+    h1 {{ margin: 0; color: var(--ink); font-size: 78px; line-height: 1.15; letter-spacing: 0; font-weight: 850; text-wrap: balance; }}
+    .lead {{ margin: 28px 0 0; max-width: 980px; color: #34302b; font-size: 34px; line-height: 1.48; font-weight: 600; }}
+    .slide-content {{ display: grid; grid-template-columns: minmax(0, 1fr) 430px; gap: 54px; align-items: end; }}
+    .point-list, .sequence-list {{ margin: 0; padding: 0; list-style: none; display: grid; gap: 22px; }}
+    .point-list li, .sequence-list li {{ display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 22px; align-items: start; color: #24211e; font-size: 32px; line-height: 1.45; font-weight: 650; }}
+    .point-list li::before {{ content: ""; width: 12px; height: 12px; margin-top: 16px; border-radius: 50%; background: var(--blue); }}
+    .sequence-list {{ counter-reset: step; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 26px; align-items: stretch; }}
+    .sequence-list li {{ counter-increment: step; display: block; min-height: 250px; padding: 34px 30px; background: rgba(255,255,255,.66); border: 1px solid rgba(25,24,23,.16); border-radius: 8px; font-size: 25px; }}
+    .sequence-list li::before {{ content: counter(step, decimal-leading-zero); display: block; margin-bottom: 30px; color: var(--red); font-size: 44px; line-height: 1; font-weight: 850; }}
+    .proof-card {{ align-self: end; padding: 34px 34px 38px; border-radius: 8px; background: #191817; color: #f7f1e3; min-height: 220px; }}
+    .proof-card b {{ display: block; margin-bottom: 18px; color: #f0b458; font-size: 22px; }}
+    .proof-card span {{ display: block; font-size: 26px; line-height: 1.42; font-weight: 650; }}
+    .compare-grid {{ grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }}
+    .compare-panel {{ padding: 42px; min-height: 410px; border-radius: 8px; background: rgba(255,255,255,.66); border: 1px solid rgba(25,24,23,.16); }}
+    .compare-panel.strong {{ background: #191817; color: #f7f1e3; }}
+    .compare-panel h3 {{ margin: 0 0 28px; font-size: 30px; line-height: 1.2; color: var(--red); }}
+    .compare-panel.strong h3 {{ color: #f0b458; }}
+    .compare-panel.strong li {{ color: #f7f1e3; }}
+    .metric-grid {{ grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }}
+    .metric-card {{ min-height: 300px; padding: 38px; border-radius: 8px; background: #191817; color: #f7f1e3; display: flex; flex-direction: column; justify-content: space-between; }}
+    .metric-card strong {{ color: #f0b458; font-size: 78px; line-height: 1; font-weight: 880; }}
+    .metric-card span {{ font-size: 25px; line-height: 1.38; font-weight: 650; }}
+    blockquote {{ grid-column: 1 / -1; margin: 0; padding: 54px 72px; border-radius: 8px; background: #191817; color: #f7f1e3; font-size: 58px; line-height: 1.32; font-weight: 780; }}
+    .slide-hero, .slide-closing {{ align-content: center; grid-template-rows: auto auto; }}
+    .slide-hero h1, .slide-closing h1 {{ max-width: 1260px; font-size: 96px; line-height: 1.08; }}
+    .slide-hero .slide-content, .slide-closing .slide-content {{ grid-template-columns: minmax(0, 1fr) 380px; }}
+    .svg-compat-slide {{ padding: 0; display: block; }}
     .svg-layer, .svg-layer > svg {{ width: 100%; height: 100%; display: block; }}
-    .progress {{ position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: var(--accent); transition: width .2s ease; z-index: 10; }}
-    .counter {{ position: fixed; right: 18px; bottom: 14px; z-index: 11; color: rgba(255,255,255,.68); font-size: 13px; letter-spacing: 0; }}
-    .visually-hidden {{ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }}
+    .progress {{ position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: var(--red); transition: width .2s ease; z-index: 10; }}
+    .counter {{ position: fixed; right: 18px; bottom: 14px; z-index: 11; color: rgba(255,255,255,.72); font-size: 13px; letter-spacing: 0; }}
+    @media (prefers-reduced-motion: reduce) {{ .slide {{ transition: none; }} }}
   </style>
 </head>
 <body>
   <main class="presentation" aria-live="polite">
-    <div class="stage">
+    <div class="stage" data-stage="1920x1080">
       {"".join(sections)}
     </div>
   </main>
   <div class="progress" aria-hidden="true"></div>
   <div class="counter" aria-hidden="true"></div>
   <script>
-    const pages = [...document.querySelectorAll('.page')];
+    const stage = document.querySelector('.stage');
+    const slides = [...document.querySelectorAll('.slide')];
     const progress = document.querySelector('.progress');
     const counter = document.querySelector('.counter');
+    const STAGE_W = 1920;
+    const STAGE_H = 1080;
     let index = 0;
+    function fitStage() {{
+      const scale = Math.min(innerWidth / STAGE_W, innerHeight / STAGE_H);
+      const left = (innerWidth - STAGE_W * scale) / 2;
+      const top = (innerHeight - STAGE_H * scale) / 2;
+      stage.style.transform = `translate(${{left}}px, ${{top}}px) scale(${{scale}})`;
+    }}
     function show(next) {{
-      index = Math.max(0, Math.min(pages.length - 1, Number(next) || 0));
-      pages.forEach((page, i) => page.classList.toggle('active', i === index));
-      progress.style.width = ((index + 1) / pages.length * 100) + '%';
-      counter.textContent = `${{index + 1}} / ${{pages.length}}`;
-      location.hash = `slide-${{index + 1}}`;
+      index = Math.max(0, Math.min(slides.length - 1, Number(next) || 0));
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+      progress.style.width = slides.length ? ((index + 1) / slides.length * 100) + '%' : '0';
+      counter.textContent = `${{index + 1}} / ${{slides.length}}`;
+      history.replaceState(null, '', `#slide-${{index + 1}}`);
     }}
     window.qiaomuShowSlide = show;
+    addEventListener('resize', fitStage);
     addEventListener('keydown', event => {{
       if (['ArrowRight', ' ', 'PageDown'].includes(event.key)) show(index + 1);
       if (['ArrowLeft', 'PageUp'].includes(event.key)) show(index - 1);
       if (event.key === 'Home') show(0);
-      if (event.key === 'End') show(pages.length - 1);
+      if (event.key === 'End') show(slides.length - 1);
     }});
     addEventListener('click', event => {{ if (!event.altKey) show(index + 1); }});
     const match = location.hash.match(/slide-(\\d+)/);
+    fitStage();
     show(match ? Number(match[1]) - 1 : 0);
   </script>
 </body>
@@ -372,35 +784,79 @@ def screenshot_html(project: Path, html_path: Path, slide_count: int, selected: 
     out_dir.mkdir(parents=True, exist_ok=True)
     outputs: list[str] = []
     with sync_playwright() as p:
-        executable = find_chromium_executable(p)
-        launch_kwargs = {"executable_path": executable} if executable else {}
-        browser = p.chromium.launch(**launch_kwargs)
-        try:
-            for viewport in ({"width": 1280, "height": 720}, {"width": 1440, "height": 900}):
-                context = browser.new_context(viewport=viewport, device_scale_factor=1)
-                page = context.new_page()
-                page.goto(html_path.resolve().as_uri(), wait_until="load")
-                page.wait_for_timeout(200)
-                for slide_no in selected:
-                    if slide_no > slide_count:
-                        continue
-                    page.evaluate("(n) => window.qiaomuShowSlide && window.qiaomuShowSlide(n)", slide_no - 1)
-                    page.wait_for_timeout(100)
-                    out = out_dir / f"slide-{slide_no:02d}-{viewport['width']}x{viewport['height']}.png"
-                    page.screenshot(path=str(out), full_page=False)
-                    outputs.append(rel(project, out))
-                page.close()
-                context.close()
-        finally:
-            browser.close()
+        errors: list[str] = []
+        for executable in chromium_executable_candidates(p):
+            launch_kwargs = {"executable_path": executable} if executable else {}
+            try:
+                browser = p.chromium.launch(**launch_kwargs)
+            except Exception as exc:
+                label = executable or "playwright-default"
+                errors.append(f"{label}: {exc}")
+                continue
+            try:
+                for viewport in ({"width": 1280, "height": 720}, {"width": 1440, "height": 900}):
+                    context = browser.new_context(viewport=viewport, device_scale_factor=1)
+                    page = context.new_page()
+                    page.goto(html_path.resolve().as_uri(), wait_until="load")
+                    page.wait_for_timeout(200)
+                    for slide_no in selected:
+                        if slide_no > slide_count:
+                            continue
+                        page.evaluate("(n) => window.qiaomuShowSlide && window.qiaomuShowSlide(n)", slide_no - 1)
+                        page.wait_for_timeout(420)
+                        out = out_dir / f"slide-{slide_no:02d}-{viewport['width']}x{viewport['height']}.png"
+                        page.screenshot(path=str(out), full_page=False)
+                        outputs.append(rel(project, out))
+                    page.close()
+                    context.close()
+                return outputs
+            finally:
+                browser.close()
+        raise RuntimeError("All Chromium launch candidates failed: " + " | ".join(errors))
     return outputs
+
+
+def run_html_deck_validator(project: Path, html_path: Path) -> dict[str, Any]:
+    reports = project / "reports"
+    json_report = reports / "html_deck_validation.json"
+    markdown_report = reports / "html_deck_validation.md"
+    script = Path(__file__).resolve().parent / "validate_html_deck.py"
+    command = [
+        sys.executable,
+        str(script),
+        str(html_path),
+        "--json",
+        str(json_report),
+        "--markdown",
+        str(markdown_report),
+    ]
+    result = run(command)
+    payload: dict[str, Any] = {}
+    if json_report.exists():
+        try:
+            loaded = read_json(json_report)
+            if isinstance(loaded, dict):
+                payload = loaded
+        except Exception:
+            payload = {}
+    return {
+        "command": " ".join(shlex.quote(part) for part in command),
+        "status": payload.get("status") or ("passed" if result.returncode == 0 else STATUS_FAILED),
+        "returncode": result.returncode,
+        "json": rel(project, json_report),
+        "markdown": rel(project, markdown_report),
+        "error_count": len(payload.get("errors") or []),
+        "warning_count": len(payload.get("warnings") or []),
+        "stdout": result.stdout[-1200:] if result.stdout else "",
+        "stderr": result.stderr[-1200:] if result.stderr else "",
+    }
 
 
 def export_formal_html(project: Path, slug: str, title: str, source: str, screenshots: bool) -> dict[str, Any]:
     slides = load_slides(project)
     source_dir = resolve_svg_source_dir(project, source)
     svgs = find_svg_files(project, source)
-    if not svgs:
+    if not slides and not svgs:
         existing = project / "html" / "index.html"
         export_existing = project / "exports" / f"{slug}.html"
         if existing.exists() or export_existing.exists():
@@ -409,9 +865,9 @@ def export_formal_html(project: Path, slug: str, title: str, source: str, screen
                 "path": rel(project, existing if existing.exists() else export_existing),
                 "reason": "existing formal HTML found",
             }
-        return {"status": STATUS_MISSING, "reason": f"no SVG pages found under {rel(project, source_dir)}/"}
+        return {"status": STATUS_MISSING, "reason": "no slide_plan.json slides or SVG compatibility pages found"}
 
-    cached = cached_formal_html(project, slug, title, source, svgs, screenshots)
+    cached = cached_formal_html(project, slug, title, slides, svgs, screenshots)
     if cached:
         return cached
 
@@ -425,49 +881,94 @@ def export_formal_html(project: Path, slug: str, title: str, source: str, screen
     html_path.write_text(html, encoding="utf-8")
     export_path.write_text(html, encoding="utf-8")
 
-    selected = [1, max(1, len(svgs) // 3), max(1, len(svgs) * 2 // 3), len(svgs)]
+    slide_count = len(slides) if slides else len(svgs)
+    render_strategy = "native_semantic_html_primary" if slides else "svg_compatibility_fallback"
+    source_map = build_html_source_map(project, slides, svgs, source_dir)
+    design_kernel = build_html_design_kernel(project, title, source_map)
+    write_json(project / "html_source_map.json", source_map)
+    write_json(project / "html_design_kernel.json", design_kernel)
+    validation = run_html_deck_validator(project, html_path)
+
+    selected = [1, max(1, slide_count // 3), max(1, slide_count * 2 // 3), slide_count]
     selected = sorted(set(selected))[:4]
     screenshots_out: list[str] = []
     screenshot_warning = ""
     if screenshots:
         try:
-            screenshots_out = screenshot_html(project, html_path, len(svgs), selected)
+            screenshots_out = screenshot_html(project, html_path, slide_count, selected)
         except Exception as exc:
             screenshot_warning = str(exc)
 
     manifest = {
         "schema_version": "1.0.0",
         "mode": "semantic_html_deck",
+        "render_strategy": render_strategy,
         "title": title,
-        "slide_count": len(svgs),
-        "svg_source": rel(project, source_dir),
-        "source_contracts": [
-            path
-            for path in ("slide_plan.json", "content_contract.json", "visual_contract.json", "spec_lock.json")
-            if (project / path).exists()
-        ],
+        "slide_count": slide_count,
+        "svg_source": rel(project, source_dir) if svgs else "",
+        "html_design_kernel": "html_design_kernel.json",
+        "html_source_map": "html_source_map.json",
+        "source_contracts": existing_source_contracts(project),
         "html_outputs": [rel(project, html_path), rel(project, export_path)],
-        "component_strategy": "DOM navigation plus inline SVG slide components; visible layer is not rendered slide screenshots.",
+        "component_strategy": "DOM-first semantic slide sections with CSS stage and JS navigation; SVG/Canvas are optional local components, and full-page SVG is compatibility fallback only.",
         "whole_slide_screenshot_policy": "forbid whole-slide screenshot images for formal HTML; screenshots are QA evidence only.",
-        "accessibility_notes": "Slide titles and source anchors are mirrored into hidden accessible text; SVG text remains in the DOM where supported.",
+        "accessibility_notes": "Slide titles, body copy, and proof points are emitted as inspectable HTML text when slide_plan.json is available.",
+        "point_review_policy": {
+            "slide_ids": "stable data-slide-id values from html_source_map.json",
+            "element_labels": "major title/body/points carry data-screen-label",
+            "review_status": "needs-browser-review" if not screenshots_out else "screenshots-captured",
+        },
+        "asset_performance": {
+            "strategy": "local assets only; native DOM export embeds no whole-slide raster screenshots",
+            "preferred_formats": ["webp", "avif", "jpg", "svg"],
+            "package_budget_kb": 3072,
+            "image_budget_kb": 250,
+            "largest_image_kb": 0,
+            "package_size_mb": 0,
+            "lazy_loading": "not applicable unless image slots are declared",
+        },
+        "slide_chrome_policy": {
+            "stage": "content_only_canvas",
+            "viewer_chrome": "progress and page position outside stage",
+            "visible_footer": "none unless explicitly requested",
+        },
+        "motion_system": {
+            "level": "none",
+            "engines": [],
+            "manifest": "",
+            "reduced_motion": "prefers-reduced-motion disables slide transitions",
+            "fallback": "static deck remains readable without playback",
+        },
+        "layout_registry": design_kernel.get("layout_registry", {}),
+        "image_slot_registry": design_kernel.get("image_slot_registry", {}),
+        "validation": validation,
         "readability_qa": {
             "viewports_checked": ["1280x720", "1440x900"],
-            "stage_strategy": "fixed 16:9 aspect stage, centered with explicit absolute position and scaled by viewport fit",
+            "stage_strategy": "1920x1080 fixed 16:9 coordinate stage with explicit top-left transform origin and viewport-fit scale",
             "min_body_px_at_1280_stage": 18,
             "overflow_policy": "fit stage without hidden/clipped slide content; page overflow is intentionally disabled",
-            "content_parity_policy": "same slide_plan titles, anchors, and proof objects as the PPTX/SVG source",
+            "content_parity_policy": "same slide_plan titles, anchors, and proof objects as the source contract",
+            "background_decoration_budget": {
+                "level": "quiet",
+                "decorative_line_families_max_body": 0,
+                "standalone_line_segments_max_body": 0,
+                "safe_area_clearance_px_min_1280x720": 32,
+            },
             "browser_screenshots": screenshots_out,
             "screenshot_warning": screenshot_warning,
         },
         "external_skill_dependency": "none",
     }
     write_json(project / "html_delivery_manifest.json", manifest)
-    status = STATUS_EXPORTED if not screenshot_warning else STATUS_FAILED
+    status = STATUS_EXPORTED if not screenshot_warning and validation.get("status") == "passed" else STATUS_FAILED
     return {
         "status": status,
         "path": rel(project, export_path),
         "index": rel(project, html_path),
         "manifest": "html_delivery_manifest.json",
+        "html_design_kernel": "html_design_kernel.json",
+        "html_source_map": "html_source_map.json",
+        "validation": validation,
         "warning": screenshot_warning,
     }
 
@@ -476,14 +977,25 @@ def cached_formal_html(
     project: Path,
     slug: str,
     title: str,
-    source: str,
+    slides: list[dict[str, Any]],
     svgs: list[Path],
     screenshots: bool,
 ) -> dict[str, Any] | None:
     html_path = project / "html" / "index.html"
     export_path = project / "exports" / f"{slug}.html"
     manifest_path = project / "html_delivery_manifest.json"
-    if not html_path.exists() or not export_path.exists() or not manifest_path.exists():
+    kernel_path = project / "html_design_kernel.json"
+    source_map_path = project / "html_source_map.json"
+    validation_json = project / "reports" / "html_deck_validation.json"
+    validation_md = project / "reports" / "html_deck_validation.md"
+    if (
+        not html_path.exists()
+        or not export_path.exists()
+        or not manifest_path.exists()
+        or not kernel_path.exists()
+        or not source_map_path.exists()
+        or not validation_json.exists()
+    ):
         return None
     try:
         manifest = read_json(manifest_path)
@@ -493,7 +1005,8 @@ def cached_formal_html(
         return None
     if manifest.get("mode") != "semantic_html_deck":
         return None
-    if manifest.get("title") != title or manifest.get("slide_count") != len(svgs):
+    slide_count = len(slides) if slides else len(svgs)
+    if manifest.get("title") != title or manifest.get("slide_count") != slide_count:
         return None
     inputs = svgs + [
         project / "slide_plan.json",
@@ -502,7 +1015,9 @@ def cached_formal_html(
         project / "spec_lock.json",
         Path(__file__).resolve(),
     ]
-    outputs = [html_path, export_path, manifest_path]
+    outputs = [html_path, export_path, manifest_path, kernel_path, source_map_path, validation_json]
+    if validation_md.exists():
+        outputs.append(validation_md)
     readability = manifest.get("readability_qa") if isinstance(manifest.get("readability_qa"), dict) else {}
     if screenshots:
         if readability.get("screenshot_warning"):
@@ -519,7 +1034,10 @@ def cached_formal_html(
         "path": rel(project, export_path),
         "index": rel(project, html_path),
         "manifest": "html_delivery_manifest.json",
-        "cache": {"status": "reused", "reason": "formal HTML outputs are fresh for unchanged SVG source"},
+        "html_design_kernel": "html_design_kernel.json",
+        "html_source_map": "html_source_map.json",
+        "validation": "reports/html_deck_validation.json",
+        "cache": {"status": "reused", "reason": "formal HTML outputs are fresh for unchanged source contracts"},
     }
 
 
@@ -968,7 +1486,7 @@ def build_bundle(
         "deliverable_policy": {
             "pptx": "editable PPTX source of truth when present",
             "pdf": "portable viewing/export artifact generated from PPTX",
-            "html": "formal semantic web deck generated from inline SVG when SVG pages exist",
+            "html": "formal semantic web deck generated as native DOM from slide_plan.json; full-page SVG is compatibility fallback only",
             "html-parity": "preview-only browser parity artifact generated from rendered PPTX previews",
             "keynote": "macOS Keynote import/export artifact; failure is recorded as missing evidence or failed evidence",
         },

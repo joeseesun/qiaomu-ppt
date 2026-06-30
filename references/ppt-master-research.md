@@ -2,11 +2,9 @@
 
 This document records what Qiaomu PPT learned from the local study of `hugohe3/ppt-master`. It is an adaptation map. The upstream skill is not a runtime dependency; selected MIT-licensed SVG/PPTX infrastructure may be vendored with attribution in `NOTICE.md`.
 
-Upstream studied locally at:
-
-```text
-/Users/joe/Documents/Qiaomu PPT Skill/research/ppt-master
-```
+Upstream was studied from a local checkout of the public `hugohe3/ppt-master`
+repository. The local checkout path is intentionally not part of this public
+skill.
 
 Latest refresh for this learning note also inspected a fresh sparse shallow
 clone at `/tmp/ppt-master-latest-study` on 2026-06-25, remote `main` at

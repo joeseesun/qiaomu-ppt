@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-06-30",
+  "purpose": "Reusable NotebookLM slide-deck style prompts for qiaomu-ppt. Prompts are written in Chinese because qiaomu-ppt is Chinese-first, but aliases include common English style names.",
+  "usage": "Pass an id with scripts/notebooklm_deck.py --style-preset <id>, or let --style natural language match aliases.",
+  "research_sources": [
+    {
+      "title": "Generate a Slide Deck in NotebookLM - NotebookLM Help",
+      "url": "https://support.google.com/notebooklm/answer/16757456?hl=en",
+      "note": "Official capability reference for NotebookLM slide-deck prompts and PPTX download."
+    },
+    {
+      "title": "PowerPoint Tips to Present Like a Pro - HubSpot",
+      "url": "https://blog.hubspot.com/marketing/easy-powerpoint-design-tricks-ht",
+      "note": "General presentation-design principles such as visual theme, concise text, fonts, whitespace, and visual emphasis."
+    },
+    {
+      "title": "How to Make a Good Presentation - Visme",
+      "url": "https://www.visme.co/blog/presentation-design/",
+      "note": "General presentation-design guidance used to keep presets practical across business, teaching, and storytelling scenarios."
+    }
+  ],
+  "global_prompt_rules": [
+    "风格必须落实为版式、图像语言、颜色、字体气质、图解方式和信息密度，而不是只写在标题里。",
+    "风格描述、生成要求、受众说明和工具流程说明只是内部生成指令，不得成为幻灯片画布上的标题、副标题、标签、脚注或章节名；可见文字必须来自来源内容中的观众判断、概念名称、证据锚点和行动结论。",
+    "每页保留一个核心判断或动作，避免模板化装饰和无意义图标堆叠。",
+    "不要在幻灯片画布上出现 NotebookLM、Google、source id、生成流程、提示词说明或工具水印。"
+  ],
+  "styles": [
+    {
+      "id": "executive_consulting",
+      "name_zh": "高管咨询风",
+      "aliases": ["高管", "咨询", "麦肯锡", "mckinsey", "consulting", "board", "executive"],
+      "best_for": "战略汇报、董事会材料、管理层决策、商业分析",
+      "prompt": "整体采用高管咨询汇报风格：克制、清晰、决策导向。每页标题必须是结论句，不是主题标签；正文压缩成 3-5 个要点；优先使用问题-洞察-建议、2x2 矩阵、对比表、路线图、关键指标卡和带注释的数据图。配色以中性浅底、深色文字和一个强调色为主，不使用花哨装饰。每页都要回答“所以管理者应该做什么”。"
+    },
+    {
+      "id": "data_storytelling",
+      "name_zh": "数据故事风",
+      "aliases": ["数据故事", "数据可视化", "data story", "chart", "dataviz", "dashboard"],
+      "best_for": "研究报告、市场分析、运营复盘、增长/财务数据",
+      "prompt": "整体采用数据故事风格：每页围绕一个数据洞察展开。优先使用带注释的柱状图、折线图、漏斗、瀑布、排名、热力图或关键数字对比；图表必须有明确结论标题、单位、时间范围和高亮点。少用大段文字，把解释写成图旁短注释。避免把表格截图当成主视觉，复杂数据要拆成多页逐步讲。"
+    },
+    {
+      "id": "warm_minimal",
+      "name_zh": "温暖极简风",
+      "aliases": ["极简", "温暖极简", "minimal", "minimalist", "clean", "warm minimal"],
+      "best_for": "公司内训、业务简报、知识分享、正式但不冷冰冰的场景",
+      "prompt": "整体采用温暖极简风格：大留白、清晰层级、柔和中性色、少量圆角几何和一个克制强调色。每页只保留必要文字和一个核心视觉元素；标题短、字号大、正文行距舒展。避免冷冰冰的纯白模板和密集项目符号，让页面在会议室、邮件附件和手机上都易读。"
+    },
+    {
+      "id": "editorial_magazine",
+      "name_zh": "杂志编辑风",
+      "aliases": ["杂志", "编辑风", "editorial", "magazine", "print", "folio"],
+      "best_for": "趋势报告、人物/品牌故事、研究洞察、读物型 deck",
+      "prompt": "整体采用高质量杂志编辑风格：宽边距、非对称网格、强图片层级、短引文、页码/章节感和精致标题排版。每页像一张可阅读的杂志跨页：一个主标题、一个醒目的图片或数据锚点、少量正文说明。适当使用衬线标题或优雅字体气质，但保证中文可读。"
+    },
+    {
+      "id": "product_launch",
+      "name_zh": "产品发布风",
+      "aliases": ["产品发布", "发布会", "launch", "product launch", "keynote"],
+      "best_for": "新品发布、功能发布、品牌发布、产品愿景",
+      "prompt": "整体采用产品发布会风格：强首屏、少字、大标题、清晰卖点、节奏感强。每页突出一个产品变化或用户收益，优先使用大图主视觉、功能分解、前后对比、使用场景、价值主张和 CTA。避免报告式长段落；让观众即使远距离看投影也能抓住重点。"
+    },
+    {
+      "id": "startup_pitch",
+      "name_zh": "创业融资风",
+      "aliases": ["融资", "pitch", "startup", "investor pitch", "demo day"],
+      "best_for": "融资路演、Demo Day、创业项目介绍",
+      "prompt": "整体采用创业融资路演风格：问题要尖锐，解决方案要直接，市场、牵引力、商业模式和团队优势要可扫读。结构优先按 Problem → Solution → Why Now → Market → Product → Traction → Business Model → Ask 展开。版式使用大数字、市场地图、用户旅程、竞品坐标、里程碑和资金用途图。语气自信但不夸张。"
+    },
+    {
+      "id": "academic_conference",
+      "name_zh": "学术会议风",
+      "aliases": ["学术", "论文", "conference", "academic", "defense", "research"],
+      "best_for": "论文汇报、答辩、学术会议、研究组分享",
+      "prompt": "整体采用学术会议风格：来源严谨、结构清楚、方法和发现分离。每页标题写成研究发现或问题，不写泛泛章节名；优先使用研究问题、方法框架、实验流程、结果图、局限性和未来工作。保留必要术语、变量和引用锚点，但避免把论文正文搬到页面上。"
+    },
+    {
+      "id": "teaching_whiteboard",
+      "name_zh": "教学白板风",
+      "aliases": ["教学", "课件", "白板", "whiteboard", "lecture", "training"],
+      "best_for": "课程、培训、概念解释、入门教学",
+      "prompt": "整体采用白板线稿图解风格：白色画布、手写感线条、定义框、步骤箭头、对错对比和少量引导性问题。每页只推进一个知识台阶，用短标题和少量标签承载观众需要理解的判断；复杂概念拆成“直觉入口、关键术语、例子验证”。"
+    },
+    {
+      "id": "stick_figure_explainer",
+      "name_zh": "火柴人图解风",
+      "aliases": ["火柴人", "stick", "stick figure", "简笔人", "小人图解"],
+      "best_for": "流程解释、轻松科普、用户故事、复杂概念简化",
+      "prompt": "整体采用清晰的火柴人/简笔人图解风格：黑白线条为主，人物、流程和冲突用极简 stick figure 表达；每页只保留一个核心动作或关系。用箭头、分镜、对话气泡、手写感短标签和少量高亮色帮助理解。不要做写实插画，也不要堆叠复杂图标。"
+    },
+    {
+      "id": "technical_blueprint",
+      "name_zh": "技术蓝图风",
+      "aliases": ["技术", "架构", "蓝图", "blueprint", "system design", "architecture"],
+      "best_for": "技术架构、系统设计、开发者汇报、AI/云/数据平台说明",
+      "prompt": "整体采用技术蓝图风格：逻辑精密、结构分层、图解优先。优先使用架构图、模块关系、数据流、时序图、能力分层、接口边界和风险清单。可以使用深色或浅色工程画布、细线连接和代码/配置片段，但每条线都必须有语义；不要使用纯装饰网格或无意义科技线。"
+    },
+    {
+      "id": "workshop_playbook",
+      "name_zh": "工作坊手册风",
+      "aliases": ["工作坊", "playbook", "workshop", "手册", "操作指南", "sop"],
+      "best_for": "培训工作坊、操作手册、团队共创、方法论落地",
+      "prompt": "整体采用工作坊手册风格：行动导向、步骤清楚、可直接照着做。每页设计成一个操作单元：目标、输入、步骤、产出、检查点。优先使用流程卡、清单、画布、模板框、时间盒和复盘问题。少做口号，多给可执行动作。"
+    },
+    {
+      "id": "client_proposal",
+      "name_zh": "客户提案风",
+      "aliases": ["客户提案", "proposal", "sales deck", "方案", "client"],
+      "best_for": "销售提案、咨询方案、客户汇报、服务介绍",
+      "prompt": "整体采用客户提案风格：客户问题先行，方案收益明确，下一步清楚。每页都要把“我们能帮你解决什么”说具体。优先使用现状-问题-机会、前后对比、方案模块、交付路线、案例证据、费用/范围说明和行动建议。视觉要专业可信，不要像广告海报。"
+    },
+    {
+      "id": "board_finance",
+      "name_zh": "董事会财务风",
+      "aliases": ["董事会", "财务", "board finance", "financial", "quarterly review", "qbr"],
+      "best_for": "季度经营会、财务汇报、预算会、投资委员会",
+      "prompt": "整体采用董事会财务汇报风格：严谨、可追责、重趋势和决策。每页突出一个经营判断，优先使用 KPI 卡、预算/实际差异、趋势图、风险矩阵、情景分析和决策选项。颜色克制，高亮只用于异常、风险或关键机会。不要用营销化大图稀释数字可信度。"
+    },
+    {
+      "id": "brutalist_newsprint",
+      "name_zh": "粗粝报刊风",
+      "aliases": ["报刊", "brutalist", "newsprint", "黑白红", "newspaper"],
+      "best_for": "观点表达、趋势批判、深度文章转演讲、强态度报告",
+      "prompt": "整体采用粗粝报刊/Brutalist 风格：高对比黑白、少量红色强调、大字号标题、报纸栏格、引文框和硬朗分割。适合表达强观点和批判性判断。每页要有新闻标题式结论、证据摘要和视觉冲击；避免花哨渐变和柔和商务模板。"
+    },
+    {
+      "id": "modern_3d_icon",
+      "name_zh": "现代 3D 图标风",
+      "aliases": ["3d", "3D", "立体图标", "3d icon", "object"],
+      "best_for": "产品功能、SaaS 说明、概念模块、轻量商业介绍",
+      "prompt": "整体采用现代 3D 图标/对象风格：用少量高质量 3D 图标或立体对象代表关键概念，配合干净背景和清晰文字层级。每页最多一个主 3D 对象或一组同风格小对象；图像服务于概念理解，不要把页面做成装饰素材展览。"
+    },
+    {
+      "id": "handmade_craft",
+      "name_zh": "手作拼贴风",
+      "aliases": ["手作", "拼贴", "craft", "collage", "anti-ai", "handmade"],
+      "best_for": "创意提案、品牌人格、文化趋势、反 AI 味设计",
+      "prompt": "整体采用手作拼贴/人味设计风格：纸张纹理、手写感标注、照片拼贴、胶带/剪贴层次、自然不完美边缘和温暖色彩。页面要有手工制作感，但信息结构仍然清楚。适合强调真实、创造力、人的经验和反模板化气质。"
+    },
+    {
+      "id": "glass_dashboard",
+      "name_zh": "轻玻璃仪表盘风",
+      "aliases": ["玻璃", "glass", "glassmorphism", "dashboard ui", "saas"],
+      "best_for": "SaaS 产品、数据看板、AI 工具、平台能力展示",
+      "prompt": "整体采用克制的轻玻璃仪表盘风格：深浅对比清晰、半透明面板少量使用、数据卡片和产品 UI 感强，但不能让玻璃效果影响文字可读性。优先展示指标、模块、流程状态和产品界面结构。避免整页都是模糊玻璃卡片。"
+    },
+    {
+      "id": "mobile_first_accessible",
+      "name_zh": "移动优先高可读风",
+      "aliases": ["移动端", "手机", "可读", "accessible", "mobile first", "accessibility"],
+      "best_for": "微信/移动阅读、异步分享、短汇报、给非现场观众阅读",
+      "prompt": "整体采用移动优先高可读风格：大字号、强对比、短标题、单列或双列布局、每页只讲一个重点。所有文字在手机截图中也必须清楚，图表要简化并直接标注结论。避免小脚注、密集表格、复杂背景和过度动画感。"
+    },
+    {
+      "id": "cinematic_story",
+      "name_zh": "电影叙事风",
+      "aliases": ["电影", "叙事", "cinematic", "storytelling", "visual story"],
+      "best_for": "主题演讲、品牌故事、人物/事件叙事、长文转演讲",
+      "prompt": "请把整套演示文稿做成同一部电影的连续分镜：统一影调、统一字体气质、统一画面语言。每页像一个镜头，用少字标题、场景感画面和情绪转场推进故事；不要每页换一种视觉风格。"
+    },
+    {
+      "id": "social_card_deck",
+      "name_zh": "社交媒体卡片风",
+      "aliases": ["小红书", "社交卡片", "social", "carousel", "card deck", "xhs"],
+      "best_for": "社媒分享、知识卡片、短内容拆解、朋友圈/小红书预览",
+      "prompt": "整体采用社交媒体卡片风格：每页都是可独立截图传播的知识卡片，标题抓人、正文短、重点突出。使用强封面、编号步骤、金句页、对比页和总结清单。注意保持 16:9 PPT 可读，不要堆太多贴纸式装饰；如果要转竖版，保留足够安全边距。"
+    }
+  ]
+}

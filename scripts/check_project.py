@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -206,6 +207,10 @@ VISIBLE_PRODUCTION_JARGON = [
     ("图版标签", r"(?:复原|化石|骨骼|证据)?图版[：:]?"),
     ("讲解顺序", r"讲解顺序[：:]?"),
     ("证据编号栏", r"证据\s*\d{1,2}\s*/"),
+    (
+        "NotebookLM 风格提示泄漏",
+        r"(像老师|老师.{0,8}白板|讲清一个概念|白板讲解风|教学白板风|手绘白板图解风|白板线稿图解|手绘极简少字版|创意方向|内部视觉方向|可读性要求|视觉要求|结构要求|少字硬约束)",
+    ),
 ]
 VISUAL_ASSET_REQUIRED_FIELDS = [
     "asset_id",
@@ -249,6 +254,27 @@ TITLE_SELECTOR_TOKENS = (
     "cover-sub",
     "closing",
 )
+HTML_FORMAT_NAMES = {
+    "html",
+    "semantic_html",
+    "semantic-html",
+    "formal_html",
+    "formal-html",
+    "html_deck",
+    "semantic_html_deck",
+}
+NON_HTML_DELIVERY_FORMATS = {
+    "ppt",
+    "pptx",
+    "powerpoint",
+    "pdf",
+    "key",
+    "keynote",
+    "html-parity",
+    "html_parity",
+    "parity-html",
+    "parity_html",
+}
 
 
 def read_text(path: Path) -> str:
@@ -258,6 +284,108 @@ def read_text(path: Path) -> str:
 def load_json(path: Path) -> Any:
     with path.open("r", encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def normalize_format_name(value: Any) -> str:
+    return str(value or "").strip().lower().replace(" ", "_")
+
+
+def semantic_html_route_info(root: Path) -> dict[str, Any]:
+    """Detect whether the project intentionally requested formal HTML only."""
+    info: dict[str, Any] = {
+        "semantic_html_manifest": False,
+        "semantic_html_only": False,
+        "requested_formats": [],
+        "last_requested_formats": [],
+        "formats": [],
+        "successful_non_html_formats": [],
+        "requested_non_html_formats": [],
+        "non_html_outputs": [],
+    }
+    html_manifest_path = root / "html_delivery_manifest.json"
+    if html_manifest_path.exists():
+        try:
+            manifest = load_json(html_manifest_path)
+            info["semantic_html_manifest"] = isinstance(manifest, dict) and manifest.get("mode") == "semantic_html_deck"
+        except Exception:
+            info["semantic_html_manifest"] = False
+
+    export_manifest_path = root / "export_manifest.json"
+    formats: dict[str, Any] = {}
+    if export_manifest_path.exists():
+        try:
+            export_manifest = load_json(export_manifest_path)
+        except Exception:
+            export_manifest = {}
+        if isinstance(export_manifest, dict):
+            for key in ("requested_formats", "last_requested_formats"):
+                raw = export_manifest.get(key)
+                normalized = [normalize_format_name(item) for item in raw] if isinstance(raw, list) else []
+                info[key] = [item for item in normalized if item]
+            raw_formats = export_manifest.get("formats")
+            formats = raw_formats if isinstance(raw_formats, dict) else {}
+            info["formats"] = [normalize_format_name(name) for name in formats.keys()]
+
+    requested_all = set(info["requested_formats"]) | set(info["last_requested_formats"])
+    info["requested_non_html_formats"] = sorted(
+        item for item in requested_all if item and item not in HTML_FORMAT_NAMES
+    )
+    for name, item in formats.items():
+        normalized = normalize_format_name(name)
+        if normalized not in NON_HTML_DELIVERY_FORMATS:
+            continue
+        status = str(item.get("status") or "").lower() if isinstance(item, dict) else ""
+        if status in {"existing", "exported", "success"}:
+            info["successful_non_html_formats"].append(normalized)
+
+    export_dir = root / "exports"
+    if export_dir.exists():
+        for pattern in ("*.ppt", "*.pptx", "*.pdf", "*.key"):
+            info["non_html_outputs"].extend(str(path.relative_to(root)) for path in export_dir.glob(pattern))
+
+    info["semantic_html_only"] = bool(
+        info["semantic_html_manifest"]
+        and not info["requested_non_html_formats"]
+        and not info["successful_non_html_formats"]
+        and not info["non_html_outputs"]
+    )
+    return info
+
+
+def is_codex_runtime() -> bool:
+    return any(os.environ.get(name) for name in ("CODEX_THREAD_ID", "CODEX_SHELL", "CODEX_CI"))
+
+
+def is_codex_native_image_asset(item: dict[str, Any]) -> bool:
+    blob = " ".join(
+        str(item.get(key) or "")
+        for key in (
+            "asset_id",
+            "filename",
+            "path",
+            "source",
+            "source_path",
+            "generated_asset_source",
+            "original_source",
+            "generator",
+            "provider",
+            "notes",
+            "generation_note",
+            "rights_notes",
+        )
+    ).lower()
+    return any(
+        token in blob
+        for token in (
+            "codex-native",
+            "codex-imagegen",
+            "codex_imagegen",
+            "codex image_gen",
+            "image_gen",
+            ".codex/generated_images",
+            "/.codex/generated_images/",
+        )
+    )
 
 
 def artifact_mtime(path: Path) -> float:
@@ -1154,7 +1282,16 @@ def check_visual_asset_manifest(
     ai_generated_count = 0
     procedural_fallback_count = 0
     real_imagegen_count = 0
+    codex_native_imagegen_count = 0
     needs_manual: list[str] = []
+    codex_runtime = is_codex_runtime()
+    slide_count = 0
+    try:
+        slide_plan = load_json(root / "slide_plan.json")
+        slide_count = len(iter_slides(slide_plan))
+    except Exception:
+        slide_count = 0
+    codex_native_target = max(3, round(slide_count * 0.2)) if slide_count > 8 else (1 if slide_count >= 4 else 0)
     for idx, item in enumerate(items, start=1):
         if not isinstance(item, dict):
             failures.append(f"visual asset item {idx} must be an object")
@@ -1221,6 +1358,8 @@ def check_visual_asset_manifest(
                     procedural_fallback_count += 1
                 elif generator:
                     real_imagegen_count += 1
+                    if is_codex_native_image_asset(item):
+                        codex_native_imagegen_count += 1
 
         if acquire_via == "web" and status == "Sourced" and not item.get("license_tier"):
             failures.append(f"web visual asset item {idx} is Sourced but missing license_tier")
@@ -1236,6 +1375,9 @@ def check_visual_asset_manifest(
     evidence["visual_asset_statuses"] = statuses
     evidence["ai_generated_count"] = ai_generated_count
     evidence["real_imagegen_count"] = real_imagegen_count
+    evidence["codex_runtime"] = codex_runtime
+    evidence["codex_native_imagegen_count"] = codex_native_imagegen_count
+    evidence["codex_native_imagegen_target"] = codex_native_target if codex_runtime else 0
     evidence["procedural_fallback_count"] = procedural_fallback_count
     evidence["needs_manual_assets"] = needs_manual
     if needs_manual:
@@ -1291,6 +1433,15 @@ def check_visual_asset_manifest(
                 warnings.append(message)
         if require_real_imagegen and ai_generated_count and not real_imagegen_count:
             failures.append("strict image generation check requires at least one non-procedural generated AI asset")
+
+    if require_real_imagegen and codex_runtime and codex_native_target and codex_native_imagegen_count < codex_native_target:
+        failures.append(
+            "Codex runtime strict image generation check requires Codex-native image_gen assets on key pages: "
+            f"{codex_native_imagegen_count}/{codex_native_target}. "
+            "Use the Codex image generation tool and record generator=codex-native-image_gen plus "
+            "generated_asset_source; content-only slides, external-provider-only images, source-derived graphics, "
+            "SVG, and shapes do not satisfy final/professional production."
+        )
 
     return failures, warnings, evidence
 
@@ -1375,9 +1526,18 @@ def check_layout_execution_contract(root: Path, slides: list[dict[str, Any]]) ->
     evidence: dict[str, Any] = {}
     spec_path = root / "spec_lock.json"
     svg_present = has_svg_pages(root)
+    route_info = semantic_html_route_info(root)
+    html_only = bool(route_info.get("semantic_html_only"))
     evidence["svg_pages_present"] = svg_present
+    evidence["delivery_route"] = route_info
 
     if not spec_path.exists():
+        if html_only:
+            evidence["layout_contract_policy"] = (
+                "semantic_html_only: layout_execution_contract is optional; use html_layout_intent, "
+                "html_design_kernel, html_source_map, and browser screenshots as primary layout evidence"
+            )
+            return failures, warnings, evidence
         if svg_present:
             failures.append("SVG/PPTX-oriented project needs spec_lock.json with layout_execution_contract")
         elif len(slides) > 8:
@@ -1393,6 +1553,16 @@ def check_layout_execution_contract(root: Path, slides: list[dict[str, Any]]) ->
 
     contract = spec.get("layout_execution_contract")
     if not isinstance(contract, dict):
+        if html_only:
+            evidence["layout_contract_policy"] = (
+                "semantic_html_only: spec_lock may contain lightweight html_layout_intent; "
+                "layout_execution_contract with absolute coordinate slots is not required"
+            )
+            if not isinstance(spec.get("html_layout_intent"), dict):
+                warnings.append(
+                    "semantic HTML spec_lock should include lightweight html_layout_intent when layout_execution_contract is omitted"
+                )
+            return failures, warnings, evidence
         if svg_present or len(slides) > 8:
             failures.append("spec_lock.json missing layout_execution_contract")
         else:
@@ -1608,6 +1778,7 @@ def visible_policy_patterns(root: Path) -> list[tuple[str, str]]:
 
 
 def scan_visible_policy_text(text: str, patterns: list[tuple[str, str]]) -> list[str]:
+    text = strip_non_visible_payloads(text)
     hits: list[str] = []
     for label, pattern in patterns:
         if re.search(pattern, text, flags=re.IGNORECASE):
@@ -1915,6 +2086,12 @@ def check_export_manifest(root: Path) -> tuple[list[str], list[str], dict[str, A
         candidate = root / str(pptx_item.get("path"))
         if candidate.exists():
             pptx_path = candidate
+        cleanup_report = str(pptx_item.get("watermark_cleanup_report") or "")
+        if manifest.get("route") == "notebooklm_native_slide_deck":
+            if not cleanup_report:
+                warnings.append("NotebookLM PPTX export should record watermark_cleanup_report")
+            elif not (root / cleanup_report).exists():
+                failures.append(f"NotebookLM watermark cleanup report missing: {cleanup_report}")
 
     requested = manifest.get("requested_formats", [])
     if requested and not isinstance(requested, list):
@@ -1974,6 +2151,35 @@ def check_export_manifest(root: Path) -> tuple[list[str], list[str], dict[str, A
             warnings.append("export_manifest.json keynote failure should include diagnostic_command")
 
     return failures, warnings, evidence
+
+
+def export_manifest_allows_image_backed_pptx(manifest: dict[str, Any] | None) -> tuple[bool, str]:
+    if not isinstance(manifest, dict):
+        return False, ""
+    route = str(manifest.get("route") or "")
+    formats = manifest.get("formats")
+    pptx_item = formats.get("pptx") if isinstance(formats, dict) else None
+    if route == "notebooklm_native_slide_deck":
+        return True, route
+    if isinstance(pptx_item, dict) and pptx_item.get("image_backed_ok") is True:
+        return True, "export_manifest.formats.pptx.image_backed_ok"
+    return False, ""
+
+
+def detect_notebooklm_native_project(root: Path) -> dict[str, Any]:
+    manifest_path = root / "export_manifest.json"
+    if not manifest_path.exists():
+        return {"is_notebooklm_native": False}
+    try:
+        manifest = load_json(manifest_path)
+    except Exception:
+        return {"is_notebooklm_native": False}
+    allowed, reason = export_manifest_allows_image_backed_pptx(manifest if isinstance(manifest, dict) else None)
+    return {
+        "is_notebooklm_native": bool(allowed),
+        "reason": reason,
+        "route": manifest.get("route") if isinstance(manifest, dict) else "",
+    }
 
 
 def iter_pptx_visible_text(path: Path) -> tuple[list[tuple[int, str]], str | None]:
@@ -2149,10 +2355,13 @@ def check_quality_benchmark_gate(root: Path, slide_count: int) -> tuple[list[str
     failures: list[str] = []
     warnings: list[str] = []
     intent = detect_quality_intent(root, slide_count)
+    route_info = semantic_html_route_info(root)
+    html_only = bool(route_info.get("semantic_html_only"))
     benchmark_path = root / "reports" / "deck_quality_benchmark.json"
     repair_path = root / "reports" / "deck_repair_plan.json"
     evidence: dict[str, Any] = {
         "intent": intent,
+        "delivery_route": route_info,
         "benchmark": str(benchmark_path.relative_to(root)) if benchmark_path.exists() else "",
         "repair_plan": str(repair_path.relative_to(root)) if repair_path.exists() else "",
     }
@@ -2162,6 +2371,12 @@ def check_quality_benchmark_gate(root: Path, slide_count: int) -> tuple[list[str
     high_intent = threshold > 0
     if not benchmark_path.exists():
         message = "reports/deck_quality_benchmark.json missing; cannot prove content depth, image density, style execution, and layout rhythm"
+        if html_only:
+            warnings.append(
+                message
+                + "; semantic_html_only treats this benchmark as advisory and uses validate_html_deck.py plus browser screenshots as primary evidence"
+            )
+            return failures, warnings, evidence
         if high_intent:
             failures.append(message)
         else:
@@ -2190,12 +2405,17 @@ def check_quality_benchmark_gate(root: Path, slide_count: int) -> tuple[list[str
         }
     )
     effective_threshold = max(threshold, benchmark_target if benchmark_target >= 75 else 0)
-    benchmark_enforced = high_intent or benchmark_target >= 75
+    benchmark_enforced = (high_intent or benchmark_target >= 75) and not html_only
     if benchmark_enforced and score < effective_threshold:
         failures.append(f"deck_quality_benchmark score {score} below required {effective_threshold} for {intent['mode']}")
+    elif html_only and effective_threshold and score < effective_threshold:
+        warnings.append(
+            f"deck_quality_benchmark score {score} below advisory target {effective_threshold}; "
+            "semantic_html_only does not enforce PPTX/PDF/image-generation-oriented benchmark caps"
+        )
     elif not high_intent and score < 70:
         warnings.append(f"deck_quality_benchmark score {score} is weak; review repair plan before final delivery")
-    if intent.get("mode") == "ppt_master_grade" and not ppt_master_ready:
+    if intent.get("mode") == "ppt_master_grade" and not ppt_master_ready and not html_only:
         failures.append("project claims ppt_master_grade but benchmark does not mark ppt_master_ready")
 
     if repair_path.exists():
@@ -2216,7 +2436,7 @@ def check_quality_benchmark_gate(root: Path, slide_count: int) -> tuple[list[str
                 "deck_repair_plan contains critical repair actions: "
                 + ", ".join(str(item.get("action_id") or item.get("title") or "critical") for item in critical[:5])
             )
-    elif high_intent:
+    elif high_intent and not html_only:
         warnings.append("reports/deck_repair_plan.json missing; high-design/final decks should record repair actions after benchmark")
     return failures, warnings, evidence
 
@@ -2227,19 +2447,38 @@ def check_project(root: Path, *, require_real_imagegen: bool = False) -> dict[st
     warnings: list[str] = []
     evidence: dict[str, Any] = {"root": str(root)}
     visible_text_patterns = visible_policy_patterns(root)
+    notebooklm_native = detect_notebooklm_native_project(root)
+    is_notebooklm_native = bool(notebooklm_native.get("is_notebooklm_native"))
+    delivery_route = semantic_html_route_info(root)
+    semantic_html_only = bool(delivery_route.get("semantic_html_only"))
+    evidence["notebooklm_native"] = notebooklm_native
+    evidence["delivery_route"] = delivery_route
 
-    for name in REQUIRED_ROOT:
-        if not (root / name).exists():
-            failures.append(f"missing required artifact: {name}")
+    if is_notebooklm_native:
+        for name in (
+            "notebooklm_generation_manifest.json",
+            "notebooklm_slide_prompt.txt",
+            "reports/notebooklm_watermark_cleanup.json",
+            "export_manifest.json",
+        ):
+            if not (root / name).exists():
+                failures.append(f"missing required NotebookLM-native artifact: {name}")
+    else:
+        for name in REQUIRED_ROOT:
+            if not (root / name).exists():
+                failures.append(f"missing required artifact: {name}")
 
     deck_brief_text = read_text(root / "deck_brief.md") if (root / "deck_brief.md").exists() else ""
-    source_failures, source_warnings, source_evidence = check_source_manifest(root, deck_brief_text)
-    failures.extend(source_failures)
-    warnings.extend(source_warnings)
-    evidence["source_manifest"] = source_evidence
+    if is_notebooklm_native:
+        evidence["source_manifest"] = {"skipped": True, "reason": "NotebookLM-native route records sources in notebooklm_generation_manifest.json"}
+    else:
+        source_failures, source_warnings, source_evidence = check_source_manifest(root, deck_brief_text)
+        failures.extend(source_failures)
+        warnings.extend(source_warnings)
+        evidence["source_manifest"] = source_evidence
 
     recommendations_path = root / "style_recommendations.json"
-    if recommendations_path.exists():
+    if recommendations_path.exists() and not is_notebooklm_native:
         try:
             recommendations = load_json(recommendations_path)
             top = recommendations.get("top", []) if isinstance(recommendations, dict) else []
@@ -2342,6 +2581,15 @@ def check_project(root: Path, *, require_real_imagegen: bool = False) -> dict[st
     failures.extend(export_manifest_failures)
     warnings.extend(export_manifest_warnings)
     evidence.update(export_manifest_evidence)
+    export_manifest_payload = export_manifest_evidence.get("export_manifest")
+    image_backed_pptx_allowed, image_backed_reason = export_manifest_allows_image_backed_pptx(
+        export_manifest_payload if isinstance(export_manifest_payload, dict) else None
+    )
+    if image_backed_pptx_allowed:
+        evidence["pptx_image_backed_exception"] = {
+            "allowed": True,
+            "reason": image_backed_reason,
+        }
 
     benchmark_failures, benchmark_warnings, benchmark_evidence = check_quality_benchmark_gate(root, len(slides))
     failures.extend(benchmark_failures)
@@ -2408,9 +2656,9 @@ def check_project(root: Path, *, require_real_imagegen: bool = False) -> dict[st
         parity_html_exports.extend((root / "html-parity").glob("*.html"))
     evidence["html_exports"] = [str(path.relative_to(root)) for path in html_exports]
     evidence["html_parity_exports"] = [str(path.relative_to(root)) for path in parity_html_exports]
-    if not exports:
+    if not exports and not semantic_html_only:
         warnings.append("no PPTX export found; mark editable PPTX export as missing evidence if required")
-    if len(slides) > 0 and not html_exports:
+    if len(slides) > 0 and not html_exports and not image_backed_pptx_allowed:
         warnings.append("no formal semantic HTML presentation export found; normal PPT runs should produce one unless explicitly forbidden")
 
     parity_manifest = root / "html_parity_manifest.json"
@@ -2463,7 +2711,12 @@ def check_project(root: Path, *, require_real_imagegen: bool = False) -> dict[st
                     failures.append("pptx_text_check.json reports failures")
                 editability = text_check.get("editability", {})
                 if isinstance(editability, dict) and editability.get("image_backed_ratio", 0) >= 0.8:
-                    failures.append("PPTX text check reports a mostly image-backed deck; normal editable PPTX must use native foreground objects")
+                    if image_backed_pptx_allowed:
+                        warnings.append(
+                            "PPTX text check reports a mostly image-backed deck; allowed by explicit NotebookLM/native image-backed route"
+                        )
+                    else:
+                        failures.append("PPTX text check reports a mostly image-backed deck; normal editable PPTX must use native foreground objects")
             except Exception as exc:
                 failures.append(f"invalid pptx_text_check.json: {exc}")
         else:
@@ -2478,9 +2731,14 @@ def check_project(root: Path, *, require_real_imagegen: bool = False) -> dict[st
             else:
                 editability_reports[str(export.relative_to(root))] = editability
                 if editability.get("image_backed_ratio", 0) >= 0.8:
-                    failures.append(
-                        f"{export.relative_to(root)} is mostly whole-slide raster images; label it as image-backed preview/social output, not editable PPTX"
-                    )
+                    if image_backed_pptx_allowed:
+                        warnings.append(
+                            f"{export.relative_to(root)} is mostly whole-slide raster images; accepted for explicit NotebookLM/native image-backed route"
+                        )
+                    else:
+                        failures.append(
+                            f"{export.relative_to(root)} is mostly whole-slide raster images; label it as image-backed preview/social output, not editable PPTX"
+                        )
             picture_aspects, picture_aspect_warning = inspect_pptx_picture_aspects(export)
             if picture_aspect_warning:
                 warnings.append(picture_aspect_warning)

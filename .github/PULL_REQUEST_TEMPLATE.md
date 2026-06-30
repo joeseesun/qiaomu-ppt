@@ -4,8 +4,9 @@
 
 ## Verification
 
-- [ ] `python3 /Users/joe/.agents/skills/qiaomu-meta-skill/scripts/validate_skill.py .`
-- [ ] `python3 /Users/joe/.agents/skills/qiaomu-meta-skill/scripts/trigger_eval.py . --cases evals/trigger_cases.json --output reports/trigger-eval.json`
+- [ ] `python3 scripts/instruction_eval.py --cases evals/instruction_cases.json --output reports/instruction-eval.json --markdown reports/instruction-eval.md`
+- [ ] `python3 scripts/source_intake_matrix_smoke.py --output reports/source_intake_matrix_smoke.json --markdown reports/source_intake_matrix_smoke.md`
+- [ ] `python3 scripts/visual_quality_regression.py`
 - [ ] `python3 scripts/url_to_markdown.py "https://example.com" --output-dir /tmp/qiaomu-ppt-url-test`
 - [ ] `python3 scripts/check_project.py <project_dir>` when generated deck artifacts are included
 

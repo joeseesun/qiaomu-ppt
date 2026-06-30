@@ -24,7 +24,7 @@
     },
     "plan": {
       "label_zh": "方案档",
-      "run_now": ["路线卡与最终交付门", "来源/事实缺口判断", "确认边界门", "content_preflight.py <project> --profile plan（进入正式大纲前）", "top_quality_plan.py <project> --profile plan（已有资料/大纲/视觉计划时）"],
+      "run_now": ["路线卡与最终交付门", "来源/事实缺口判断", "确认边界门", "默认审美决策门：根据主题/受众/证据类型/情绪温度/版式节奏选择最适合风格并记录 avoid_style", "图文融合计划门：每张主要图片必须有 content_binding、claim_to_image_link、文字安全区和 integration_move", "content_preflight.py <project> --profile plan（进入正式大纲前）", "top_quality_plan.py <project> --profile plan（已有资料/大纲/视觉计划时）"],
       "defer_until_final": ["PPTX/HTML 导出验证", "原生 Office/Keynote/WPS 验证", "图片生成完整性验证", "质量基准评分"],
       "skip_by_default": ["bootstrap.py --check", "check_project.py <project>", "pptx_preview.py", "pptx_text_check.py", "validate_html_deck.py"],
       "expensive_checks": ["LibreOffice 导出/预览转换", "浏览器截图", "图片生成", "完整质量基准"],
@@ -34,21 +34,21 @@
       "label_zh": "草稿档",
       "run_now": ["content_preflight.py <project> --profile draft", "top_quality_plan.py <project> --profile draft", "check_project.py <project>", "导出文件存在/可读检查", "关键页预览抽查"],
       "defer_until_final": ["原生 Office/Keynote/WPS 验证", "完整质量基准 85 分门槛", "全量图片出处审计"],
-      "skip_by_default": ["instruction_eval.py", "trigger_eval.py", "validate_skill.py", "Keynote 自动化验证"],
+      "skip_by_default": ["instruction_eval.py", "Keynote 自动化验证"],
       "expensive_checks": ["LibreOffice 批量预览转换", "浏览器截图", "图片生成"],
       "notes": ["草稿档用于发现结构性问题，不承诺最终可交付质量。"]
     },
     "final": {
       "label_zh": "最终档",
-      "run_now": ["content_preflight.py <project> --profile final", "top_quality_plan.py <project> --profile final", "check_project.py <project>", "最终导出清单 export_manifest.json", "路线相关预览/文本/语义验证", "质量基准和修复计划"],
+      "run_now": ["content_preflight.py <project> --profile final", "top_quality_plan.py <project> --profile final", "style_fit_audit.py <project> --enforce", "check_project.py <project>", "最终导出清单 export_manifest.json", "路线相关预览/文本/语义验证", "质量基准和修复计划", "final_status.py <project> 输出 final_status.json 和 交付检查.md"],
       "defer_until_final": [],
-      "skip_by_default": ["instruction_eval.py", "trigger_eval.py", "validate_skill.py", "PowerPoint/WPS/Keynote 原生验证，除非用户明确要求"],
+      "skip_by_default": ["instruction_eval.py", "PowerPoint/WPS/Keynote 原生验证，除非用户明确要求"],
       "expensive_checks": ["LibreOffice 导出/预览转换", "浏览器截图", "图片生成", "完整质量基准"],
       "notes": ["最终档才声称文件可交付；无法验证的原生软件或外部服务要写成 missing evidence。"]
     },
     "release": {
       "label_zh": "发布档",
-      "run_now": ["content_preflight.py <project> --profile release", "top_quality_plan.py <project> --profile release", "final 档全部检查", "公开交付包完整性检查", "敏感路径/凭证泄露检查", "用户明确要求的原生软件验证"],
+      "run_now": ["content_preflight.py <project> --profile release", "top_quality_plan.py <project> --profile release", "style_fit_audit.py <project> --enforce", "final 档全部检查", "final_status.py <project> 输出 final_status.json 和 交付检查.md", "公开交付包完整性检查", "敏感路径/凭证泄露检查", "用户明确要求的原生软件验证"],
       "defer_until_final": [],
       "skip_by_default": ["与用户交付格式无关的旁路导出"],
       "expensive_checks": ["原生 PowerPoint/WPS/Keynote 验证", "全量媒体来源复核", "发布包复验"],

@@ -51,7 +51,7 @@
     {
       "id": "data_dense_pro",
       "label": "Data-Dense Pro",
-      "best_for": ["research reports", "market analysis", "technical evidence", "metrics-heavy decks"],
+      "best_for": ["research reports", "market analysis", "technical evidence", "metrics-heavy decks", "AI implementation reports", "production KPI loops"],
       "avoid_for": ["emotional openers", "pure culture essays", "portfolio stories"],
       "visual_behavior": {
         "typography": "Tabular numerals, compact labels, strong hierarchy between claim and evidence.",
@@ -65,16 +65,16 @@
     {
       "id": "technical_terminal",
       "label": "Technical Terminal",
-      "best_for": ["developer tools", "AI infrastructure", "CLI products", "engineering explainers"],
-      "avoid_for": ["consumer culture", "children education", "luxury brand stories"],
+      "best_for": ["developer tools", "AI infrastructure", "CLI products", "engineering explainers", "field engineering", "enterprise AI implementation", "production deployment", "observability and trace workflows"],
+      "avoid_for": ["consumer culture", "children education", "luxury brand stories", "soft watercolor explainers"],
       "visual_behavior": {
         "typography": "Mono is used for code, IDs, commands, or numbered evidence, not everything by default.",
         "layout": "Command palette, logs, architecture strips, and code/evidence splits.",
-        "media": "Real code, terminal output, architecture diagrams, and product screenshots.",
+        "media": "Real code, terminal output, architecture diagrams, product screenshots, production consoles, field engineering scenes, and system cutaways.",
         "chart_policy": "Operational charts, traces, timelines, and dependency maps."
       },
       "qiaomu_archetype_fit": ["knowledge_explainer", "product_launch", "research_report"],
-      "risk": "Mono-everywhere can hurt Chinese readability; keep CJK body in a readable sans."
+      "risk": "Mono-everywhere can hurt Chinese readability; keep CJK body in a readable sans. For serious technical or operational decks, avoid soft/cute/decorative treatment unless it is an explicit concept choice with a clear rationale."
     },
     {
       "id": "cinematic_product",

@@ -16,6 +16,7 @@ from typing import Any
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_FORMATS = "pptx,pdf,html,html-parity"
+DEFAULT_OUTPUTS_ROOT = Path.home() / "Downloads" / "Qiaomu PPT"
 
 
 def utc_now() -> str:
@@ -152,8 +153,8 @@ def main() -> int:
     parser.add_argument("inputs", nargs="*", help="URLs, files, folders, or ZIP archives to ingest.")
     parser.add_argument("--input", dest="extra_inputs", action="append", default=[], help="Additional input. Can be repeated.")
     parser.add_argument("--topic", default="", help="Deck topic/title. Required when no inputs are supplied.")
-    parser.add_argument("--project", type=Path, help="Output project directory. Defaults to outputs/<date>-<slug>.")
-    parser.add_argument("--outputs-root", type=Path, default=Path("outputs"), help="Root used when --project is omitted.")
+    parser.add_argument("--project", type=Path, help="Output project directory. Defaults to ~/Downloads/Qiaomu PPT/<date>-<slug>.")
+    parser.add_argument("--outputs-root", type=Path, default=DEFAULT_OUTPUTS_ROOT, help="Root used when --project is omitted.")
     parser.add_argument("--slug", default="", help="Project/output slug.")
     parser.add_argument("--title", default="", help="Deck title for production. Defaults to --topic or prepared title.")
     parser.add_argument("--slides", type=int, default=10, help="Target slide count.")
@@ -188,7 +189,7 @@ def main() -> int:
     parser.add_argument("--max-cards-per-source", type=int, default=4)
     parser.add_argument("--skip-auto-research", action="store_true", help="For topic-only requests, write a research brief but do not fetch sources.")
     parser.add_argument("--no-auto-supplement-sources", action="store_true", help="Disable supplemental topic research when provided sources are too thin.")
-    parser.add_argument("--research-provider", choices=["auto", "brave", "wikipedia", "duckduckgo", "openalex"], default="auto")
+    parser.add_argument("--research-provider", choices=["auto", "wikipedia", "duckduckgo", "openalex"], default="auto")
     parser.add_argument("--research-depth", choices=["fast", "balanced", "deep"], default="fast")
     parser.add_argument("--research-max-pages", type=int, default=3)
     parser.add_argument("--research-per-url-timeout", type=int, default=25)

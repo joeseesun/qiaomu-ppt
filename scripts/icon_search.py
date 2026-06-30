@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import urllib.error
 import urllib.parse
@@ -16,7 +17,7 @@ import urllib.request
 from pathlib import Path
 
 
-DEFAULT_STUDIO = Path("/Users/joe/Documents/qm-icon-studio")
+DEFAULT_STUDIO = Path(os.environ.get("QM_ICON_STUDIO", str(Path.home() / "Documents" / "qm-icon-studio")))
 ICONIFY_SET_ALIASES = {
     "lucide": "lucide",
     "heroicon": "heroicons",

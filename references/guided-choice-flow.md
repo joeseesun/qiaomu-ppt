@@ -65,6 +65,7 @@ Example:
    B. 只要 PPTX
    C. HTML 优先
    D. 加 Keynote
+   E. NotebookLM 原生 PPTX/PDF（图片式，含水印清理证据）
 
 默认执行：1A 2B 3A 4A 5A。你可以回「生成」，或回「1B 2C 3A 4B 5A」。
 ```
@@ -143,9 +144,10 @@ friendly entry into it.
 
 - Guided choice selects direction, depth, length, style, image-generation/API
   policy, and delivery defaults.
-- After the guided choice reply, the next production artifact is a
-  source-grounded Markdown research dossier built from supplied material, model
-  knowledge, and web/source research when allowed.
+- After the guided choice reply, the next production artifacts are a
+  source-grounded Markdown research dossier and a source-synthesis article
+  (`content_report.md` or `内容母稿-<主题>.md`) built from supplied material,
+  model knowledge, and web/source research when allowed.
 - Design proposal turns those choices into story arc, style candidates,
   visual-character picker, page-by-page slide plan, layout mix, image plan,
   anti-slop plan, and deliverables.

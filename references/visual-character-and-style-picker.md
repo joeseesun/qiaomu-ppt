@@ -23,6 +23,55 @@ Use this order before rendering:
    rules.
 5. Record an explicit `avoid_family` when a tempting style would harm the task.
 
+## Fit Before Taste
+
+When the user does not specify a style, style selection is a content decision,
+not a taste decision. Pick the visual character that best preserves the deck's
+credibility, audience trust, evidence density, and intended action.
+
+Do not choose a style because it is novel, pretty, or different from the last
+deck. A style is suitable only when it helps the audience believe the claim,
+inspect the proof, and remember the transition between pages.
+
+Required default-selection fields:
+
+```json
+{
+  "primary_visual_family": "the family that best serves this subject",
+  "counterpoint_family": "optional family with a narrow job",
+  "alternative_family": "the next-best viable family",
+  "domain_fit_reason": "why this subject and audience need this visual language",
+  "avoid_family": "a tempting but harmful direction",
+  "avoid_reason": "why it would weaken clarity, trust, emotion, or reading",
+  "image_content_binding_policy": "how images will belong to each page instead of acting as generic atmosphere"
+}
+```
+
+If the selected style cannot produce concrete image subjects, annotation
+targets, and a stable text surface for the slide claims, choose another style
+before writing prompts.
+
+## Domain Defaults And Avoids
+
+Use these defaults when the user gives no visual direction. They are starting
+points; source evidence and audience context can override them, but the override
+must be recorded.
+
+| Content domain | Default visual direction | Good image subjects | Avoid by default |
+| --- | --- | --- | --- |
+| Technical, AI, infrastructure, engineering, field deployment | `technical_terminal` + `data_dense_pro`, with `editorial_minimal` for chapter breath | real operations room, field engineer with customer workflow, system cutaway, trace/eval console, deployment pipeline, KPI loop, architecture wall | cute illustration, decorative cyberpunk, soft craft texture, fake dashboards |
+| Market, strategy, finance, company analysis | `data_dense_pro` + restrained editorial | charts, tables, annotated source pages, product screenshots, market maps | cinematic atmosphere without evidence, fake dashboards, decorative metrics |
+| Product launch or SaaS workflow | `cinematic_product` + `technical_terminal` when the product is technical | real product surfaces, user workflow, before/after use case, system integration | fake UI, glass-card stacks, abstract gradients without product signal |
+| Teaching and knowledge explainer | `editorial_minimal` or `warm_editorial` with proof diagrams | examples, step diagrams, source objects, instructor-friendly whitespace | novelty illustration that hides the concept, tiny labels, decorative icons |
+| Culture, history, biography, music, literature | `premium_cultural` or `warm_editorial` | primary artifacts, portraits, places, timelines, archival texture | generic antique paper, fake seals, fake documents |
+| Creator, community, social talk | `warm_editorial` + controlled `playful_creative` | real moments, quotes, examples, behind-the-scenes objects | icon soup, random stickers, unreadable novelty type |
+
+These defaults are not locks. A watercolor style can be excellent for a poetry,
+craft, childhood memory, or art-history deck; it is weak only when it makes the
+current subject less credible or less clear. A data-dense style can be excellent
+for a market deck; it is weak when it turns an emotional biography into a
+spreadsheet. Decide from the subject, not from a global blacklist.
+
 ## Three-Question Picker
 
 Use these three questions internally. Ask the user only when the answer cannot
@@ -77,6 +126,10 @@ Rules:
 - Never mix two unrelated accent systems.
 - Never mix two display-font personalities on the same slide.
 - If a remix cannot explain which family owns which decision, use one family.
+- If the counterpoint family makes the deck less credible for the content
+  domain, reject the remix. For example, storybook warmth may help a children's
+  courseware deck but can weaken compliance or production architecture proof;
+  data-dense dashboard language may help finance but flatten a biography.
 
 ## Family To Slide Behavior
 
@@ -89,6 +142,19 @@ Visual family is not a skin. It must affect:
   generated concept art, portraits, diagrams, or quiet textures.
 - `renderer_recipe`: which components are built, not just colors.
 - `quality gates`: which failures are likely and must be checked.
+
+Before image generation, translate the visual family into prompt-level rules:
+
+- concrete page-specific subject
+- camera/medium appropriate to the domain
+- visible work object or evidence object
+- protected text safe area
+- annotation targets
+- negative styles that would weaken credibility
+
+Do not send prompts that only say "high-end", "tech", "editorial", "watercolor",
+"cinematic", or similar surface adjectives without tying the image to the slide
+claim.
 
 ## External Reference Boundary
 

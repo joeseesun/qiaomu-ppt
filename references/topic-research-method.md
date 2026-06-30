@@ -116,12 +116,16 @@ Prefer source variety:
 Save evidence under:
 
 ```text
-sources/
-  source_manifest.json
-  source_notes.md
-  source_cards.json
-  images/
-research_dossier.md
+~/Downloads/Qiaomu PPT/<date>-<slug>/
+  README.md
+  task_manifest.json
+  research_dossier.md
+  content_report.md or 内容母稿-<主题>.md
+  sources/
+    source_manifest.json
+    source_notes.md
+    source_cards.json
+    images/
 ```
 
 `source_manifest.json` records where material came from. `source_notes.md`
@@ -129,6 +133,13 @@ records what the material means. `source_cards.json` is a structured bridge to
 the slide plan. `research_dossier.md` is the human-readable research Markdown
 shown or summarized before the slide plan; it may be a root-level file or a
 substantial `sources/source_notes.md` when the project stays compact.
+`content_report.md` or `内容母稿-<主题>.md` is the source-synthesis article: it
+turns the research into a readable argument with a central thesis, reasoning,
+boundaries, and slide-worthy claims. It is not optional for broad-topic decks
+unless the user supplied a finished article/source document and explicitly asks
+to skip synthesis.
+`README.md` and `task_manifest.json` make the research package reusable even if
+the workflow stops before PPT generation.
 
 For a deterministic first pass, use:
 
@@ -148,9 +159,16 @@ slide claims must come from ingested source cards.
 
 For compound topics, split the user's phrase into entity focus terms before
 searching. A topic such as `蒲松龄与聊斋志异` should search both `蒲松龄` and
-`聊斋志异`, not only the full phrase. When Brave Search is unavailable, the
-Wikipedia/Wikidata fallback should still return entity pages if those focus
-terms are resolvable.
+`聊斋志异`, not only the full phrase. The default automated route must not
+require a private search key: use Wikipedia/Wikidata, DuckDuckGo Instant Answer,
+OpenAlex for deep scholarly lanes, and manual `--candidate-url` seeds when a
+general web search has already found useful sources.
+
+If automated candidate discovery returns no useful URLs, do not report a missing
+search key as the problem. Record the candidate gap and try a different route:
+Codex/web search or site search to seed URLs, then ingest known URLs through the
+source intake cascade. For special source types, use the methods in
+`source-intake-method.md` before marking `missing evidence`.
 
 When building `source_cards.json`, filter navigation text, footnotes, external
 advertising, bibliography-only lines, language switchers, wiki project links,
@@ -209,6 +227,68 @@ Recommended `source_cards.json` shape:
 Never hide gaps. A deck with honest gaps is better than a confident generic
 deck.
 
+## Phase 3.5: Source-Synthesis Article
+
+Before writing `content_contract.json`, `slide_plan.json`, or a formal HTML/PPTX
+render, write a source-synthesis article:
+
+```text
+<project>/content_report.md
+<project>/内容母稿-<主题>.md
+```
+
+This is the content mother document for the deck. It should read like a compact
+essay, not like a bibliography or a list of links. It answers:
+
+- after reading the sources, what is the central judgment?
+- what facts and examples support that judgment?
+- what interpretation is yours, and what is source-backed?
+- what tension, contradiction, or audience misconception makes the topic worth
+  presenting?
+- what reusable claims, examples, and reasoning structure does the article make
+  available for later planning?
+- what should not be claimed because evidence, rights, or freshness is weak?
+
+Minimum shape:
+
+```markdown
+# <主题>: <清晰判断>
+
+## 中心判断
+...
+
+## 资料如何改变了我的理解
+...
+
+## 支撑这个判断的关键事实
+...
+
+## 解释结构
+...
+
+## 可复用的主张结构
+...
+
+## 资料边界与风险
+...
+```
+
+Hard rules:
+
+- `research_dossier.md` is a research archive; it does not replace the
+  source-synthesis article.
+- The source-synthesis article is research material, not a layout plan. Do not
+  include page-by-page structure, typography, image-generation prompts, visual
+  style choices, or PPT production advice in this article; put those in second
+  stage sidecars such as `page_kernel_map.json`, `visual_translation_plan.json`,
+  `design_proposal.md`, or `slide_plan.json`.
+- Do not generate `slide_plan.json` directly from search results, link lists, or
+  unprocessed source cards for a broad topic.
+- If the user wants speed, write a shorter but still coherent article first,
+  then produce a fast draft; do not skip the article.
+- The final answer should report the content article path alongside the PPT/HTML
+  output path.
+
 ## Phase 4: User Alignment Checkpoint
 
 Before creating the full design proposal, discuss the content direction with
@@ -233,7 +313,8 @@ If the user asks to move fast, record assumptions and continue, but still keep
 
 ## Phase 5: Content Contract
 
-Only after research and alignment, write `content_contract.json`.
+Only after research, source synthesis, and alignment, write
+`content_contract.json`.
 
 Required fields for topic-researched decks:
 
@@ -241,6 +322,7 @@ Required fields for topic-researched decks:
 {
   "research_required": true,
   "research_status": "completed | partial | skipped_by_user",
+  "source_synthesis": "content_report.md",
   "topic_angle": "作品解读",
   "audience": "...",
   "purpose": "...",

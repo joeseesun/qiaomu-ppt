@@ -48,6 +48,42 @@ GENERIC_PHRASES = {
     "带来启发",
     "值得关注",
 }
+VISIBLE_CONCRETE_TERMS = {
+    "OpenAI",
+    "Google",
+    "Palantir",
+    "Mistral",
+    "Scale",
+    "FDSE",
+    "FDSWE",
+    "TDL",
+    "Delta",
+    "RAG",
+    "Agent",
+    "eval",
+    "observability",
+    "RBAC",
+    "SSO",
+    "CRM",
+    "ERP",
+    "K8s",
+    "CI/CD",
+    "VPC",
+    "trace",
+    "latency",
+    "cost",
+    "embedding",
+    "rerank",
+    "MVP",
+    "PRD",
+    "权限",
+    "检索",
+    "评估",
+    "延迟",
+    "成本",
+    "可观测",
+}
+GENERIC_VISIBLE_TERMS = {"AI", "FDE", "LLM", "API", "DEMO", "PPT", "PPTX", "HTML"}
 MAINLINE_SKIP_TOKENS = {"cover", "closing", "chapter", "section", "divider", "封面", "结尾", "章节", "分隔"}
 SOURCE_ID_ONLY_RE = re.compile(r"^(?:S|SC|SRC)[-_][A-Z0-9_-]+(?:\s*[/,;；]\s*(?:S|SC|SRC)[-_][A-Z0-9_-]+)*$", re.I)
 CARD_ID_RE = re.compile(r"^(?:S|SC|SRC)[-_][A-Z0-9_-]+$", re.I)
@@ -98,6 +134,55 @@ def normalize_id_list(value: Any) -> list[str]:
     if isinstance(value, list):
         return [str(item).strip() for item in value if str(item).strip()]
     return []
+
+
+def visible_copy(slide: dict[str, Any]) -> str:
+    labels = slide.get("visible_labels")
+    if isinstance(labels, list):
+        label_text = " ".join(norm(item) for item in labels if item)
+    else:
+        label_text = norm(labels)
+    body = norm(slide.get("visible_body"))
+    if not body:
+        body = " ".join(norm(item) for item in slide.get("content_points", []) if item)
+    return " ".join(
+        item
+        for item in (
+            norm(slide.get("visible_title") or slide.get("claim_title") or slide.get("title")),
+            body,
+            label_text,
+        )
+        if item
+    )
+
+
+def visible_specificity_markers(text: str) -> set[str]:
+    markers: set[str] = set()
+    for match in re.finditer(r"\d+(?:\.\d+)?\s*(?:%|x|倍|天|周|月|年|ms|s|秒|美元|人)?", text, flags=re.I):
+        markers.add("number:" + re.sub(r"\s+", "", match.group(0)).lower())
+    for match in re.finditer(r"\b[A-Z][A-Za-z0-9+./-]{1,}\b", text):
+        token = match.group(0).strip()
+        if token.upper() not in GENERIC_VISIBLE_TERMS:
+            markers.add(f"latin:{token.lower()}")
+    if re.search(r"[A-Za-z]+/[A-Za-z]+", text):
+        markers.add("slash-term")
+    text_lower = text.lower()
+    for term in VISIBLE_CONCRETE_TERMS:
+        if (term in text) or (re.search(r"[A-Za-z]", term) and term.lower() in text_lower):
+            markers.add("term:" + term.lower())
+    if len(re.findall(r"[、,，/]", text)) >= 3:
+        markers.add("enumeration")
+    return markers
+
+
+def has_enough_visible_information(slide: dict[str, Any]) -> bool:
+    text = visible_copy(slide)
+    markers = visible_specificity_markers(text)
+    if len(text) < 36:
+        return False
+    if len(markers) >= 2:
+        return True
+    return len(markers) >= 1 and len(text) >= 72
 
 
 def is_mainline(slide: dict[str, Any]) -> bool:
@@ -184,6 +269,8 @@ def score_project(project: Path, min_score: int) -> dict[str, Any]:
     weak_titles: list[str] = []
     duplicate_titles: list[str] = []
     generic_slides: list[int] = []
+    low_information_slides: list[int] = []
+    source_detail_missing_slides: list[int] = []
     hollow_anchor_slides: list[int] = []
     source_id_usage: Counter[str] = Counter()
     seen_titles: set[str] = set()
@@ -198,6 +285,8 @@ def score_project(project: Path, min_score: int) -> dict[str, Any]:
         points = " ".join(norm(item) for item in slide.get("content_points", []) if item)
         if any(phrase in title + points for phrase in GENERIC_PHRASES):
             generic_slides.append(int(slide.get("slide_no") or 0))
+        if is_mainline(slide) and not has_enough_visible_information(slide):
+            low_information_slides.append(int(slide.get("slide_no") or 0))
     for slide in mainline:
         ids = normalize_id_list(slide.get("source_card_ids") or slide.get("source_ids"))
         source_id_usage.update(ids)
@@ -226,6 +315,13 @@ def score_project(project: Path, min_score: int) -> dict[str, Any]:
         )
         if has_specific_anchor:
             specific += 1
+        if anchor and is_mainline(slide):
+            visible_markers = visible_specificity_markers(visible_copy(slide))
+            anchor_markers = visible_specificity_markers(anchor)
+            if len(anchor_markers) >= 2:
+                overlap = visible_markers & anchor_markers
+                if len(overlap) < min(2, len(anchor_markers)):
+                    source_detail_missing_slides.append(int(slide.get("slide_no") or 0))
 
     contract_fields = [
         "audience",
@@ -301,9 +397,44 @@ def score_project(project: Path, min_score: int) -> dict[str, Any]:
             "score": pct(1.0 - ratio(len(generic_slides), max(1, len(slides)))),
             "evidence": f"generic phrase slides: {generic_slides[:8]}",
         },
+        {
+            "id": "visible_information_density",
+            "weight": 18,
+            "score": pct(1.0 - ratio(len(low_information_slides), max(1, len(mainline)))),
+            "evidence": (
+                f"{len(mainline) - len(low_information_slides)}/{len(mainline)} mainline slides show concrete visible details; "
+                f"low-info slides {low_information_slides[:10]}"
+            ),
+        },
+        {
+            "id": "visible_source_detail_transfer",
+            "weight": 18,
+            "score": pct(1.0 - ratio(len(source_detail_missing_slides), max(1, len(mainline)))),
+            "evidence": (
+                f"{len(mainline) - len(source_detail_missing_slides)}/{len(mainline)} mainline slides carry source-specific visible details; "
+                f"missing slides {source_detail_missing_slides[:10]}"
+            ),
+        },
     ]
     total_weight = sum(int(item["weight"]) for item in categories)
     score = round(sum(int(item["score"]) * int(item["weight"]) for item in categories) / total_weight)
+    low_info_limit = max(2, round(len(mainline) * 0.25))
+    if len(low_information_slides) > low_info_limit:
+        score = min(score, 79)
+        failures.append(
+            "visible slide copy is too hollow: "
+            f"{len(low_information_slides)} mainline slide(s) lack concrete visible details; "
+            f"limit {low_info_limit}. Move source-specific numbers, names, mechanisms, metrics, "
+            "or examples from source_anchor/speaker notes into the actual slide copy."
+        )
+    source_detail_limit = max(2, round(len(mainline) * 0.18))
+    if len(source_detail_missing_slides) > source_detail_limit:
+        score = min(score, 79)
+        failures.append(
+            "source details are trapped in anchors/notes instead of visible copy: "
+            f"{len(source_detail_missing_slides)} mainline slide(s) miss source-specific visible details; "
+            f"limit {source_detail_limit}."
+        )
 
     if score < min_score:
         failures.append(f"content outline score {score} below target {min_score}")
@@ -317,6 +448,10 @@ def score_project(project: Path, min_score: int) -> dict[str, Any]:
         warnings.append("source anchors are ids instead of concrete evidence on slides: " + ", ".join(map(str, hollow_anchor_slides[:8])))
     if max_source_reuse > reuse_limit:
         warnings.append(f"one source card is reused too often: {max_source_reuse} uses, limit {reuse_limit}")
+    if low_information_slides:
+        warnings.append("visible copy lacks concrete information on slides: " + ", ".join(map(str, low_information_slides[:10])))
+    if source_detail_missing_slides:
+        warnings.append("visible copy misses source-specific details on slides: " + ", ".join(map(str, source_detail_missing_slides[:10])))
 
     return {
         "schema_version": "1.0.0",

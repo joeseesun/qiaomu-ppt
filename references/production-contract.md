@@ -4,13 +4,20 @@ Each normal run should create a project folder with these artifacts or explain w
 
 ```text
 <project>/
+  README.md             # human-readable task archive index
+  task_manifest.json    # machine-readable stage/file index
   deck_brief.md
+  research_dossier.md   # first-stage research package, useful even without PPT generation
+  content_report.md      # source-synthesis article; Chinese projects may use 内容母稿-<主题>.md
   content_contract.json  # audience-purpose card, structure framework, title policy, slide claims
   slide_plan.json
+  page_content_guide.md  # human-readable per-page content/script guide when generated
+  page_content_guide.json
   style_recommendations.json  # when style is unspecified or auto recommendation is requested
   layout_recommendations.json # when image/text pattern recommendation is used
   style_brief.md
   spec_lock.json
+  ppt_config.json       # optional explicit PPT execution config, when a route uses it
   visual_asset_manifest.json  # acquisition route, status, prompt/source, files, rights, QA notes
   visual_contract.json  # background rhythm, layout roles, image/text plan, image slots
   visible_provenance_policy.json  # optional; required when citations are visible
@@ -47,8 +54,66 @@ Each normal run should create a project folder with these artifacts or explain w
   html_delivery_manifest.json  # required for formal HTML delivery
   html_parity_manifest.json    # required only for screenshot parity preview
   animations.json      # optional sidecar for group-level animation intent
+  notes/
+    total.md           # full narration / word-for-word speaker script when requested
   qa_report.md
 ```
+
+Stage boundaries:
+
+- `00_research`: `README.md`, `task_manifest.json`, `research_dossier.md`,
+  `sources/source_manifest.json`, `sources/source_notes.md`,
+  `sources/source_cards.json`, and downloaded/extracted source images. This is
+  a first-class deliverable even when the deck is never generated.
+- `01_content_synthesis`: `content_report.md` or `内容母稿-<主题>.md`. This is
+  the source-synthesis article that turns links, notes, and evidence cards into
+  a readable argument. Formal `slide_plan.json` should be extracted from this
+  article, not directly from link lists or raw source summaries.
+- `02_story_planning`: `content_contract.json`, `slide_plan.json`,
+  `page_content_guide.*`, speaker notes, and per-page scripts.
+- `03_visual_and_config`: `style_*`, `spec_lock.json`, `ppt_config.json`,
+  `visual_contract.json`, `visual_asset_manifest.json`, and image prompts.
+- `04_generation_and_delivery`: PPTX/HTML/PDF/Keynote exports, previews,
+  checks, QA reports, and delivery manifests.
+
+Default project root is `~/Downloads/Qiaomu PPT/<date>-<slug>/` unless the user
+or calling project explicitly provides another path.
+
+## README.md / task_manifest.json
+
+Required for normal project preparation. These files make each task folder
+understandable later.
+
+Required shape for `task_manifest.json`:
+
+```json
+{
+  "schema_version": "1.0.0",
+  "topic": "Deck topic",
+  "project": "/absolute/path",
+  "storage_policy": {
+    "default_root": "~/Downloads/Qiaomu PPT",
+    "project_naming": "<YYYY-MM-DD>-<slug>"
+  },
+  "stages": [
+    {
+      "id": "00_research",
+      "label_zh": "资料搜索整理",
+        "artifacts": ["research_dossier.md", "content_report.md", "sources/source_manifest.json"]
+    }
+  ]
+}
+```
+
+Hard rules:
+
+- Every normal run gets one task folder. Do not scatter downloaded images,
+  source links, prompts, and exports across unrelated temp paths.
+- The research archive must remain useful if the workflow stops before PPT
+  generation.
+- Broad-topic decks should include `content_report.md` or `内容母稿-<主题>.md`
+  before `slide_plan.json`; `research_dossier.md` is a source archive, not the
+  content argument.
 
 Hard HTML rules:
 

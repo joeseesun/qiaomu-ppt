@@ -6,10 +6,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import platform
 import re
 import shlex
-import shutil
 import subprocess
 import sys
 import time
@@ -17,35 +15,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from production_support import (
+    DEFAULT_FORMATS,
+    as_list,
+    can_attempt_keynote_export,
+    collect_artifacts,
+    critical_step_failures,
+    parse_formats,
+    quality_policy,
+    render_report,
+    required_step_failures,
+    summarize_export_formats,
+)
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_FORMATS = "pptx,pdf,html,html-parity"
-CRITICAL_STEPS = {
-    "source_adequacy",
-    "content_outline_audit",
-    "element_plan_audit",
-    "style_fit_audit",
-    "quality_profile_preflight",
-    "image_art_direction",
-    "image_generation_readiness",
-    "deck_repair_apply",
-    "image_generation_preflight",
-    "image_generation",
-    "visual_asset_manifest_validate",
-    "svg_generate",
-    "svg_quality",
-    "visual_rhythm_check",
-    "style_execution_audit",
-    "svg_preview",
-    "preview_gate_update",
-    "svg_finalize",
-    "pptx_export",
-    "pptx_text_check",
-    "page_content_guide",
-    "export_bundle",
-    "project_check",
-    "deck_repair_plan",
-}
 
 
 def utc_now() -> str:
@@ -81,44 +64,6 @@ def slugify(value: str) -> str:
     return value or "deck"
 
 
-def parse_formats(value: str) -> list[str]:
-    known = {"pptx", "pdf", "html", "html-parity", "keynote"}
-    formats = [item.strip() for item in value.split(",") if item.strip()]
-    unknown = [item for item in formats if item not in known]
-    if unknown:
-        raise SystemExit(f"Unknown export format(s): {', '.join(unknown)}")
-    result: list[str] = []
-    for item in formats:
-        if item not in result:
-            result.append(item)
-    return result
-
-
-def can_attempt_keynote_export() -> bool:
-    return (
-        platform.system() == "Darwin"
-        and bool(shutil.which("osascript"))
-        and Path("/Applications/Keynote.app").exists()
-    )
-
-
-def quality_policy(profile: str, args: argparse.Namespace) -> dict[str, Any]:
-    enforce = profile in {"professional", "final"}
-    min_score = args.benchmark_min_score
-    if profile == "professional":
-        min_score = max(min_score, 75)
-    elif profile == "final":
-        min_score = max(min_score, 85)
-    return {
-        "profile": profile,
-        "require_real_imagegen": args.require_real_imagegen or enforce,
-        "enforce_quality_benchmark": args.enforce_quality_benchmark or enforce,
-        "fail_on_critical_repairs": args.fail_on_critical_repairs or enforce,
-        "benchmark_min_score": min_score,
-        "repair_ready_score": max(args.repair_ready_score, 90 if profile == "final" else args.repair_ready_score),
-    }
-
-
 def resolve_image_limit(args: argparse.Namespace) -> int:
     if args.image_limit is not None:
         return max(0, args.image_limit)
@@ -135,6 +80,42 @@ def is_unresolved_source_ai_fallback(item: dict[str, Any]) -> bool:
     )
 
 
+def is_codex_runtime() -> bool:
+    return any(os.environ.get(name) for name in ("CODEX_THREAD_ID", "CODEX_SHELL", "CODEX_CI"))
+
+
+def is_codex_native_image_asset(item: dict[str, Any]) -> bool:
+    blob = " ".join(
+        str(item.get(key) or "")
+        for key in (
+            "asset_id",
+            "filename",
+            "path",
+            "source",
+            "source_path",
+            "generated_asset_source",
+            "original_source",
+            "generator",
+            "provider",
+            "notes",
+            "generation_note",
+            "rights_notes",
+        )
+    ).lower()
+    return any(
+        token in blob
+        for token in (
+            "codex-native",
+            "codex-imagegen",
+            "codex_imagegen",
+            "codex image_gen",
+            "image_gen",
+            ".codex/generated_images",
+            "/.codex/generated_images/",
+        )
+    )
+
+
 def analyze_ai_asset_readiness(project: Path) -> dict[str, Any]:
     manifest_path = project / "visual_asset_manifest.json"
     evidence: dict[str, Any] = {
@@ -143,6 +124,7 @@ def analyze_ai_asset_readiness(project: Path) -> dict[str, Any]:
         "procedural_fallback_count": 0,
         "non_terminal_ai_count": 0,
         "real_imagegen_count": 0,
+        "codex_native_imagegen_count": 0,
         "source_unresolved_fallback_count": 0,
         "examples": [],
         "source_unresolved_fallback_examples": [],
@@ -182,6 +164,8 @@ def analyze_ai_asset_readiness(project: Path) -> dict[str, Any]:
                 evidence["examples"].append(item.get("filename") or item.get("asset_id") or item.get("path"))
         elif status == "Generated" and generator:
             evidence["real_imagegen_count"] += 1
+            if is_codex_native_image_asset(item):
+                evidence["codex_native_imagegen_count"] += 1
         elif status in {"Pending", "Needs-Manual", "Missing", "Failed"}:
             evidence["non_terminal_ai_count"] += 1
             if len(evidence["examples"]) < 5:
@@ -198,9 +182,12 @@ def analyze_source_visual_readiness(project: Path) -> dict[str, Any]:
         "unresolved_source_count": 0,
         "source_web_user_count": 0,
         "existing_source_web_user_count": 0,
+        "trusted_source_web_user_count": 0,
+        "local_source_derived_count": 0,
         "missing_file_count": 0,
         "examples": [],
         "missing_file_examples": [],
+        "local_source_derived_examples": [],
     }
     if not manifest_path.exists():
         evidence["visual_asset_manifest_exists"] = False
@@ -233,6 +220,12 @@ def analyze_source_visual_readiness(project: Path) -> dict[str, Any]:
             if via == "source":
                 evidence["existing_source_count"] += 1
             evidence["existing_source_web_user_count"] += 1
+            if is_trusted_source_visual(item):
+                evidence["trusted_source_web_user_count"] += 1
+            else:
+                evidence["local_source_derived_count"] += 1
+                if len(evidence["local_source_derived_examples"]) < 5:
+                    evidence["local_source_derived_examples"].append(label)
             continue
         evidence["unresolved_source_count"] += 1
         if len(evidence["examples"]) < 5:
@@ -242,6 +235,54 @@ def analyze_source_visual_readiness(project: Path) -> dict[str, Any]:
             if len(evidence["missing_file_examples"]) < 5:
                 evidence["missing_file_examples"].append(label)
     return evidence
+
+
+def is_local_source_derived_visual(item: dict[str, Any]) -> bool:
+    blob = " ".join(
+        str(item.get(key) or "")
+        for key in (
+            "asset_id",
+            "filename",
+            "path",
+            "purpose",
+            "asset_role",
+            "rights_notes",
+            "generator",
+            "art_direction",
+        )
+    ).lower()
+    return any(
+        token in blob
+        for token in (
+            "source-derived",
+            "local-source-derived",
+            "源资料衍生",
+            "本地衍生",
+            "该 png 只提供源资料衍生",
+        )
+    )
+
+
+def is_trusted_source_visual(item: dict[str, Any]) -> bool:
+    via = str(item.get("acquire_via") or "").lower()
+    if is_local_source_derived_visual(item):
+        return False
+    if via == "user":
+        return True
+    if via == "web":
+        return bool(item.get("source_page_url") or item.get("source_url") or item.get("url"))
+    if via == "source":
+        raw_path = str(item.get("path") or "")
+        has_source_file = raw_path.startswith("sources/")
+        return bool(
+            has_source_file
+            or item.get("source_path")
+            or item.get("source_page_url")
+            or item.get("source_image_id")
+            or item.get("source_page")
+            or item.get("source_url")
+        )
+    return False
 
 
 def quality_profile_preflight(
@@ -293,19 +334,58 @@ def quality_profile_preflight(
         except Exception:
             slide_count = 0
         source_visual_floor = max(3, round(slide_count * 0.25)) if slide_count > 8 else 0
-        has_real_ai = int(ai_evidence.get("real_imagegen_count") or 0) > 0
-        source_visual_ready = int(source_visual_evidence.get("existing_source_web_user_count") or 0) >= source_visual_floor
-        if slide_count > 8 and not has_real_ai and not source_visual_ready:
+        key_ai_floor = max(3, round(slide_count * 0.2)) if slide_count > 8 else (1 if slide_count >= 4 else 0)
+        real_ai_count = int(ai_evidence.get("real_imagegen_count") or 0)
+        planned_ai_count = int(ai_evidence.get("ai_count") or 0)
+        has_key_ai_path = real_ai_count >= key_ai_floor or (generate_images and planned_ai_count >= key_ai_floor)
+        evidence["key_real_imagegen_target"] = key_ai_floor
+        codex_runtime = is_codex_runtime()
+        codex_ai_count = int(ai_evidence.get("codex_native_imagegen_count") or 0)
+        evidence["codex_runtime"] = codex_runtime
+        evidence["codex_native_imagegen_target"] = key_ai_floor if codex_runtime else 0
+        trusted_source_visual_count = int(source_visual_evidence.get("trusted_source_web_user_count") or 0)
+        source_visual_ready = trusted_source_visual_count >= source_visual_floor
+        if slide_count > 8 and not has_key_ai_path:
             message = (
-                f"{profile} profile has no real generated images and only "
-                f"{source_visual_evidence.get('existing_source_web_user_count', 0)} ready source/web/user visual(s); "
-                f"target at least {source_visual_floor} source visuals or add AI atmosphere/concept assets. "
-                "Use --generate-images, built-in image-generation handoff, or downgrade to --quality-profile draft."
+                f"{profile} profile needs real generated images on key pages: target {key_ai_floor}, "
+                f"currently {real_ai_count} real generated asset(s) and {planned_ai_count} AI asset row(s). "
+                "Downloaded/source images can be used as evidence, but they do not replace key-page generation. "
+                "Add AI rows for cover/opening, major proof/framework pages, and closing, then run --generate-images; "
+                "or downgrade to --quality-profile draft."
             )
             if profile == "final":
                 failures.append(message)
             else:
                 warnings.append(message)
+        if codex_runtime and key_ai_floor and codex_ai_count < key_ai_floor:
+            message = (
+                f"{profile} profile is running in Codex and requires Codex-native image_gen assets on key pages: "
+                f"{codex_ai_count}/{key_ai_floor}. Use the Codex image generation tool, copy the generated files "
+                "from ~/.codex/generated_images into project assets, and record each row with acquire_via=ai, "
+                "status=Generated, generator=codex-native-image_gen, plus generated_asset_source. "
+                "Content-only slides, external-provider-only images, source-derived graphics, SVG, or shapes are failure "
+                "for final/professional production unless the user explicitly downgrades the run to draft/no generation."
+            )
+            if profile == "final":
+                failures.append(message)
+            else:
+                warnings.append(message)
+        if slide_count > 8 and not has_key_ai_path and not source_visual_ready:
+            message = (
+                f"{profile} profile also has only {trusted_source_visual_count} trusted source/web/user visual(s) "
+                f"({source_visual_evidence.get('local_source_derived_count', 0)} local source-derived visual(s) do not count as source evidence); "
+                f"target at least {source_visual_floor} trusted source visuals when source evidence is part of the deck."
+            )
+            if profile == "final":
+                failures.append(message)
+            else:
+                warnings.append(message)
+        if slide_count > 8 and not generate_images and real_ai_count < key_ai_floor:
+            failures.append(
+                f"{profile} profile was run with --no-generate-images but has only "
+                f"{real_ai_count}/{key_ai_floor} real generated key-page image(s). "
+                "This is a draft/offline path, not a final-production path."
+            )
         needs_real_images = bool(
             ai_evidence.get("procedural_fallback_count") or ai_evidence.get("non_terminal_ai_count")
         )
@@ -437,13 +517,6 @@ def skip_step(name: str, reason: str, *, required: bool = True) -> dict[str, Any
 
 def step_ok(step: dict[str, Any]) -> bool:
     return step.get("status") in {"passed", "skipped_optional"}
-
-
-def latest_existing(paths: list[Path]) -> Path | None:
-    existing = [path for path in paths if path.exists()]
-    if not existing:
-        return None
-    return max(existing, key=lambda path: path.stat().st_mtime)
 
 
 def artifact_mtime(path: Path) -> float:
@@ -628,73 +701,6 @@ def previous_step_passed(project: Path, name: str, command: list[str]) -> bool:
     return False
 
 
-def collect_artifacts(project: Path, slug: str) -> dict[str, Any]:
-    exports = project / "exports"
-    previews = project / "previews"
-    artifacts: dict[str, Any] = {}
-    candidates = {
-        "slide_plan": project / "slide_plan.json",
-        "source_adequacy": project / "reports" / "source_adequacy.json",
-        "source_adequacy_md": project / "reports" / "source_adequacy.md",
-        "style_direction": project / "style_direction.json",
-        "style_direction_md": project / "style_direction.md",
-        "visual_asset_manifest": project / "visual_asset_manifest.json",
-        "image_art_direction": project / "image_art_direction.json",
-        "image_generation_queue": project / "assets" / "images" / "image_generation_queue.json",
-        "image_generation_queue_md": project / "assets" / "images" / "image_generation_queue.md",
-        "image_generation_readiness": project / "reports" / "image_generation_readiness.json",
-        "image_generation_readiness_md": project / "reports" / "image_generation_readiness.md",
-        "built_in_image_generation_tasks": project / "assets" / "images" / "built_in_image_generation_tasks.json",
-        "built_in_image_generation_guide": project / "assets" / "images" / "built_in_image_generation_guide.md",
-        "image_generation_batch": project / "assets" / "images" / "generation_batch" / "manifest.json",
-        "image_generation_requests": project / "assets" / "images" / "generation_batch" / "requests.jsonl",
-        "image_generation_import_mapping": project / "assets" / "images" / "generation_batch" / "import_mapping.template.json",
-        "image_generation_run": project / "assets" / "images" / "image_generation_run.json",
-        "image_prompts": project / "image_prompts.md",
-        "image_prompts_json": project / "assets" / "images" / "image_prompts.json",
-        "image_prompts_md": project / "assets" / "images" / "image_prompts.md",
-        "svg_quality_report": project / "reports" / "svg_quality_report.txt",
-        "visual_rhythm_report": project / "reports" / "visual_rhythm_report.json",
-        "style_execution_audit": project / "reports" / "style_execution_audit.json",
-        "style_execution_audit_md": project / "reports" / "style_execution_audit.md",
-        "content_outline_audit": project / "reports" / "content_outline_audit.json",
-        "content_outline_audit_md": project / "reports" / "content_outline_audit.md",
-        "element_plan_audit": project / "reports" / "element_plan_audit.json",
-        "element_plan_audit_md": project / "reports" / "element_plan_audit.md",
-        "style_fit_audit": project / "reports" / "style_fit_audit.json",
-        "style_fit_audit_md": project / "reports" / "style_fit_audit.md",
-        "deck_quality_benchmark": project / "reports" / "deck_quality_benchmark.json",
-        "deck_quality_benchmark_md": project / "reports" / "deck_quality_benchmark.md",
-        "deck_repair_plan": project / "reports" / "deck_repair_plan.json",
-        "deck_repair_plan_md": project / "reports" / "deck_repair_plan.md",
-        "deck_repair_apply_report": project / "reports" / "deck_repair_apply_report.json",
-        "deck_repair_apply_report_md": project / "reports" / "deck_repair_apply_report.md",
-        "pptx_text_check": project / "pptx_text_check.json",
-        "page_content_guide": project / "page_content_guide.json",
-        "page_content_guide_md": project / "page_content_guide.md",
-        "project_check": project / "project_check.json",
-        "export_manifest": project / "export_manifest.json",
-        "production_manifest": project / "production_manifest.json",
-        "production_report": project / "production_report.md",
-        "svg_preview_grid": previews / "svg_output" / "thumbnail-grid.jpg",
-        "html_preview_grid": previews / "html" / "slide-01-1280x720.png",
-        "pptx": exports / f"{slug}.pptx",
-        "pdf": exports / f"{slug}.pdf",
-        "html": exports / f"{slug}.html",
-        "html_parity": exports / f"{slug}-preview.html",
-        "keynote": exports / f"{slug}.key",
-        "pptx_trace": exports / f"{slug}.pptx.trace.json",
-    }
-    for key, path in candidates.items():
-        if path.exists():
-            artifacts[key] = rel(project, path)
-    if "pptx" not in artifacts:
-        pptx = latest_existing(sorted(exports.glob("*.pptx")) if exports.exists() else [])
-        if pptx:
-            artifacts["pptx"] = rel(project, pptx)
-    return artifacts
-
-
 def report_lists(path: Path) -> tuple[list[str], list[str]]:
     if not path.exists():
         return [], []
@@ -801,75 +807,6 @@ def upsert_preview_gate(
     if not outputs:
         result["reason"] = "no SVG preview outputs found for selected preview slides"
     return result
-
-
-def summarize_export_formats(project: Path, requested_formats: list[str]) -> tuple[dict[str, Any], list[str]]:
-    manifest_path = project / "export_manifest.json"
-    if not manifest_path.exists():
-        return {}, [f"export_manifest.json missing after requesting: {', '.join(requested_formats)}"]
-    try:
-        manifest = read_json(manifest_path)
-    except Exception as exc:
-        return {}, [f"cannot read export_manifest.json: {exc}"]
-    formats = manifest.get("formats", {}) if isinstance(manifest, dict) else {}
-    failures: list[str] = []
-    for name in requested_formats:
-        item = formats.get(name)
-        if not isinstance(item, dict):
-            failures.append(f"{name}: missing from export_manifest.json")
-            continue
-        if item.get("status") in {"missing", "failed"}:
-            reason = item.get("reason") or item.get("warning") or "no reason recorded"
-            failures.append(f"{name}: {item.get('status')} ({reason})")
-    return formats if isinstance(formats, dict) else {}, failures
-
-
-def render_report(manifest: dict[str, Any]) -> str:
-    lines = [
-        f"# Qiaomu PPT Production Report",
-        "",
-        f"- Project: `{manifest['project']}`",
-        f"- Title: {manifest['title']}",
-        f"- Slug: `{manifest['slug']}`",
-        f"- OK: `{str(manifest['ok']).lower()}`",
-        f"- Quality profile: `{manifest.get('quality_policy', {}).get('profile', 'unknown')}`",
-        f"- Generated at: `{manifest['generated_at']}`",
-        "",
-        "## Steps",
-        "",
-    ]
-    for step in manifest.get("steps", []):
-        marker = "OK" if step.get("status") == "passed" else step.get("status", "unknown").upper()
-        required = "required" if step.get("required") else "optional"
-        lines.append(f"- {marker} `{step.get('name')}` ({required}, {step.get('duration_seconds', 0)}s)")
-        if step.get("reason"):
-            lines.append(f"  Reason: {step['reason']}")
-    lines.extend(["", "## Export Formats", ""])
-    export_formats = manifest.get("export_formats", {})
-    if export_formats:
-        for name, item in export_formats.items():
-            status = item.get("status") if isinstance(item, dict) else "unknown"
-            path = item.get("path") if isinstance(item, dict) else ""
-            reason = item.get("reason") if isinstance(item, dict) else ""
-            suffix = f" -> `{path}`" if path else ""
-            if reason:
-                suffix += f" ({reason})"
-            lines.append(f"- `{name}`: {status}{suffix}")
-    else:
-        lines.append("- No export manifest available.")
-    lines.extend(["", "## Artifacts", ""])
-    for key, value in manifest.get("artifacts", {}).items():
-        lines.append(f"- `{key}`: `{value}`")
-    if manifest.get("failures"):
-        lines.extend(["", "## Failures", ""])
-        for failure in manifest["failures"]:
-            lines.append(f"- {failure}")
-    if manifest.get("warnings"):
-        lines.extend(["", "## Warnings", ""])
-        for warning in manifest["warnings"]:
-            lines.append(f"- {warning}")
-    lines.append("")
-    return "\n".join(lines)
 
 
 def main() -> int:
@@ -1093,6 +1030,12 @@ def main() -> int:
             "style_fit_audit.py",
             reports / "style_fit_audit.json",
             reports / "style_fit_audit.md",
+        ),
+        (
+            "ppt_master_axis_audit",
+            "ppt_master_axis_audit.py",
+            reports / "ppt_master_axis_audit.json",
+            reports / "ppt_master_axis_audit.md",
         ),
     ]
     upstream_inputs = existing_paths(
@@ -1857,18 +1800,9 @@ def main() -> int:
         )
     )
     export_formats, format_failures = summarize_export_formats(project, requested_formats)
-    step_failures = [
-        f"{step['name']}: {step.get('reason') or 'returncode ' + str(step.get('returncode'))}"
-        for step in steps
-        if step.get("required", True) and step.get("status") not in {"passed"}
-    ]
-    critical_failed = [
-        step
-        for step in steps
-        if step.get("name") in CRITICAL_STEPS
-        and step.get("required", True)
-        and step.get("status") != "passed"
-    ]
+
+    step_failures = required_step_failures(steps)
+    critical_failed = critical_step_failures(steps)
     requested_format_failed = bool(format_failures)
     ok = not critical_failed and (not requested_format_failed or args.allow_missing_formats)
     warnings = []
@@ -1898,8 +1832,69 @@ def main() -> int:
     }
     write_json(project / "production_manifest.json", manifest)
     write_text(project / "production_report.md", render_report(manifest))
+
+    final_status_command = [
+        sys.executable,
+        SCRIPT_DIR / "final_status.py",
+        project,
+        "--output",
+        project / "final_status.json",
+        "--markdown",
+        project / "交付检查.md",
+        "--report-only",
+    ]
+    steps.append(
+        run_step(
+            "final_status",
+            final_status_command,
+            cwd=project,
+            required=True,
+            timeout=60,
+            env=env,
+        )
+    )
+    final_status_payload: dict[str, Any] = {}
+    final_status_failures: list[str] = []
+    if (project / "final_status.json").exists():
+        try:
+            loaded = read_json(project / "final_status.json")
+            if isinstance(loaded, dict):
+                final_status_payload = loaded
+        except Exception as exc:
+            final_status_failures.append(f"cannot read final_status.json: {exc}")
+    else:
+        final_status_failures.append("final_status.json missing")
+    if final_status_payload:
+        manifest["final_status"] = {
+            "ok": bool(final_status_payload.get("ok")),
+            "status": final_status_payload.get("status"),
+            "json": "final_status.json",
+            "markdown": "交付检查.md",
+        }
+        if not final_status_payload.get("ok"):
+            final_status_failures.extend(as_list(final_status_payload.get("blocking_failures")))
+    else:
+        manifest["final_status"] = {
+            "ok": False,
+            "status": "missing",
+            "json": "final_status.json",
+            "markdown": "交付检查.md",
+        }
+    step_failures = required_step_failures(steps)
+    critical_failed = critical_step_failures(steps)
+    ok = (
+        not critical_failed
+        and (not requested_format_failed or args.allow_missing_formats)
+        and bool(final_status_payload.get("ok"))
+        and not final_status_failures
+    )
+    manifest["ok"] = ok
+    manifest["steps"] = steps
+    manifest["failures"] = step_failures + ([] if args.allow_missing_formats else format_failures) + final_status_failures
+    manifest["warnings"] = warnings + as_list(final_status_payload.get("warnings"))
     manifest["artifacts"] = collect_artifacts(project, slug)
     write_json(project / "production_manifest.json", manifest)
+    write_text(project / "production_report.md", render_report(manifest))
     print(json.dumps(manifest, ensure_ascii=False, indent=2))
     return 0 if ok else 2
 

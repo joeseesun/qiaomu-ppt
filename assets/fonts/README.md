@@ -1,7 +1,9 @@
 # Fonts
 
-`qiaomu-ppt` bundles a small presentation font kit so public installs can render
-Chinese-first decks consistently without a separate font download step.
+`qiaomu-ppt` uses a small presentation font kit so public installs can render
+Chinese-first decks consistently. The font binaries are not committed to the
+public repository; download them locally when you need full PPTX/preview
+fidelity.
 
 Curated families:
 
@@ -20,8 +22,8 @@ Optional packs are declared in `data/font_manifest.json`:
 - `courseware`: LXGW WenKai for classroom and reading decks.
 - `code`: Sarasa Mono SC and JetBrains Mono for code, CLI, and aligned CJK/Latin snippets.
 
-The bundled font binaries are licensed under the SIL Open Font License 1.1. See
-`OFL.txt` in this directory and `data/font_manifest.json` for source URLs,
+The recommended font binaries are licensed under the SIL Open Font License 1.1.
+See `OFL.txt` in this directory and `data/font_manifest.json` for source URLs,
 license URLs, roles, and recommended stacks.
 
 Re-download or repair the bundled fonts with:
@@ -31,8 +33,9 @@ python3 scripts/bootstrap.py --download-fonts
 ```
 
 Sarasa Mono SC is distributed upstream as a `.7z` archive; repairing it requires
-`bsdtar`, `7zz`, or `7z`. The extracted font binaries are bundled here, so normal
-skill use does not require those tools.
+`bsdtar`, `7zz`, or `7z`. If those tools are missing, the skill will fall back to
+system CJK and Latin fonts and record typography fidelity as missing evidence
+when needed.
 
 If the fonts are missing in a downstream install, generated decks should record
 exact typography as missing evidence and fall back to system CJK and Latin fonts.
