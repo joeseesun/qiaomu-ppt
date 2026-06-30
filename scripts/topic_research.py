@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import subprocess
 import sys
@@ -90,17 +89,29 @@ def topic_focus_terms(topic: str, limit: int = 5) -> list[str]:
     raw = re.sub(r"[《》“”\"']", " ", str(topic or ""))
     pieces = re.split(r"\s*(?:与|和|及|以及|、|，|,|：|:|/|\\+|&|vs\\.?|VS\\.?|——|--|-)\s*", raw)
     terms: list[str] = []
+
+    def append_term(value: str) -> None:
+        value = re.sub(r"\s+", " ", value).strip()
+        value = re.sub(r"^(介绍|解读|关于|制作|一份|PPT|ppt|主题)\s*", "", value).strip()
+        if len(value) >= 2 and value not in terms:
+            terms.append(value)
+
     for piece in [topic, *pieces]:
         value = re.sub(r"\s+", " ", piece).strip()
         value = re.sub(r"^(介绍|解读|关于|制作|一份|PPT|ppt|主题)\s*", "", value).strip()
-        if len(value) < 2:
-            continue
-        if value not in terms:
-            terms.append(value)
+        append_term(value)
+        possessive_history = re.match(r"^(.+?)的(?:历史|发展史|简史|起源|演变|源流)$", value)
+        if possessive_history:
+            append_term(possessive_history.group(1))
+        for suffix in ("发展史", "简史"):
+            if value.endswith(suffix):
+                append_term(value[: -len(suffix)])
     # If one compound CJK phrase survived intact, also try shorter CJK chunks.
     for match in re.findall(r"[\u4e00-\u9fff]{2,12}", raw):
-        if match not in terms:
-            terms.append(match)
+        append_term(match)
+        possessive_history = re.match(r"^(.+?)的(?:历史|发展史|简史|起源|演变|源流)$", match)
+        if possessive_history:
+            append_term(possessive_history.group(1))
     return terms[:limit]
 
 
@@ -153,38 +164,6 @@ def topic_lanes(topic: str, depth: str = "balanced") -> list[tuple[str, str]]:
         return lanes
     return [item for item in lanes if item[0] not in {"visuals", "visuals_zh"}]
     return lanes
-
-
-def brave_search(query: str, lane: str, max_results: int) -> tuple[list[Candidate], list[str]]:
-    key = os.environ.get("BRAVE_SEARCH_API_KEY") or os.environ.get("BRAVE_API_KEY")
-    if not key:
-        return [], ["BRAVE_SEARCH_API_KEY not set"]
-    url = "https://api.search.brave.com/res/v1/web/search?" + urlencode(
-        {"q": query, "count": min(max_results, 10), "search_lang": "zh-cn"}
-    )
-    payload, warnings = fetch_json(
-        url,
-        headers={"Accept": "application/json", "X-Subscription-Token": key},
-    )
-    candidates: list[Candidate] = []
-    if isinstance(payload, dict):
-        results = ((payload.get("web") or {}).get("results") or [])
-        for idx, item in enumerate(results[:max_results], start=1):
-            if not isinstance(item, dict):
-                continue
-            result_url = normalize_url(item.get("url", ""))
-            if result_url:
-                candidates.append(
-                    Candidate(
-                        url=result_url,
-                        title=clean_text(item.get("title", "")),
-                        snippet=clean_text(item.get("description", "")),
-                        provider="brave",
-                        lane=lane,
-                        score=100 - idx,
-                    )
-                )
-    return candidates, warnings
 
 
 def wikipedia_opensearch(query: str, lane: str, lang: str, max_results: int) -> tuple[list[Candidate], list[str]]:
@@ -324,14 +303,12 @@ def collect_candidates(topic: str, max_results_per_lane: int, provider: str, lan
     warnings: list[str] = []
     for lane, query in topic_lanes(topic, depth):
         providers = []
-        if provider in {"auto", "brave"}:
-            providers.append(brave_search)
         if provider in {"auto", "wikipedia"}:
             providers.append(lambda q, l, m: wikipedia_opensearch(q, l, lang, m))
             if lang != "en":
                 providers.append(lambda q, l, m: wikipedia_opensearch(q, l, "en", max(2, m // 2)))
             providers.append(lambda q, l, m: wikidata_search(q, l, "zh" if lang.startswith("zh") else lang, m))
-        if provider in {"auto", "duckduckgo"} and depth != "fast":
+        if provider in {"auto", "duckduckgo"}:
             providers.append(duckduckgo_instant_answer)
         if provider in {"auto", "openalex"} and depth == "deep" and lane in {"context", "context_zh", "influence", "primary"}:
             providers.append(openalex_search)
@@ -378,8 +355,6 @@ def provider_boost(provider: str) -> int:
         return 12
     if "manual" in provider:
         return 30
-    if "brave" in provider:
-        return 8
     if "duckduckgo" in provider:
         return 2
     if "openalex" in provider:
@@ -412,7 +387,7 @@ def write_research_brief(output_dir: Path, topic: str, audience: str, route: str
         "research_status": "attempted",
         "research_questions": [
             f"{topic} 的基本事实、时间线和关键人物/概念是什么？",
-            f"{topic} 哪些解释角度最适合做成 PPT 主线？",
+            f"{topic} 哪些解释角度最适合形成清晰论证？",
             f"{topic} 有哪些可作为视觉证据的图片、图表、原文、地点或档案？",
         ],
         "source_strategy": [
@@ -440,6 +415,42 @@ Only sources successfully ingested into `source_manifest.json` and represented i
 slide evidence until they pass ingestion.
 """,
     )
+
+
+def recommended_fallback_routes(candidates: list[Candidate], selected_urls: list[str], source_result: dict[str, Any]) -> list[dict[str, str]]:
+    routes: list[dict[str, str]] = []
+    if not candidates:
+        routes.append(
+            {
+                "route": "seed_candidate_urls",
+                "reason": "no automatic candidate URLs were found",
+                "action": "Use Codex/web search, site search, or curated references to find candidate URLs, then rerun with --candidate-url.",
+            }
+        )
+    if selected_urls and not source_result.get("ingested", 0):
+        routes.append(
+            {
+                "route": "url_extraction_cascade",
+                "reason": "candidate URLs existed but were not ingested",
+                "action": "Run source_to_markdown.py for the URLs; it uses direct HTML, Jina Reader, Defuddle, and agent-fetch fallbacks.",
+            }
+        )
+    if not source_result.get("ingested", 0):
+        routes.extend(
+            [
+                {
+                    "route": "qiaomu_markdown_proxy",
+                    "reason": "generic ingestion may miss login-shaped, paywalled, or script-rendered pages",
+                    "action": "Try qiaomu-markdown-proxy fetch routes for WeChat, Feishu/Lark, PDF, and generic webpages when that skill is available.",
+                },
+                {
+                    "route": "qiaomu_anything_to_notebooklm",
+                    "reason": "large, mixed, audio/video, X/Twitter, Office, EPUB, OCR, or NotebookLM-friendly sources need special handling",
+                    "action": "Use the anything-to-NotebookLM source-intake routes as research extraction helpers, then import the resulting Markdown as evidence.",
+                },
+            ]
+        )
+    return routes
 
 
 def run_source_intake(
@@ -539,6 +550,7 @@ def write_report(
     warnings: list[str],
     source_result: dict[str, Any],
 ) -> dict[str, Any]:
+    fallback_routes = recommended_fallback_routes(candidates, selected_urls, source_result)
     report = {
         "schema_version": "1.0.0",
         "ok": bool(source_result.get("ingested", 0)),
@@ -550,6 +562,7 @@ def write_report(
         "selected_urls": selected_urls,
         "candidates": candidate_payload(candidates),
         "warnings": warnings,
+        "recommended_fallback_routes": fallback_routes,
         "source_result": source_result,
         "artifacts": {
             "research_brief": "research_brief.json",
@@ -567,7 +580,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Research a broad topic and ingest selected URLs into qiaomu-ppt sources.")
     parser.add_argument("topic", help="Topic to research.")
     parser.add_argument("--output-dir", "-o", type=Path, default=Path("sources"), help="Sources output directory.")
-    parser.add_argument("--provider", choices=["auto", "brave", "wikipedia", "duckduckgo", "openalex"], default="auto")
+    parser.add_argument("--provider", choices=["auto", "wikipedia", "duckduckgo", "openalex"], default="auto")
     parser.add_argument("--depth", choices=["fast", "balanced", "deep"], default="balanced", help="Search breadth. fast skips slow scholarly/deep lanes.")
     parser.add_argument("--lang", default="zh", help="Primary Wikipedia/Wikidata language code.")
     parser.add_argument("--audience", default="general Chinese-speaking audience")

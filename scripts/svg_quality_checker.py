@@ -194,8 +194,9 @@ class SVGQualityChecker:
         "04_ending": (),  # ending pages legitimately use varied vocabularies
     }
 
-    def __init__(self, *, template_mode: bool = False):
+    def __init__(self, *, template_mode: bool = False, strict_visual: bool = False):
         self.template_mode = template_mode
+        self.strict_visual = strict_visual
         self.results = []
         self.summary = {
             'total': 0,
@@ -268,6 +269,10 @@ class SVGQualityChecker:
 
                 # 3. Check fonts
                 self._check_fonts(content, result)
+
+                # 3b. Strict visual hygiene checks for recurring design regressions.
+                if self.strict_visual:
+                    self._check_strict_visual_hygiene(content, result)
 
                 # 4. Check width/height consistency with viewBox
                 self._check_dimensions(content, result)
@@ -509,6 +514,147 @@ class SVGQualityChecker:
                     f"Times New Roman / Consolas): {font_family}"
                 )
                 break
+
+    def _check_strict_visual_hygiene(self, content: str, result: Dict):
+        """Catch recurring visual regressions that are too design-specific for base SVG validity."""
+        self._check_cjk_primary_font_hygiene(content, result)
+        self._check_decorative_underlines(content, result)
+
+    @staticmethod
+    def _attr_value(attrs: str, name: str) -> str:
+        match = re.search(rf'\b{name}\s*=\s*(["\'])(.*?)\1', attrs, re.IGNORECASE | re.DOTALL)
+        return match.group(2).strip() if match else ""
+
+    @staticmethod
+    def _style_value(attrs: str, name: str) -> str:
+        style = SVGQualityChecker._attr_value(attrs, "style")
+        if not style:
+            return ""
+        for part in style.split(";"):
+            if ":" not in part:
+                continue
+            key, value = part.split(":", 1)
+            if key.strip().lower() == name.lower():
+                return value.strip()
+        return ""
+
+    @staticmethod
+    def _font_stack_parts(font_family: str) -> list[str]:
+        parts = []
+        for item in font_family.split(","):
+            cleaned = item.strip().strip('"').strip("'").lower()
+            if cleaned and cleaned not in {"sans-serif", "serif", "monospace", "system-ui"}:
+                parts.append(cleaned)
+        return parts
+
+    def _check_cjk_primary_font_hygiene(self, content: str, result: Dict):
+        weak_latin_heads = {
+            "georgia",
+            "times",
+            "times new roman",
+            "cambria",
+            "palatino",
+            "arial",
+            "helvetica",
+            "helvetica neue",
+            "calibri",
+            "inter",
+        }
+        cjk_families = {
+            "noto sans cjk sc",
+            "noto serif cjk sc",
+            "source han sans sc",
+            "source han serif sc",
+            "microsoft yahei",
+            "pingfang sc",
+            "heiti sc",
+            "songti sc",
+            "simsun",
+            "simhei",
+            "kaiti",
+            "fangsong",
+            "lxgw wenkai",
+            "sarasa mono sc",
+            "smiley sans",
+        }
+        for match in re.finditer(r"<(?:text|tspan)\b([^>]*)>(.*?)</(?:text|tspan)>", content, re.IGNORECASE | re.DOTALL):
+            attrs, raw_text = match.group(1), match.group(2)
+            text = re.sub(r"<[^>]+>", "", raw_text)
+            text = html.unescape(text)
+            if not re.search(r"[\u4e00-\u9fff]", text):
+                continue
+            font_family = self._attr_value(attrs, "font-family") or self._style_value(attrs, "font-family")
+            if not font_family:
+                continue
+            parts = self._font_stack_parts(font_family)
+            if not parts:
+                continue
+            first = parts[0]
+            has_cjk_later = any(part in cjk_families for part in parts[1:])
+            if first in weak_latin_heads and has_cjk_later:
+                result["errors"].append(
+                    f"strict visual: weak primary display font for CJK text; "
+                    f"put a CJK-first family before Latin fallback: {font_family}"
+                )
+                return
+
+    @staticmethod
+    def _parse_float(value: str) -> float | None:
+        try:
+            return float(str(value).replace("px", "").strip())
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _is_red_hex(value: str) -> bool:
+        value = value.strip().upper()
+        if not HEX_VALUE_RE.fullmatch(value):
+            return False
+        raw = value[1:]
+        if len(raw) == 3:
+            raw = "".join(ch * 2 for ch in raw)
+        if len(raw) < 6:
+            return False
+        r = int(raw[0:2], 16)
+        g = int(raw[2:4], 16)
+        b = int(raw[4:6], 16)
+        return r >= 150 and g <= 110 and b <= 110
+
+    def _check_decorative_underlines(self, content: str, result: Dict):
+        red_horizontal_lines = []
+        for match in re.finditer(r"<line\b([^>]*)/?>", content, re.IGNORECASE | re.DOTALL):
+            attrs = match.group(1)
+            stroke = self._attr_value(attrs, "stroke") or self._style_value(attrs, "stroke")
+            if not self._is_red_hex(stroke):
+                continue
+            x1 = self._parse_float(self._attr_value(attrs, "x1"))
+            x2 = self._parse_float(self._attr_value(attrs, "x2"))
+            y1 = self._parse_float(self._attr_value(attrs, "y1"))
+            y2 = self._parse_float(self._attr_value(attrs, "y2"))
+            if None in {x1, x2, y1, y2}:
+                continue
+            assert x1 is not None and x2 is not None and y1 is not None and y2 is not None
+            length = abs(x2 - x1)
+            if abs(y2 - y1) <= 2 and 24 <= length <= 260:
+                red_horizontal_lines.append((x1, y1, x2, y2, stroke))
+        clusters: list[list[tuple[float, float, float, float, str]]] = []
+        for item in red_horizontal_lines:
+            x1, _y1, x2, _y2, _stroke = item
+            length = abs(x2 - x1)
+            matched = False
+            for cluster in clusters:
+                cx1, _cy1, cx2, _cy2, _cstroke = cluster[0]
+                if abs(x1 - cx1) <= 24 and abs(x2 - cx2) <= 32 and abs(length - abs(cx2 - cx1)) <= 32:
+                    cluster.append(item)
+                    matched = True
+                    break
+            if not matched:
+                clusters.append([item])
+        if any(len(cluster) >= 2 for cluster in clusters):
+            result["errors"].append(
+                "strict visual: decorative underlines detected; repeated red horizontal rules "
+                "should encode data, timelines, separators, or focus states, not template decoration"
+            )
 
     def _check_dimensions(self, content: str, result: Dict):
         """Check width/height consistency with viewBox"""
@@ -1446,6 +1592,8 @@ def print_usage() -> None:
     print("  python3 scripts/svg_quality_checker.py templates/decks/招商银行 --template-mode")
     print("\nOptions:")
     print("  --format <ppt169|ppt43|...>   Expected canvas format")
+    print("  --expected-format <format>     Alias for --format")
+    print("  --strict-visual                Enable stricter visual hygiene checks")
     print("  --template-mode               Validate a templates/{layouts,decks}/<id> directory:")
     print("                                  glob *.svg directly, skip spec_lock checks,")
     print("                                  enforce roster ↔ design_spec.md Page Roster consistency,")
@@ -1468,14 +1616,16 @@ def main() -> None:
         sys.exit(1)
 
     template_mode = '--template-mode' in sys.argv
-    checker = SVGQualityChecker(template_mode=template_mode)
+    strict_visual = '--strict-visual' in sys.argv
+    checker = SVGQualityChecker(template_mode=template_mode, strict_visual=strict_visual)
 
     # Parse arguments
     target = sys.argv[1]
     expected_format = None
 
-    if '--format' in sys.argv:
-        idx = sys.argv.index('--format')
+    format_flag = '--format' if '--format' in sys.argv else '--expected-format' if '--expected-format' in sys.argv else ''
+    if format_flag:
+        idx = sys.argv.index(format_flag)
         if idx + 1 < len(sys.argv):
             expected_format = sys.argv[idx + 1]
 

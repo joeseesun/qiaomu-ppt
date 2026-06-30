@@ -206,7 +206,7 @@ def score_project(project: Path, min_score: int) -> dict[str, Any]:
     min_component_target = max(3, min(slide_count, 6))
     min_proof_target = max(3, min(slide_count, 6))
     asset_target = max(1, round(slide_count * (0.55 if slide_count > 8 else 0.45)))
-    generated_target = max(1, round(slide_count * 0.25)) if slide_count > 8 else 0
+    generated_target = max(3, round(slide_count * 0.2)) if slide_count > 8 else 0
     max_component_reuse = max(component_counter.values()) if component_counter else 0
     component_reuse_limit = max(2, round(slide_count * 0.22))
     adjacent_component_repeats = sum(
@@ -272,10 +272,9 @@ def score_project(project: Path, min_score: int) -> dict[str, Any]:
             "score": pct(
                 1.0
                 if slide_count <= 8
-                else max(
+                else min(
                     ratio(manifest_stats["ai_slide_count"], generated_target),
                     ratio(manifest_stats["ai_count"], generated_target),
-                    ratio(manifest_stats["slide_asset_count"], asset_target),
                 )
             ),
             "evidence": (
@@ -308,8 +307,11 @@ def score_project(project: Path, min_score: int) -> dict[str, Any]:
         warnings.append("slides with weak/non-semantic element planning: " + ", ".join(map(str, weak_element_slides[:8])))
     if manifest_stats.get("pending_count"):
         warnings.append(f"{manifest_stats['pending_count']} visual asset rows are not terminal")
-    if slide_count > 8 and not manifest_stats.get("ai_count"):
-        warnings.append("long deck has no AI visual rows; record why source/user/web visuals are sufficient or add atmosphere/concept-image rows")
+    if slide_count > 8 and manifest_stats.get("ai_count", 0) < generated_target:
+        failures.append(
+            f"long deck needs AI visual rows for key pages: {manifest_stats.get('ai_count', 0)}/{generated_target}. "
+            "Downloaded/source images can support evidence pages but do not replace generated key-page visuals."
+        )
     if max_component_reuse > component_reuse_limit:
         warnings.append(f"one component family is reused too often: {max_component_reuse} uses, limit {component_reuse_limit}")
 

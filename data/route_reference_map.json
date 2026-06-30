@@ -1,24 +1,30 @@
 {
   "schema_version": "1.0.0",
-  "updated_at": "2026-06-27",
+  "updated_at": "2026-06-29",
   "purpose": "乔木 PPT 的机器可读路线表，用于在不通读全部参考文件的情况下决定路线、最小必读参考、主要脚本、确认边界和质量门。",
   "global": {
     "always_keep": [
       "不要把用户项目产物写进 skill 目录。",
+      "默认把每次任务的调研包和后续产物写进 ~/Downloads/Qiaomu PPT/<date>-<slug>/，除非用户或项目明确指定其他位置。",
+      "第一步资料搜索整理和内容消化是独立交付物：引用链接、下载/提取图片、来源卡、research_dossier.md、content_report.md 或 内容母稿-<主题>.md、README.md/task_manifest.json 必须落盘。",
       "不要把 默认、生成、做个PPT、页数 等初始措辞当成允许直接渲染最终文件。",
       "整页图片式 PPTX 不能满足通常意义上的可编辑 PPTX 交付。",
+      "NotebookLM 原生 slide deck 可以作为明确选择的图片式/原生 PPTX 路线；必须在 export_manifest.json 标注 route=notebooklm_native_slide_deck 和 image_backed_ok。",
+      "用户未指定风格时，默认审美决策必须由主题、受众、证据类型、可信度需求、情绪温度、版式节奏和使用场景推导；风格漂亮但削弱内容即失败。",
+      "图片必须和每页内容绑定：生成图或来源图要有 claim_to_image_link、content_binding、文字安全区、标注目标和 integration_move。",
       "缺工具、缺来源权限、缺图片生成、缺原生 Office、缺 Keynote 或缺导出证据时，必须记录为 missing evidence。"
     ],
     "default_project_locations": [
-      "当前工作区 outputs/<date>-<slug>/",
-      "~/Documents/Qiaomu PPT/<date>-<slug>/",
+      "~/Downloads/Qiaomu PPT/<date>-<slug>/",
       "用户明确指定的位置"
     ],
     "baseline_scripts": [
+      "scripts/qiaomu_ppt.py plan|prepare|build|check",
       "scripts/bootstrap.py --check",
       "scripts/content_preflight.py <project> --profile <plan|draft|final>",
       "scripts/top_quality_plan.py <project> --profile <plan|draft|final>",
-      "scripts/check_project.py <project>"
+      "scripts/check_project.py <project>",
+      "scripts/final_status.py <project>"
     ],
     "baseline_references": [
       "references/chinese-typography-layout.md",
@@ -54,13 +60,16 @@
       "match_terms": ["url", "链接", "网页", "pdf", "epub", "office", "docx", "xlsx", "飞书", "文档", "zip", "资料包", "根据这个", "文章"],
       "input_patterns": ["http://", "https://", ".pdf", ".docx", ".pptx", ".xlsx", ".epub", ".zip"],
       "final_delivery": "editable_pptx",
-      "first_action": "先抓取/转换来源材料，生成来源清单和初步来源卡，再做资料与研究档案。",
-      "after_choice_action": "开始来源抓取和资料规划；不要直接渲染最终 PPT。",
+      "first_action": "先在下载目录项目夹中抓取/转换来源材料，生成来源清单、初步来源卡、图片候选、资料档案和内容母稿。",
+      "after_choice_action": "开始来源抓取、资料规划和内容母稿写作；不要直接渲染最终 PPT。",
       "confirmation_required": true,
       "required_references": [
         "references/source-intake-method.md",
         "references/url-ingestion.md",
-        "references/model-driven-generation.md"
+        "references/model-driven-generation.md",
+        "references/ppt-aesthetic-quality-framework.md",
+        "references/visual-character-and-style-picker.md",
+        "references/image-text-integration-contract.md"
       ],
       "optional_references": [
         "references/image-text-layout-patterns.md",
@@ -68,6 +77,7 @@
         "references/pptx-skill-method-adaptation.md"
       ],
       "primary_scripts": [
+        "scripts/prepare_deck_project.py <inputs...> --topic \"<topic>\"",
         "scripts/source_to_markdown.py <inputs...> --output-dir <project>/sources",
         "scripts/create_deck.py --topic \"<topic>\" <inputs...> --project <project> --slides <n>",
         "scripts/produce_deck.py <project> --quality-profile final --generate-images --enforce-quality-benchmark --fail-on-critical-repairs --benchmark-min-score 85"
@@ -76,14 +86,47 @@
       "stop_before": "design_proposal_confirmation"
     },
     {
+      "id": "notebooklm_native_pptx",
+      "label_zh": "NotebookLM 原生 PPTX / 搜索生成",
+      "priority": 97,
+      "match_terms": ["notebooklm", "NotebookLM", "原生pptx", "原生 PPTX", "notebooklm pptx", "slide-deck", "搜索生成ppt", "火柴人风格PPT", "图片式pptx", "纯图片pptx"],
+      "input_patterns": ["youtube.com", "youtu.be"],
+      "final_delivery": "notebooklm_native_pptx_plus_pdf",
+      "first_action": "确认用户明确要 NotebookLM 原生生成或接受图片式/原生 PPTX；创建项目目录，直接用 notebooklm CLI 添加来源、执行 Fast/Deep Research 或上传来源，再生成 slide-deck。",
+      "after_choice_action": "运行 scripts/notebooklm_deck.py 生成 NotebookLM PPTX/PDF；用户未明确指定风格时，先给 3-5 个按主题挑选、可读性优先的 NotebookLM 描述框风格建议和一个推荐默认值，再把确认后的短 prompt 写入 --prompt 或 --style。NotebookLM 提示词保持紧凑，研究等待使用 source_readiness 辅助信号，slide deck 使用独立 artifact wait，并记录 prompt、来源、搜索、下载、可编辑性、可编辑水印清理和可选图片水印修复证据。",
+      "route_reminders": [
+        "NotebookLM 路线如果用户未明确指定视觉风格，方案阶段必须给 3-5 个按主题挑选的风格建议、推荐默认值和每项一行短描述框 prompt；优先选择可读性好、对来源内容有视觉改进但不过度抢戏的风格。",
+        "NotebookLM UI 描述框对应原生 CLI 的 DESCRIPTION 位置参数；在 scripts/notebooklm_deck.py 中对应 --prompt。默认使用 --format presenter --length short 生成演示用简化幻灯片；--format detailed 或 --length default 只用于用户明确要阅读稿、讲义或资料汇编。",
+        "NotebookLM 风格建议避免直接要求复制具体出版物、品牌或在世艺术家；改写成都市杂志插画风、复古丝网电影海报风、博物馆专题展览风、手绘白板图解风等可描述视觉语言。",
+        "NotebookLM 风格 prompt、preset 描述、可读性要求和工具流程说明只属于内部生成指令，不得出现在画布可见文字里；交付前必须看缩略图排除 prompt 泄漏，因为图片式 PPTX 的可见字可能无法被原生文本检查捕获。"
+      ],
+      "confirmation_required": true,
+      "required_references": [
+        "references/notebooklm-native-deck.md",
+        "references/source-intake-method.md",
+        "references/quality-gates.md"
+      ],
+      "optional_references": [
+        "references/model-driven-generation.md",
+        "references/pptx-skill-method-adaptation.md"
+      ],
+      "primary_scripts": [
+        "scripts/notebooklm_deck.py <project> --title \"<title>\" --input <url-or-file> --search \"<query>\" --style-preset data_storytelling --style \"<optional short creative direction>\" --format presenter --length short --language zh_Hans --research-wait-timeout 180 --artifact-wait-timeout 900 --preview",
+        "scripts/strip_notebooklm_watermark.py <project>/exports/<slug>.notebooklm.raw.pptx --output <project>/exports/<slug>.notebooklm.pptx --remove-corner-logo --inpaint-raster-watermark --pdf-output <project>/exports/<slug>.notebooklm.pdf",
+        "scripts/check_project.py <project>"
+      ],
+      "required_gates": ["NotebookLM 登录/CLI 门", "来源/搜索导入门", "风格提示注入门", "PPTX/PDF 下载门", "水印清理证据门", "图片式交付标注门", "最终验证门"],
+      "stop_before": "design_proposal_confirmation_or_explicit_native_generation"
+    },
+    {
       "id": "paper_to_ppt",
       "label_zh": "论文转 PPT",
       "priority": 100,
       "match_terms": ["论文", "paper", "arxiv", "hugging face paper", "hugging face papers", "tex", "figure", "表格", "图表"],
       "input_patterns": ["arxiv.org", "huggingface.co/papers", "hf.co/papers"],
       "final_delivery": "editable_pptx",
-      "first_action": "先解析论文来源，优先提取 arXiv TeX、图、表和缺失证据，再写研究档案和逐页计划。",
-      "after_choice_action": "开始论文来源提取和研究规划；不要直接渲染最终 PPT。",
+      "first_action": "先在下载目录项目夹中解析论文来源，优先提取 arXiv TeX、图、表和缺失证据，再写研究档案、内容母稿和逐页计划。",
+      "after_choice_action": "开始论文来源提取、研究规划和内容母稿写作；不要直接渲染最终 PPT。",
       "confirmation_required": true,
       "required_references": [
         "references/paper-source-intake.md",
@@ -96,6 +139,7 @@
         "references/svg-pptx-compatibility.md"
       ],
       "primary_scripts": [
+        "scripts/prepare_deck_project.py <paper-url-or-file> --topic \"<paper title>\"",
         "scripts/source_to_markdown.py <paper-url-or-file> --output-dir <project>/sources",
         "scripts/paper_to_markdown.py <paper-url-or-file> --output-dir <project>/sources/papers",
         "scripts/create_deck.py --topic \"<paper title>\" <paper-url-or-file> --project <project> --slides <n>"
@@ -110,8 +154,8 @@
       "match_terms": ["微信公众号", "公众号文章", "微信文章", "mp.weixin.qq.com", "公众号链接"],
       "input_patterns": ["mp.weixin.qq.com"],
       "final_delivery": "editable_pptx",
-      "first_action": "先抓取微信文章正文和图片；普通 URL 提取弱时记录缺失证据或请求导出。",
-      "after_choice_action": "开始微信来源抓取和资料规划；不要直接渲染最终 PPT。",
+      "first_action": "先在下载目录项目夹中抓取微信文章正文和图片；普通 URL 提取弱时记录缺失证据或请求导出；再写资料档案和内容母稿。",
+      "after_choice_action": "开始微信来源抓取、资料规划和内容母稿写作；不要直接渲染最终 PPT。",
       "confirmation_required": true,
       "required_references": [
         "references/wechat-source-intake.md",
@@ -123,6 +167,7 @@
         "references/image-text-layout-patterns.md"
       ],
       "primary_scripts": [
+        "scripts/prepare_deck_project.py <wechat-url> --topic \"<topic>\" --download-images",
         "scripts/source_to_markdown.py <wechat-url> --output-dir <project>/sources --download-images",
         "scripts/create_deck.py --topic \"<topic>\" <wechat-url> --project <project> --slides <n>"
       ],
@@ -136,20 +181,23 @@
       "match_terms": ["ppt", "pptx", "powerpoint", "slides", "slide deck", "演示文稿", "幻灯片", "介绍", "主题", "人物", "历史", "文化", "讲一下", "做个ppt", "生成一个ppt", "默认", "不用过多搜索"],
       "input_patterns": [],
       "final_delivery": "editable_pptx",
-      "first_action": "先给路线卡和选择卡；用户接受默认后，再做主题研究、资料与研究档案和方案。",
-      "after_choice_action": "按默认值开始主题研究和方案规划；不要直接渲染最终 PPT。",
+      "first_action": "先给路线卡和选择卡；用户接受默认后，在下载目录项目夹中做主题研究、资料档案、内容母稿和方案。",
+      "after_choice_action": "按默认值开始主题研究、调研包归档和内容母稿写作，再做方案规划；不要直接渲染最终 PPT。",
       "confirmation_required": true,
       "required_references": [
         "references/guided-choice-flow.md",
         "references/topic-research-method.md",
-        "references/model-driven-generation.md"
+        "references/model-driven-generation.md",
+        "references/ppt-aesthetic-quality-framework.md",
+        "references/visual-character-and-style-picker.md",
+        "references/image-text-integration-contract.md"
       ],
       "optional_references": [
         "references/design-style-library.md",
-        "references/visual-character-and-style-picker.md",
         "references/visual-asset-acquisition.md"
       ],
       "primary_scripts": [
+        "scripts/prepare_deck_project.py --topic \"<topic>\" --slides <n>",
         "scripts/topic_research.py \"<topic>\" --output-dir <project>/sources --depth fast",
         "scripts/create_deck.py --topic \"<topic>\" --project <project> --slides <n>"
       ],
@@ -169,7 +217,10 @@
       "required_references": [
         "references/routing-playbook.md",
         "references/model-driven-generation.md",
-        "references/visual-systems.md"
+        "references/visual-systems.md",
+        "references/ppt-aesthetic-quality-framework.md",
+        "references/visual-character-and-style-picker.md",
+        "references/image-text-integration-contract.md"
       ],
       "optional_references": [
         "references/ppt-master-grade-execution.md",
@@ -217,19 +268,22 @@
       "input_patterns": [],
       "final_delivery": "semantic_html_deck",
       "first_action": "先确认 HTML 是否为最终交付，是否需要 PPTX 静态伴随版，以及动效等级。",
-      "after_choice_action": "开始 HTML deck 结构、动效和验证规划；不要默认承诺可编辑 PPTX parity。",
+      "after_choice_action": "开始 HTML deck 内容母稿、结构、动效和验证规划；不要默认承诺可编辑 PPTX parity。",
       "confirmation_required": true,
       "required_references": [
         "references/html-output.md",
+        "references/html-design-kernel.md",
         "references/html-motion.md",
         "references/model-driven-generation.md"
       ],
       "optional_references": [
         "references/visual-systems.md",
-        "references/svg-pptx-compatibility.md"
+        "references/svg-pptx-compatibility.md",
+        "data/html_deck_design_kernel.json"
       ],
       "primary_scripts": [
         "scripts/create_deck.py --topic \"<topic>\" <inputs...> --project <project> --formats html",
+        "scripts/export_bundle.py <project> --formats html --slug <slug> --title \"<title>\"",
         "scripts/validate_html_deck.py <project>/html/index.html --json <project>/reports/html_deck_validation.json --markdown <project>/reports/html_deck_validation.md"
       ],
       "required_gates": ["HTML 语义门", "固定舞台门", "动效降级门", "浏览器截图门", "最终验证门"],

@@ -13,7 +13,8 @@
         "production_authorized": false,
         "stop_before": "guided_choice_or_design_proposal",
         "required_references": ["references/guided-choice-flow.md", "references/topic-research-method.md"],
-        "primary_scripts": ["scripts/topic_research.py"],
+        "primary_scripts": ["scripts/prepare_deck_project.py", "scripts/topic_research.py"],
+        "global_reminders": ["~/Downloads/Qiaomu PPT", "第一步资料搜索整理"],
         "check_plan_run_now": ["路线卡与最终交付门", "content_preflight.py", "top_quality_plan.py", "选择卡或默认路线门"],
         "check_plan_defer_until_final": ["PPTX 可编辑性检查"],
         "check_plan_skip_by_default": ["bootstrap.py --check"],
@@ -31,7 +32,8 @@
         "production_authorized": false,
         "stop_before": "guided_choice_or_design_proposal",
         "check_plan_skip_by_default": ["bootstrap.py --check"],
-        "next_action_contains": ["主题研究", "方案规划"]
+        "next_action_contains": ["主题研究", "方案规划", "调研包归档"],
+        "global_reminders": ["~/Downloads/Qiaomu PPT", "research_dossier.md"]
       }
     },
     {
@@ -46,7 +48,8 @@
         "approval_bypass_phrase": "不用确认",
         "stop_before": "none",
         "check_plan_run_now": ["content_preflight.py", "top_quality_plan.py", "最终导出清单", "PPTX 预览缩略图"],
-        "primary_scripts": ["scripts/create_deck.py"]
+        "primary_scripts": ["scripts/prepare_deck_project.py", "scripts/create_deck.py"],
+        "global_reminders": ["~/Downloads/Qiaomu PPT"]
       }
     },
     {
@@ -61,7 +64,8 @@
         "validation_profile": "plan",
         "production_authorized": false,
         "required_references": ["references/source-intake-method.md", "references/url-ingestion.md"],
-        "primary_scripts": ["scripts/source_to_markdown.py"],
+        "primary_scripts": ["scripts/prepare_deck_project.py", "scripts/source_to_markdown.py"],
+        "global_reminders": ["~/Downloads/Qiaomu PPT", "下载/提取图片"],
         "check_plan_run_now": ["来源清单"],
         "check_plan_defer_until_final": ["PPTX 可编辑性检查"],
         "required_gates": ["来源证据门"]
@@ -77,7 +81,8 @@
         "route": "paper_to_ppt",
         "validation_profile": "plan",
         "required_references": ["references/paper-source-intake.md"],
-        "primary_scripts": ["scripts/paper_to_markdown.py"],
+        "primary_scripts": ["scripts/prepare_deck_project.py", "scripts/paper_to_markdown.py"],
+        "global_reminders": ["~/Downloads/Qiaomu PPT"],
         "check_plan_run_now": ["论文来源可达性"],
         "production_authorized": false
       }
@@ -91,7 +96,7 @@
         "route": "html_deck",
         "final_delivery": "semantic_html_deck",
         "validation_profile": "plan",
-        "required_references": ["references/html-output.md", "references/html-motion.md"],
+        "required_references": ["references/html-output.md", "references/html-design-kernel.md", "references/html-motion.md"],
         "check_plan_run_now": ["HTML 最终交付确认门"],
         "check_plan_skip_by_default": ["PPTX 可编辑性检查"],
         "production_authorized": false
@@ -106,7 +111,7 @@
         "route": "html_deck",
         "final_delivery": "semantic_html_deck",
         "validation_profile": "plan",
-        "required_references": ["references/html-output.md", "references/html-motion.md"],
+        "required_references": ["references/html-output.md", "references/html-design-kernel.md", "references/html-motion.md"],
         "primary_scripts": ["scripts/validate_html_deck.py"],
         "check_plan_defer_until_final": ["validate_html_deck.py"],
         "check_plan_skip_by_default": ["PPTX 可编辑性检查"],
@@ -141,6 +146,37 @@
         "required_gates": ["教学正确性门", "教师备注门"],
         "check_plan_run_now": ["学科/年级/教材边界门"],
         "production_authorized": false
+      }
+    },
+    {
+      "id": "default_aesthetic_applies_to_any_topic",
+      "prompt": "生成 12 页 PPT 介绍苏轼的审美世界，用户没指定风格。",
+      "stage": "initial",
+      "slides": 12,
+      "expected": {
+        "is_qiaomu_ppt_task": true,
+        "route": "broad_topic_ppt",
+        "validation_profile": "plan",
+        "production_authorized": false,
+        "required_references": ["references/ppt-aesthetic-quality-framework.md", "references/visual-character-and-style-picker.md", "references/image-text-integration-contract.md"],
+        "check_plan_run_now": ["默认审美决策门", "图文融合计划门"],
+        "global_reminders": ["用户未指定风格时", "图片必须和每页内容绑定"]
+      }
+    },
+    {
+      "id": "notebooklm_without_style_suggests_readable_style_options",
+      "prompt": "用 NotebookLM 原生 PPT 介绍《七龙珠》，15 页，用户没有指定风格。",
+      "stage": "initial",
+      "slides": 15,
+      "expected": {
+        "is_qiaomu_ppt_task": true,
+        "route": "notebooklm_native_pptx",
+        "final_delivery": "notebooklm_native_pptx_plus_pdf",
+        "validation_profile": "plan",
+        "production_authorized": false,
+        "required_references": ["references/notebooklm-native-deck.md"],
+        "required_gates": ["风格提示注入门"],
+        "global_reminders": ["3-5 个", "--prompt", "--format presenter"]
       }
     },
     {

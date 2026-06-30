@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "artifact_family": "content_preparation",
-  "purpose": "把第一步从资料摘要升级为可审计的内容准备包：先证明主题、证据、故事和落版条件成立，再生成正式大纲或 PPT。",
+  "purpose": "把第一步从资料摘要升级为可审计的内容准备包：先证明主题、证据、解释结构和内容边界成立，再进入正式大纲或 PPT 生产。",
   "profiles": {
     "plan": {
       "minimum_overall_score": 72,
@@ -26,6 +26,12 @@
   },
   "expected_artifacts": [
     {
+      "id": "research_archive",
+      "preferred_files": ["task_manifest.json", "research_archive.json", "README.md"],
+      "label_zh": "调研归档包",
+      "purpose": "每次任务一个可理解的项目文件夹，记录来源链接、下载/提取图片、资料报告、规划产物和后续导出位置；第一阶段即使不生成 PPT 也可独立复用。"
+    },
+    {
       "id": "content_brief",
       "preferred_files": ["content_brief.json", "deck_brief.json", "content_contract.json", "deck_brief.md"],
       "label_zh": "内容任务书",
@@ -42,6 +48,18 @@
       "preferred_files": ["evidence_matrix.json", "source_evidence_matrix.json", "sources/source_cards.json", "source_cards.json"],
       "label_zh": "证据卡矩阵",
       "purpose": "把来源资料整理成能支撑页面主张的证据卡，并标注置信度、来源、适用页面和视觉机会。"
+    },
+    {
+      "id": "source_synthesis",
+      "preferred_files": [
+        "content_report.md",
+        "内容母稿.md",
+        "内容母稿-*.md",
+        "content_synthesis.md",
+        "source_synthesis.md"
+      ],
+      "label_zh": "内容母稿",
+      "purpose": "把来源资料和证据卡消化成一篇有中心判断、有推理结构、有边界说明、可独立阅读的长文；research_dossier.md 是资料档案，不能替代内容母稿。第二阶段可从这篇长文抽取页面主张。"
     },
     {
       "id": "page_kernel_map",
@@ -101,7 +119,11 @@
     "transition_from_previous"
   ],
   "quality_rules": [
-    "第一步先证明内容成立，再生成漂亮页面。",
+    "默认项目目录是 ~/Downloads/Qiaomu PPT/<YYYY-MM-DD>-<slug>/，除非用户或调用方明确指定其他位置。",
+    "每次任务都要有 README.md 或 task_manifest.json 作为归档索引，说明资料、图片、规划、配置、提示词和导出文件在哪里。",
+    "第一步资料搜索整理本身就是交付物；下载图片、引用链接、来源卡和 research_dossier.md 必须落盘，不只留在聊天上下文。",
+    "主题型 PPT 的正式大纲前必须有内容母稿（content_report.md 或 内容母稿-<主题>.md）：先把资料消化成有主张、有结构、有边界的长文；页面主张、视觉翻译和排版建议属于第二阶段 sidecar。",
+    "第一步先证明内容成立，再进入页面规划和视觉生产。",
     "研究问题树必须覆盖正向问题和反方问题，避免只搜支持自己结论的材料。",
     "证据卡必须能映射到页面主张；不能只保存来源摘要。",
     "页面内核表优先于正式 slide_plan；每页只有一个主张和一个主要证明对象。",
@@ -109,9 +131,12 @@
     "资料不足时写 missing evidence，不用空泛背景补洞。"
   ],
   "hard_blockers": [
+    "缺任务归档索引，无法判断本次任务产物沉淀在哪里",
+    "缺调研报告，后续大纲没有资料基础",
     "缺内容任务书，无法判断受众和使用场景",
     "缺研究问题树，宽泛主题容易变目录",
     "缺证据卡或证据卡没有来源",
+    "缺内容母稿，页面主张直接从链接或资料摘要抽取",
     "正式大纲前缺页面内核表",
     "关键页没有证据锚点或具体事实",
     "视觉翻译准备只写风格词，没有图文关系和布局理由"

@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-06-29",
+  "default_packs": [
+    "core",
+    "magazine",
+    "ppt_master_cases"
+  ],
+  "optional_packs": [
+    "32kw_bento",
+    "ppt_master_examples",
+    "notebooklm_styles",
+    "html_motion"
+  ],
+  "packs": {
+    "core": {
+      "library": "data/design_style_presets.json",
+      "default": true,
+      "runtime_library": true,
+      "purpose": "General qiaomu-ppt style presets for normal deck planning and rendering.",
+      "use_when": "Default for broad topic decks, business reports, courseware, talks, and product releases."
+    },
+    "magazine": {
+      "library": "data/magazine_art_styles.json",
+      "default": true,
+      "runtime_library": true,
+      "purpose": "Editorial and art-direction presets for magazine-like Chinese reading decks.",
+      "use_when": "Use for culture, lifestyle, fashion, essay, and visual storytelling decks."
+    },
+    "ppt_master_cases": {
+      "library": "data/ppt_master_case_styles.json",
+      "default": true,
+      "runtime_library": true,
+      "purpose": "Compact case-derived style abstractions learned from ppt-master examples.",
+      "use_when": "Use when the user asks for higher-end PPT craft, keynote texture, or case-style visual language."
+    },
+    "32kw_bento": {
+      "library": "data/32kw_bento_style_presets.json",
+      "default": false,
+      "runtime_library": true,
+      "purpose": "Bento/grid style seeds for dense product, dashboard, and AI-tool launch decks.",
+      "use_when": "Add with --pack 32kw_bento when the brief explicitly asks for bento, modular cards, or 32kw-style visual seeds."
+    },
+    "ppt_master_examples": {
+      "library": "data/ppt_master_examples_catalog.json",
+      "default": false,
+      "runtime_library": false,
+      "purpose": "Reference catalog for judging example scale, media density, page rhythm, and production expectations.",
+      "use_when": "Use as a research/reference pack, not as a default style recommendation library."
+    },
+    "notebooklm_styles": {
+      "library": "data/notebooklm_style_prompts.json",
+      "default": false,
+      "runtime_library": false,
+      "purpose": "NotebookLM-native style prompts for explicit NotebookLM deck generation.",
+      "use_when": "Use only on the NotebookLM-native route."
+    },
+    "html_motion": {
+      "library": "data/html_motion_presets.json",
+      "default": false,
+      "runtime_library": false,
+      "purpose": "Motion presets for explicit semantic HTML or HTML-motion routes.",
+      "use_when": "Use only when the requested deliverable includes HTML motion."
+    }
+  }
+}

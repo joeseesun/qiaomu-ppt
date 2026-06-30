@@ -245,25 +245,26 @@ def build_repair_plan(project: Path, report: dict[str, Any], *, min_score: int, 
             ],
         )
 
-    if score_of(categories, "real_image_generation") < 80 and int(assets.get("ai_count") or 0):
-        severity = "critical" if int(assets.get("procedural_fallback_count") or 0) else "high"
+    if score_of(categories, "real_image_generation") < 80 and slide_count >= 4:
         add_action(
             actions,
             action_id="repair-real-imagegen",
             priority=40,
-            severity=severity,
+            severity="critical",
             category="image_generation",
-            title="Replace procedural preview assets with real generated visuals",
+            title="Add real generated visuals on key pages",
             reason=evidence_of(categories, "real_image_generation"),
             target_artifacts=["assets/images/generation_batch/", "visual_asset_manifest.json", "assets/images/image_prompts.json"],
             steps=[
-                "Stage the existing image_generation_queue into one prompt folder per asset.",
+                "Add or keep AI rows for the cover/opening thesis, at least one major proof/framework/process page, and the closing or transition page; long decks should target roughly 20% of slides as key generated visuals.",
                 "Generate/import real image files through Codex built-in image generation or a configured provider; keep generator, dimensions, and import time in the manifest.",
-                "Do not claim final-quality visuals while generator=procedural-preview-fallback remains on used AI rows.",
+                "Downloaded/source images may be used as evidence pages, but they do not replace key-page generated visuals.",
+                "Do not claim final-quality visuals while generator=procedural-preview-fallback or local source-derived placeholder visuals remain the primary finish.",
             ],
             verification=[
                 "python3 scripts/stage_image_generation.py <project> --force",
                 "python3 scripts/check_project.py <project> --require-real-imagegen",
+                "python3 scripts/deck_quality_benchmark.py <project> --min-score " + str(min_score),
             ],
         )
 

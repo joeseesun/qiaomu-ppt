@@ -11,8 +11,11 @@ env/
 *.p12
 *.pfx
 outputs/
+reports/
 tmp/
 demo/sources/
+assets/fonts/*.ttf
+assets/fonts/*.otf
 assets/fonts/*.zip
 assets/fonts/*.tmp
 assets/fonts/*.part

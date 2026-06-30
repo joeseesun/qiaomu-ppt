@@ -17,21 +17,25 @@ SKILL_DIR = SCRIPT_DIR.parent
 DEFAULT_CONTRACT = SKILL_DIR / "data" / "content_preparation_contract.json"
 
 ARTIFACT_CANDIDATES = {
+    "research_archive": ["task_manifest.json", "research_archive.json", "README.md"],
     "content_brief": ["content_brief.json", "deck_brief.json", "content_contract.json", "deck_brief.md"],
     "question_tree": ["research_questions.json", "research_question_tree.json", "question_tree.json", "research_questions.md"],
     "research_dossier": ["research_dossier.md", "sources/research_dossier.md", "sources/source_notes.md"],
+    "source_synthesis": ["content_report.md", "内容母稿.md", "内容母稿-*.md", "content_synthesis.md", "source_synthesis.md"],
     "evidence_matrix": ["evidence_matrix.json", "source_evidence_matrix.json", "sources/source_cards.json", "source_cards.json"],
     "page_kernel_map": ["page_kernel_map.json", "slide_kernel_map.json", "slide_plan.json"],
     "visual_translation": ["visual_translation_plan.json", "visual_contract.json", "style_direction.json", "style_direction.md"],
 }
 
 PREP_WEIGHTS = {
-    "content_brief": 18,
-    "question_tree": 18,
-    "evidence_matrix": 24,
-    "story_premise": 16,
-    "page_kernels": 16,
-    "visual_translation": 8,
+    "research_archive": 8,
+    "content_brief": 14,
+    "question_tree": 14,
+    "evidence_matrix": 18,
+    "source_synthesis": 16,
+    "story_premise": 12,
+    "page_kernels": 12,
+    "visual_translation": 6,
 }
 
 GENERIC_PHRASES = {
@@ -114,6 +118,11 @@ def candidate_path(project: Path, explicit: str | None, candidates: list[str]) -
             path = project / path
         return path
     for item in candidates:
+        if "*" in item:
+            matches = sorted(project.glob(item))
+            if matches:
+                return matches[0]
+            continue
         path = project / item
         if path.exists():
             return path
@@ -373,6 +382,81 @@ def audit_question_tree(inputs: dict[str, Any], contract: dict[str, Any]) -> dic
     )
 
 
+def count_image_files(project: Path) -> int:
+    suffixes = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".tif", ".tiff", ".svg"}
+    roots = [
+        project / "sources" / "images",
+        project / "assets" / "source-images",
+        project / "assets" / "source_visuals",
+    ]
+    count = 0
+    for root in roots:
+        if root.exists():
+            count += sum(1 for path in root.rglob("*") if path.is_file() and path.suffix.lower() in suffixes)
+    return count
+
+
+def audit_research_archive(project: Path, inputs: dict[str, Any]) -> dict[str, Any]:
+    archive_path = inputs.get("research_archive_path")
+    archive_text = inputs.get("research_archive_text", "")
+    dossier_path = inputs.get("research_dossier_path")
+    dossier_text = inputs.get("research_dossier_text", "")
+    source_manifest_path = project / "sources" / "source_manifest.json"
+    source_notes_path = project / "sources" / "source_notes.md"
+    source_cards_path = project / "sources" / "source_cards.json"
+    source_manifest = read_json_optional(source_manifest_path)
+    source_cards = read_json_optional(source_cards_path)
+    source_count = len(source_manifest.get("sources", [])) if isinstance(source_manifest, dict) else 0
+    cards = extract_cards(source_cards)
+    image_candidates = 0
+    if isinstance(source_cards, dict):
+        image_candidates = len(source_cards.get("image_candidates") or [])
+    image_files = count_image_files(project)
+    link_hits = len(re.findall(r"https?://", text_blob(archive_text, dossier_text, source_manifest)))
+
+    score = 0
+    if archive_path and read_text(archive_path).strip():
+        score += 24
+    if dossier_path and dossier_text.strip():
+        score += 24
+    if source_manifest_path.exists() and source_count:
+        score += 18
+    if source_notes_path.exists() or cards:
+        score += 14
+    score += min(12, link_hits * 3)
+    if image_candidates or image_files:
+        score += 8
+
+    blockers: list[str] = []
+    actions: list[str] = []
+    if not archive_path:
+        blockers.append("缺任务归档索引")
+        actions.append("写入 README.md 或 task_manifest.json，说明本次任务的资料、图片、规划和导出产物位置。")
+    if not dossier_path:
+        blockers.append("缺调研报告")
+        actions.append("先写 research_dossier.md，把来源、链接、图片候选、解释判断和缺口沉淀下来。")
+    if source_count == 0 and not cards:
+        blockers.append("缺来源清单或来源卡")
+        actions.append("补 sources/source_manifest.json 和 sources/source_cards.json；搜索结果必须落盘，不只留在聊天里。")
+    if not image_candidates and not image_files:
+        actions.append("如果素材中有可用图片，把下载/提取图片或图片候选记录进 sources/images、source_cards 或 visual_asset_manifest。")
+
+    findings = [
+        f"来源记录 {source_count} 条，证据卡 {len(cards)} 张。",
+        f"链接锚点 {link_hits} 个，图片候选 {image_candidates} 个，本地图片 {image_files} 个。",
+    ]
+    return category(
+        category_id="research_archive",
+        label="调研归档包",
+        weight=PREP_WEIGHTS["research_archive"],
+        score=score,
+        evidence=f"index={archive_path or 'missing'}; dossier={dossier_path or 'missing'}; source_manifest={source_manifest_path if source_manifest_path.exists() else 'missing'}",
+        findings=findings,
+        actions=actions,
+        blockers=blockers,
+    )
+
+
 def audit_evidence_matrix(inputs: dict[str, Any]) -> dict[str, Any]:
     path = inputs.get("evidence_matrix_path")
     payload = inputs.get("evidence_matrix_json")
@@ -439,6 +523,78 @@ def audit_evidence_matrix(inputs: dict[str, Any]) -> dict[str, Any]:
         findings=[
             f"{claim_count}/{total} 张卡有主张，{evidence_count}/{total} 张卡有证据。",
             f"{source_count}/{total} 张卡有来源，{support_count}/{total} 张卡有页面或问题支撑。",
+        ],
+        actions=actions,
+        blockers=blockers,
+    )
+
+
+def audit_source_synthesis(inputs: dict[str, Any]) -> dict[str, Any]:
+    path = inputs.get("source_synthesis_path")
+    text = inputs.get("source_synthesis_text", "")
+    if not path or not text.strip():
+        return category(
+            category_id="source_synthesis",
+            label="内容母稿",
+            weight=PREP_WEIGHTS["source_synthesis"],
+            score=0,
+            evidence="未找到 content_report.md / 内容母稿*.md。",
+            findings=[],
+            actions=[
+                "先写内容母稿，把来源资料消化成有主张、有结构、有判断和边界的可读长文。",
+                "不要把 research_dossier.md 或链接清单当成内容母稿；资料档案解决可追溯，内容母稿解决观点质量。",
+            ],
+            blockers=["缺内容母稿"],
+        )
+
+    length = len(text)
+    groups = {
+        "中心判断": ["中心判断", "核心判断", "这份内容母稿", "本文认为", "判断是", "thesis"],
+        "资料消化": ["资料", "来源", "官方", "依据", "证据", "调研"],
+        "解释结构": ["为什么", "机制", "原因", "关键", "不是", "而是"],
+        "叙事推进": ["第一", "第二", "接着", "最后", "这条线", "更有价值的讲法"],
+        "主张结构": ["主张", "论点", "判断", "结构", "例子", "可复用"],
+        "边界风险": ["边界", "风险", "不要", "不能", "missing evidence", "版权"],
+    }
+    matched = [label for label, terms in groups.items() if contains_any(text, terms)]
+    heading_count = len(re.findall(r"^#{1,3}\s+", text, flags=re.M))
+    source_hits = len(re.findall(r"https?://|\b(?:S|SC|SRC)[-_][A-Za-z0-9_-]+\b|来源|依据", text))
+
+    score = 8
+    if length >= 2500:
+        score += 28
+    elif length >= 1500:
+        score += 20
+    elif length >= 800:
+        score += 10
+    score += 8 * len(matched)
+    score += min(8, heading_count * 2)
+    score += min(8, source_hits * 2)
+
+    blockers: list[str] = []
+    actions: list[str] = []
+    if length < 800:
+        blockers.append("内容母稿过短")
+        actions.append("把内容母稿扩展为可读长文，至少说明核心判断、证据依据、解释结构、主张结构和边界。")
+    if "中心判断" not in matched:
+        blockers.append("内容母稿缺中心判断")
+        actions.append("在开头明确写出“我读完资料后得到的核心判断”。")
+    if "资料消化" not in matched:
+        actions.append("补资料如何支撑判断，而不是只写观点。")
+    if "主张结构" not in matched:
+        actions.append("补这篇文章的可复用主张、关键例子和推理结构；不要在内容母稿里写排版或生成建议。")
+    if "边界风险" not in matched:
+        actions.append("补来源边界、版权、低置信结论或 missing evidence。")
+
+    return category(
+        category_id="source_synthesis",
+        label="内容母稿",
+        weight=PREP_WEIGHTS["source_synthesis"],
+        score=score,
+        evidence=f"{path}; chars={length}; headings={heading_count}; matched={','.join(matched) or 'none'}",
+        findings=[
+            f"内容母稿 {length} 字符，{heading_count} 个标题层级。",
+            f"覆盖：{','.join(matched) or '无'}。",
         ],
         actions=actions,
         blockers=blockers,
@@ -602,9 +758,11 @@ def evaluate_project(project: Path, inputs: dict[str, Any], contract: dict[str, 
     category_threshold = int(profile_rule.get("minimum_category_score", 70))
     allow_missing_page_kernels = bool(profile_rule.get("allow_missing_page_kernels", False))
     categories = [
+        audit_research_archive(project, inputs),
         audit_content_brief(inputs, contract),
         audit_question_tree(inputs, contract),
         audit_evidence_matrix(inputs),
+        audit_source_synthesis(inputs),
         audit_story_premise(inputs),
         audit_page_kernels(inputs, allow_missing_page_kernels),
         audit_visual_translation(inputs),
@@ -776,7 +934,71 @@ def write_self_test_project(project: Path) -> None:
     }
     write_json(project / "content_contract.json", content)
     write_json(project / "research_questions.json", questions)
+    write_json(
+        project / "task_manifest.json",
+        {
+            "schema_version": "1.0.0",
+            "topic": "AI 创作生产线",
+            "stages": [
+                {
+                    "id": "00_research",
+                    "label_zh": "资料搜索整理",
+                    "artifacts": ["research_dossier.md", "content_report.md", "sources/source_manifest.json", "sources/source_cards.json"],
+                }
+            ],
+        },
+    )
+    write_text(
+        project / "README.md",
+        "# Qiaomu PPT Task Archive\n\n- `research_dossier.md`\n- `content_report.md`\n- `sources/source_manifest.json`\n- `sources/source_cards.json`\n",
+    )
+    write_json(
+        project / "sources" / "source_manifest.json",
+        {
+            "schema_version": "1.0.0",
+            "sources": [
+                {
+                    "input": "https://example.com/report",
+                    "title": "AI workflow report",
+                    "source_type": "url",
+                    "fetch_route": "self_test",
+                    "markdown_path": "report.md",
+                    "images": ["images/workflow.png"],
+                    "warnings": [],
+                    "missing_evidence": [],
+                }
+            ],
+        },
+    )
     write_json(project / "sources" / "source_cards.json", cards)
+    write_text(
+        project / "research_dossier.md",
+        "# Research Dossier\n\n来源链接：https://example.com/report\n\n图片候选：`sources/images/workflow.png`\n\n已验证事实、解释判断、缺口和页面支撑映射已记录。\n",
+    )
+    write_text(
+        project / "content_report.md",
+        """# 为什么 AI 创作需要从模型尝鲜走向稳定生产线
+
+这份内容母稿的中心判断是：AI 创作的价值正在从模型尝鲜转向流程复用。资料显示，创作者面对的问题已经不只是会不会调用某个模型，而是能不能把选题、资料、提示词、图片、检查和分发组织成稳定链路。
+
+## 资料消化：从工具热闹到流程压力
+
+第一，来源资料说明工作流类 AI 工具正在成为基础设施。这个事实不能直接变成“AI 很重要”的空泛页面，而应该转译成一个更具体的判断：单次聊天解决灵感，生产线解决持续产出。依据自测来源 S-001，创作者已经在同一条产出链里同时面对选题、素材、文案、图片和发布检查，瓶颈不是模型能力单点不足，而是每一步之间缺少可复用衔接。
+
+第二，创作者调研反复提到稳定产出、分发和复用。这意味着核心问题不应停留在工具清单，而应解释为什么复用流程降低每次从零开始的决策成本。更有价值的判断是：AI 创作的真实成本不在一次产出，而在每次重新定义任务、寻找资料、整理证据、重写提示词和返工视觉。流程把这些高频动作沉淀下来，让新项目可以站在上一次项目的肩膀上开始。
+
+第三，流程并不会限制创意。更准确的判断是：流程把重复劳动收纳起来，让创作者把注意力放回判断、审美和取舍。这个转折回应了一个常见反方问题：不是流程让内容变普通，而是没有流程时，创作者的大量注意力被格式、素材和检查吞掉，真正需要人的判断反而被挤压。
+
+## 可复用的主张结构
+
+这篇母稿可以沉淀出四个可复用主张：第一，单点模型能力不等于稳定生产能力；第二，复用流程降低的是重新启动成本；第三，流程和创意不是对立关系，流程释放的是判断空间；第四，可持续产出的关键不是追逐更多工具，而是把选题、素材、提示词、检查表和发布清单沉淀成可反复调用的系统。这些主张各自有证据对象和反方问题，后续规划可以再决定它们是否进入页面、报告章节或讲者备注。
+
+## 边界风险
+
+边界也要写清楚：示例数据只来自自测来源，不伪造平台截图，不把局部案例说成全行业结论。涉及产品能力、行业规模或具体效果时，必须回到来源继续核查，不能用漂亮但无证据的表达替代事实。
+""",
+    )
+    write_text(project / "sources" / "images" / "workflow.png", "self-test image placeholder")
     write_json(project / "page_kernel_map.json", kernels)
     write_json(project / "visual_contract.json", visual)
 

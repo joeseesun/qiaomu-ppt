@@ -1,5 +1,7 @@
 # Qiaomu PPT
 
+**中文** | [English](#english)
+
 中文优先的 PPT 生成工作流：把主题、文档、URL、PDF、旧 deck 或课程材料，变成可编辑、可讲、可验证的演示文稿。
 
 `qiaomu-ppt` 不是模板仓库，也不是把几个上游 skill 打包转卖。它把 PPT 创作拆成一条可复用的生产线：先抓取资料，再判断路线，再写有说服力的内容结构，再锁定安静、克制、可读的视觉系统，最后用质量门检查导出证据。
@@ -9,6 +11,19 @@
 示例缩略图：
 
 ![GLM 5.2 deck thumbnail grid](docs/assets/glm52-deck-grid.jpg)
+
+## 默认核心路径
+
+`qiaomu-ppt` 的默认体验已经收敛为五步：`plan -> prepare -> proposal/preview -> build -> check`。Agent 优先使用一个轻量入口，而不是直接记忆几十个内部脚本：
+
+```bash
+python3 scripts/qiaomu_ppt.py plan --prompt "生成一个10页PPT介绍..."
+python3 scripts/qiaomu_ppt.py prepare --topic "..." --slides 10
+python3 scripts/qiaomu_ppt.py build /path/to/project --quality-profile final
+python3 scripts/qiaomu_ppt.py check /path/to/project
+```
+
+默认核心交付是可编辑 PPTX、PDF、逐页计划、视觉资产清单、讲者备注和 `final_status.json` / `交付检查.md`。NotebookLM 原生 deck、HTML 动效、Keynote、社媒图片式 deck、庞大的风格/案例研究库都属于按需路线包；用户明确要求或路线卡选中时再启用。
 
 ## 亮点
 
@@ -64,7 +79,7 @@
 - 本地资产落盘预览：没有配置真实生图后端时，可用 `materialize_visual_assets.py` 或 `prepare_deck_project.py --materialize-assets` 生成 16:9 程序化 PNG 预览资产，并明确记录 `generator: procedural-preview-fallback`；这些文件用于快速视觉 QA，可被后续 gpt-image/Codex 生图结果替换。
 - 真实生图回填：Codex 内置生图、gpt-image-2 或其它后端产出的图片，可用 `import_generated_assets.py` 按 asset id / filename 批量导入，自动更新 `visual_asset_manifest.json` 的状态、generator、尺寸和 `image_prompts.json`。
 - 图片不出框：所有图片/图表都要有 image slot、fit、mask、padding 和 `overflow_policy: clip_or_fail`。
-- 风格自动推荐：内置 74 个从 `awesome-design-md` 抽象出的 PPT 风格预设，并加入 `Magazine Art Direction` 元风格、29 个杂志子变体，以及从 `ppt-master` 案例吸收的 14 个 case style，可按场景推荐。
+- 风格自动推荐：`data/style_packs.json` 把风格库分成默认 pack 和可选 pack。默认只加载 `core`、`magazine`、`ppt_master_cases`；`32kw_bento`、完整案例索引、NotebookLM 风格和 HTML motion 是按需路线包。
 - 案例风格吸收：参考 [`hugohe3/ppt-master`](https://github.com/hugohe3/ppt-master) 的优秀案例，但不依赖其 skill 运行；只吸收可复用的图片资产策略、图表类型、页面节奏、版式语法和 spec lock 方法。
 - 完整案例索引：`data/ppt_master_examples_catalog.json` 索引了 `ppt-master` gallery 的 21 个案例、280 页最终 SVG、260 个本地图片文件、21 个 PPTX 和 301 份 notes，用于判断类似风格需要多少资料、图片和图表支撑。
 - 风格执行审计：`style_execution_audit.py` 会检查 `style_direction.json` 是否真的落到 renderer `render_style` / `component_language` / `proof_language` token，并读取 SVG 画布确认 style canvas 和 proof canvas 的风格标记真实渲染出来；同时按页检查 layout program 是否通过 ITL、Lxx 或 proof-object-to-component 映射落地，再检查 `component_type`、`art_direction`、视觉/源图密度和重复控制，防止“选了 ppt-master/杂志风格，但渲染出来仍是通用卡片页”。
@@ -98,6 +113,9 @@ python3 scripts/bootstrap.py --install-system --install-python --venv --download
 python3 scripts/bootstrap.py --check
 ```
 
+如果 `bootstrap.py` 因系统 Python 受保护而创建了本地 `.venv`，后续命令可先运行
+`source .venv/bin/activate`，或把示例里的 `python3` 替换成 `.venv/bin/python`。
+
 `--install-system` 会用 macOS Homebrew 或 Ubuntu/Debian `apt` 自动安装缺失的必需外部工具；完整 PPTX 预览/验证需要 LibreOffice（`soffice`）。如果还要一次性安装 Poppler、ImageMagick、Node.js 等可选工具，可运行：
 
 ```bash
@@ -106,7 +124,7 @@ python3 scripts/bootstrap.py --install-system --include-optional-system
 
 LibreOffice 官方下载页：<https://www.libreoffice.org/download/>。正常 agent 工作流应优先执行 `python3 scripts/bootstrap.py --install-system`，让脚本用包管理器安装；只有 Homebrew/apt 不可用、权限不足或用户明确不要自动安装时，才退到官方下载页手动安装。
 
-仓库内置一组 PPT 字体包：Noto Sans CJK SC、Noto Serif CJK SC、Inter Variable、IBM Plex Sans，以及可选的 Smiley Sans、LXGW WenKai、Sarasa Mono SC、JetBrains Mono；`--download-fonts` 用于修复或重新下载字体文件。
+本仓库声明一组 PPT 推荐字体包：Noto Sans CJK SC、Noto Serif CJK SC、Inter Variable、IBM Plex Sans，以及可选的 Smiley Sans、LXGW WenKai、Sarasa Mono SC、JetBrains Mono。公开仓库不提交字体二进制；需要完整 PPTX/预览保真度时运行 `python3 scripts/bootstrap.py --download-fonts` 下载到本地。
 
 HTML 动效不是全局必需依赖。需要自托管 GSAP/Lottie 资产时，可在具体项目里用 npm 获取浏览器库，再复制到项目 `html/assets/vendor/` 等本地目录；最终交付要在 `html_motion_manifest.json` 中记录本地路径，或明确列出外部依赖：
 
@@ -123,7 +141,7 @@ python3 scripts/create_deck.py \
   --topic "蒲松龄：狐鬼故事里的现实秩序" \
   --project demo/pusongling \
   --slides 10 \
-  "/Users/joe/Documents/pusongling.md"
+  examples/pusongling.md
 ```
 
 如果用户已经明确要一口气生产，并且真实生图后端已配置，可以加 `--produce --generate-images`：
@@ -136,7 +154,7 @@ python3 scripts/create_deck.py \
   --produce \
   --generate-images \
   --auto-apply-repairs \
-  "/Users/joe/Documents/pusongling.md"
+  examples/pusongling.md
 ```
 
 `create_deck.py` 会写入 `deck_create_manifest.json` 和 `deck_create_report.md`，
@@ -150,10 +168,13 @@ python3 scripts/prepare_deck_project.py \
   --topic "蒲松龄：狐鬼故事里的现实秩序" \
   --project demo/pusongling \
   --slides 10 \
-  "/Users/joe/Documents/pusongling.md"
+  examples/pusongling.md
 ```
 
-这一步会生成 `deck_brief.md`、`style_brief.md`、`design_proposal.md`、
+不传 `--project` 时，默认项目会写到 `~/Downloads/Qiaomu PPT/<date>-<slug>/`，
+并生成 `README.md` / `task_manifest.json` 作为本次任务的归档索引。
+
+这一步会生成 `README.md`、`task_manifest.json`、`deck_brief.md`、`style_brief.md`、`design_proposal.md`、
 `style_recommendations.json`、`layout_recommendations.json`、`style_direction.json/md`、
 `sources/source_manifest.json`、`sources/source_notes.md`、
 `sources/source_cards.json`、`content_contract.json`、`slide_plan_seed.json`、
@@ -197,7 +218,7 @@ python3 scripts/prepare_deck_project.py \
   --materialize-assets \
   --generate-preview \
   --preview-decision pending \
-  "/Users/joe/Documents/pusongling.md"
+  examples/pusongling.md
 ```
 
 也可以在已有 `slide_plan.json` 的项目里单独运行：
@@ -381,8 +402,8 @@ python3 scripts/prepare_deck_project.py \
   --slides 10
 ```
 
-这种情况下脚本会自动调用 `scripts/topic_research.py` 的 fast 模式，优先用
-Brave Search（如果配置了 `BRAVE_SEARCH_API_KEY`）、Wikipedia/Wikidata 等轻量
+这种情况下脚本会自动调用 `scripts/topic_research.py` 的 fast 模式，默认使用
+Wikipedia/Wikidata、DuckDuckGo Instant Answer 等无需私有搜索 key 的轻量
 来源建立 `sources/source_manifest.json`、`source_notes.md`、`source_cards.json`，
 再生成 `content_contract.json` 和 `slide_plan.json`。复合主题会先拆出实体焦点，
 例如“蒲松龄与聊斋志异”会同时查人物和作品；`source_cards.py` 会过滤导航、
@@ -411,8 +432,8 @@ python3 scripts/topic_research.py "蒲松龄" \
 ```bash
 python3 scripts/source_to_markdown.py \
   "https://example.com/article" \
-  "/Users/joe/Books/example.epub" \
-  "/Users/joe/Documents/report.pdf" \
+  examples/book.epub \
+  examples/report.pdf \
   --output-dir demo/sources
 ```
 
@@ -470,6 +491,16 @@ python3 scripts/source_to_markdown.py \
 python3 scripts/recommend_style.py \
   --query "AI 产品发布会，技术证据，黑底，少字，大屏演讲" \
   --route brand_release \
+  --top 5
+```
+
+需要 bento/grid 种子时再显式打开可选 pack：
+
+```bash
+python3 scripts/recommend_style.py \
+  --query "AI 工具发布，bento grid，模块化卡片，产品能力矩阵" \
+  --route brand_release \
+  --pack 32kw_bento \
   --top 5
 ```
 
@@ -741,12 +772,11 @@ python3 scripts/keynote_probe.py \
 
 推荐输出位置：
 
-- 有明确工作区时：`<workspace>/outputs/<date>-<slug>/`
-- 没有明确工作区、需要长期保存时：`~/Documents/Qiaomu PPT/<date>-<slug>/`
-- 只是快速试稿或临时交付时：`~/Downloads/<slug>/`
+- 默认：`~/Downloads/Qiaomu PPT/<date>-<slug>/`
+- 用户或项目明确要求时：`<workspace>/outputs/<date>-<slug>/`
 - 用户明确指定 Desktop / Downloads / Documents / 绝对路径时，以用户选择为准
 
-对图形界面集成，建议提供“当前工作区 / 文稿 / 下载 / 桌面 / 自定义路径”的选择；命令行和 agent 环境则默认用当前工作区的 `outputs/`，并在报告里写清楚最终路径。
+对图形界面集成，建议提供“下载 / 当前工作区 / 文稿 / 桌面 / 自定义路径”的选择；命令行和 agent 环境默认用下载目录的 `Qiaomu PPT` 归档根目录，并在报告里写清楚最终路径。
 
 ## 你可以直接这样说
 
@@ -765,10 +795,10 @@ python3 scripts/keynote_probe.py \
 ## 工作流
 
 1. 上下文入口：如果用户只说“做/生成 PPT”，先给路线卡和 1A 2B 3C 选择卡，带推荐默认项；除非用户明确说“直接生成最终版/不用确认/一口气生成”等严格跳过词，不直接开始渲染。
-2. 资料入口：读取用户材料；如果有 URL/arXiv/Hugging Face 论文/微信公众号文章/PDF/EPUB/Office/飞书导出/ZIP/文件夹，先生成 Markdown、图片候选、source cards 和 `source_manifest.json`。如果只有主题，先做主题研究。
-3. 资料文档：把模型已有知识、用户材料和联网/资料搜索结果合成 `research_dossier.md` 或足够详细的 `source_notes.md`，标出来源、图片候选、权利状态、矛盾和缺口。
+2. 资料入口：读取用户材料；如果有 URL/arXiv/Hugging Face 论文/微信公众号文章/PDF/EPUB/Office/飞书导出/ZIP/文件夹，先在项目文件夹里生成 Markdown、下载/提取图片候选、source cards 和 `source_manifest.json`。如果只有主题，先做主题研究。
+3. 资料文档：把模型已有知识、用户材料和联网/资料搜索结果合成 `research_dossier.md` 或足够详细的 `source_notes.md`，标出来源、引用链接、下载/提取图片、图片候选、权利状态、矛盾和缺口。这一步本身就是有价值的交付物，后续不生成 PPT 也要能独立复用。
 4. 主题研究：围绕人物/作品/时代/影响/图片素材等维度联网搜索，生成 `research_plan`、`source_notes.md`、`source_cards.json` 和图片候选。
-5. 拆页确认：基于资料文档拆成每页标题、可见内容、来源锚点、proof object、布局、背景/图片计划、备注目标和 QA 风险，请用户确认；素材不足时先补资料或改视觉策略，不硬写空泛 PPT。
+5. 拆页确认：基于资料文档拆成每页标题、可见内容、来源锚点、proof object、布局、背景/图片计划、备注目标、逐页脚本/讲稿目标和 QA 风险，请用户确认；素材不足时先补资料或改视觉策略，不硬写空泛 PPT。
 6. 路线判断：品牌发布、课件、商务汇报、演讲 deck、旧 PPT 美化或 HTML 预览。
 7. 内容契约：定义受众、目的、目标动作、当前状态、期望状态、stakes、结构框架和逐页主张。
 8. 视觉契约：定义风格 thesis、字体、配色、背景节奏、视觉噪声预算、图片槽位、资产获取清单和来源显示策略。
@@ -789,6 +819,7 @@ python3 scripts/keynote_probe.py \
 一个完整项目通常应该包含：
 
 - `deck_brief.md`
+- `README.md` 和 `task_manifest.json`，记录本次任务的资料、图片、规划、提示词和导出位置
 - `research_plan.md` 或 `research_plan.json`，当用户只给主题时存在
 - `research_dossier.md` 或足够详细的 `sources/source_notes.md`，在拆页和生成前给出资料综合、来源覆盖、图片候选和缺口
 - `sources/source_manifest.json`
@@ -936,9 +967,44 @@ sources/
 
 登录页、付费页、飞书私有文档、微信公众号反爬失败、OCR 缺失等情况不会假装成功，会写入 `missing_evidence`。
 
-### NotebookLM / Anything-to-NotebookLM 融合
+### NotebookLM 原生 PPTX / 搜索生成
 
-`qiaomu-ppt` 吸收了 `qiaomu-anything-to-notebooklm` 的多源识别和深度分析思路，但不把 NotebookLM 当作硬依赖。长书、混合资料包、YouTube/播客/视频、需要递归提问的资料，可以先走 NotebookLM/Anything-to-NotebookLM 做分析，再把结果沉淀为 `source_notes.md` 和 `source_cards.json`。NotebookLM 生成的 slide deck 只能作为参考，不直接替代 Qiaomu PPT 的 `content_contract.json` / `slide_plan.json`。
+`qiaomu-ppt` 现在内置 NotebookLM 原生 slide-deck 路线，不依赖
+`qiaomu-anything-to-notebooklm` skill。适用场景是：用户明确要 NotebookLM
+搜索/Deep Research、NotebookLM 原生 PPTX、或接受图片式/原生 PPTX 交付。
+默认的 Qiaomu 可编辑 PPTX 路线仍然是 SVG-first `produce_deck.py`。
+
+NotebookLM 原生生成示例：
+
+```bash
+python3 scripts/notebooklm_deck.py ~/Downloads/Qiaomu\ PPT/2026-06-29-topic \
+  --title "Topic" \
+  --input "https://example.com/article" \
+  --search "topic search query" \
+  --research-mode fast \
+  --style-preset data_storytelling \
+  --style "补充：用更强的结论标题和图表注释" \
+  --format presenter \
+  --length short \
+  --language zh_Hans \
+  --preview
+```
+
+默认使用 `--format presenter --length short` 生成现场演示用的简化版，避免把来源长文压成满屏讲义。只有用户明确要详细阅读版、讲义或资料汇编时，才切换到 `--format detailed` 或 `--length default`。
+
+`data/notebooklm_style_prompts.json` 内置 20 个 NotebookLM 演示文稿风格预设，可用 `python3 scripts/notebooklm_deck.py --list-styles` 查看。生成时优先用 `--style-preset <id>` 固定风格，例如 `executive_consulting`、`data_storytelling`、`editorial_magazine`、`teaching_whiteboard`、`technical_blueprint`、`social_card_deck`；`--style` 仍支持“火柴人风格PPT”这类自然语言，会按别名匹配预设，无法匹配时作为自定义视觉契约注入，而不是只当作标题后缀。
+
+生成后脚本会下载 PPTX/PDF，运行 `strip_notebooklm_watermark.py` 清理可编辑的 NotebookLM 水印形状或右下角 logo 对象，并默认尝试 `--inpaint-raster-watermark` 修复烘焙进 `ppt/media` 图片右下角的 NotebookLM 水印；该图片修复方案借鉴 `Albonire/notebooklm-watermark-remover` 的 MIT 方案，使用 OpenCV 做局部检测和 patch-healing。必要时用 LibreOffice 从清理后的 PPTX 重新导出 PDF。若 OpenCV 缺失、未检测到图片水印或水印形态差异过大，报告会明确标注，不会假装已去除。
+
+输出证据包括：
+
+- `notebooklm_slide_prompt.txt`
+- `notebooklm_generation_manifest.json`
+- `notebooklm_generation_report.md`
+- `reports/notebooklm_watermark_cleanup.json`
+- `pptx_text_check.json`（`allow_image_backed: true`）
+- `export_manifest.json`（`route: notebooklm_native_slide_deck`，`formats.pptx.image_backed_ok: true`）
+- `exports/raw/*.notebooklm.raw.pptx|pdf` 和 `exports/*.notebooklm.pptx|pdf`
 
 ## 依赖
 
@@ -947,7 +1013,9 @@ Python 包在 `requirements.txt` 中声明。外部工具在 `data/dependency_ma
 - LibreOffice / `soffice`：PPTX 转 PDF/图片预览；完整 PPTX 交付验证必需。
 - Poppler / `pdftotext` / `pdftoppm`：PDF 抽取和缩略图渲染。
 - ImageMagick：可选图片优化和 contact sheet。
+- OpenCV / `opencv-python-headless` + `numpy`：可选 NotebookLM 图片式 PPTX 右下角水印修复；缺失时仍会执行可编辑形状水印清理并在报告中标注 raster cleanup 缺口。
 - Playwright Chromium：可选 JS 重页面抓取。
+- NotebookLM CLI / `notebooklm`：可选 NotebookLM 原生 PPTX/PDF、source add、Fast/Deep Research 和 slide-deck 下载路线；首次使用需要 `notebooklm login`。
 - Node.js：可选 CSS/Canvas/WebGL 程序化背景渲染，以及项目级 GSAP/Lottie 浏览器库自托管；缺失时使用内置 SVG fallback 或已打包本地 JS 资产。
 - Keynote / AppleScript：macOS 可选 `.key` 导出与兼容性验证；失败要写入 `export_manifest.json`，不能由 LibreOffice 成功替代。
 
@@ -968,10 +1036,14 @@ python3 scripts/bootstrap.py --install-system
 ## 验证
 
 ```bash
-python3 /Users/joe/.agents/skills/qiaomu-meta-skill/scripts/validate_skill.py .
-python3 /Users/joe/.agents/skills/qiaomu-meta-skill/scripts/trigger_eval.py . \
-  --cases evals/trigger_cases.json \
-  --output reports/trigger-eval.json
+python3 scripts/instruction_eval.py \
+  --cases evals/instruction_cases.json \
+  --output reports/instruction-eval.json \
+  --markdown reports/instruction-eval.md
+python3 scripts/source_intake_matrix_smoke.py \
+  --output reports/source_intake_matrix_smoke.json \
+  --markdown reports/source_intake_matrix_smoke.md
+python3 scripts/visual_quality_regression.py
 python3 scripts/url_to_markdown.py "https://example.com" --output-dir /tmp/qiaomu-ppt-url-test
 python3 scripts/export_bundle.py /path/to/generated-project --formats pptx,pdf,html,html-parity
 # 仅当项目使用 authored HTML motion 时：

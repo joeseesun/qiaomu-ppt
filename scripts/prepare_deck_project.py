@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shlex
 import subprocess
 import sys
 from datetime import datetime
@@ -14,6 +15,7 @@ from typing import Any
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 SKILL_DIR = SCRIPT_DIR.parent
+DEFAULT_OUTPUTS_ROOT = Path.home() / "Downloads" / "Qiaomu PPT"
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
@@ -46,6 +48,17 @@ FORBIDDEN_BACKGROUND_OBJECTS = [
     "ui chrome",
     "text block",
 ]
+NOTEBOOKLM_NATIVE_ROUTES = {
+    "notebooklm_native",
+    "notebooklm_native_pptx",
+    "notebooklm_native_slide_deck",
+}
+NOTEBOOKLM_VISIBLE_COPY_GUARD = (
+    "可见文案边界：本提示中的风格、结构、可读性、视觉和工具流程说明只用于生成，"
+    "不得写进幻灯片画布。不要把任何规则名称、字段名、风格名称、生成方式、工具流程或制作者说明"
+    "当作标题、副标题、标签或脚注。"
+    "幻灯片可见文字只允许来自来源内容中的观众判断、概念名称、证据锚点和行动结论。"
+)
 
 
 def now_iso() -> str:
@@ -327,6 +340,266 @@ Do not treat this file as evidence. It is only the research brief.
     )
 
 
+def is_notebooklm_native_route(route: str, final_delivery: str) -> bool:
+    route_key = str(route or "").strip().lower().replace("-", "_")
+    delivery_key = str(final_delivery or "").strip().lower().replace("-", "_")
+    return route_key in NOTEBOOKLM_NATIVE_ROUTES or delivery_key in NOTEBOOKLM_NATIVE_ROUTES
+
+
+def notebooklm_source_record(raw: str) -> dict[str, Any]:
+    path = Path(raw).expanduser()
+    if path.exists():
+        return {
+            "input": raw,
+            "notebooklm_input": str(path.resolve()),
+            "source_type": "file",
+            "title": path.stem,
+            "handling": "direct_file_upload",
+            "notes": "Upload with notebooklm source add --type file; do not pass the local path as inline text.",
+        }
+    lowered = raw.lower()
+    if re.match(r"https?://", raw):
+        source_type = "youtube" if ("youtube.com/" in lowered or "youtu.be/" in lowered) else "url"
+        return {
+            "input": raw,
+            "notebooklm_input": raw,
+            "source_type": source_type,
+            "title": raw,
+            "handling": f"direct_{source_type}_upload",
+            "notes": "Let NotebookLM ingest this source directly.",
+        }
+    return {
+        "input": raw,
+        "notebooklm_input": raw,
+        "source_type": "text",
+        "title": raw[:80],
+        "handling": "direct_inline_text",
+        "notes": "Use only when the user supplied actual inline text, not a local file path.",
+    }
+
+
+def infer_notebooklm_style_preset(style_query: str) -> str:
+    query = str(style_query or "")
+    if any(token in query for token in ["火柴人", "简笔人", "stick"]):
+        return "stick_figure_explainer"
+    if any(token in query for token in ["手绘", "白板", "教学", "极简", "minimal"]):
+        return "teaching_whiteboard"
+    if any(token in query for token in ["工作坊", "手册", "playbook"]):
+        return "workshop_playbook"
+    return ""
+
+
+def notebooklm_generation_prompt(
+    *,
+    topic: str,
+    audience: str,
+    purpose: str,
+    desired_action: str,
+    slides: int,
+    style_query: str,
+) -> str:
+    style = style_query.strip() or (
+        "手绘白板图解风。每页只讲一个观点，少字，大留白，用简单线稿、箭头、小场景解释源内容，"
+        "避免密集信息框、商业咨询模板感，以及把风格说明写成页面文案。"
+    )
+    return "\n\n".join(
+        [
+            "请基于当前 NotebookLM notebook 中的全部来源生成一份中文 PowerPoint 演示文稿。",
+            f"主题：{topic}",
+            f"受众：{audience}",
+            f"目标：{purpose}",
+            f"观众看完后的行动/认知变化：{desired_action}",
+            f"页数：约 {slides} 页，允许在 12-15 页范围内调整。",
+            "请将以下视觉风格落实到版式和图解中，不能把这段文字照抄进页面：" + style,
+            "先提出核心问题和主判断，再按来源内容梳理背景、机制/流程、角色/能力、风险/取舍，最后给出行动建议或结论。",
+            "默认按现场演示稿处理，不做讲义；每页一个主判断，标题要像结论，不要照搬长文标题；每页最多 1-2 个短点或短标签，细节放到讲者备注或省略。",
+            "画面采用手绘极简、白板线稿图解、黑色细线和少量强调色；用箭头、流程环、人物小场景、简单矩阵解释复杂关系；不要长段落、密集表格、赛博 HUD、数据仪表盘、密集咨询网格、装饰性卡片堆。",
+            NOTEBOOKLM_VISIBLE_COPY_GUARD,
+            "不要在幻灯片画布上写 NotebookLM、Google、source id、生成流程、内部提示词或工具名。",
+        ]
+    )
+
+
+def shell_join(command: list[Any]) -> str:
+    return " ".join(shlex.quote(str(part)) for part in command)
+
+
+def prepare_notebooklm_native_project(
+    *,
+    args: argparse.Namespace,
+    project: Path,
+    topic: str,
+    route: str,
+    inputs: list[str],
+) -> dict[str, Any]:
+    project.mkdir(parents=True, exist_ok=True)
+    (project / "reports").mkdir(parents=True, exist_ok=True)
+    (project / "exports").mkdir(parents=True, exist_ok=True)
+    source_records = [notebooklm_source_record(item) for item in inputs]
+    style_preset = infer_notebooklm_style_preset(args.style_query)
+    prompt = notebooklm_generation_prompt(
+        topic=topic,
+        audience=args.audience,
+        purpose=args.purpose,
+        desired_action=args.desired_action,
+        slides=args.slides,
+        style_query=args.style_query,
+    )
+    command = [
+        sys.executable,
+        str(SCRIPT_DIR / "notebooklm_deck.py"),
+        str(project),
+        "--title",
+        topic,
+        "--topic",
+        topic,
+        "--audience",
+        args.audience,
+        "--slide-count",
+        str(args.slides),
+        "--format",
+        "presenter",
+        "--length",
+        "short",
+        "--language",
+        "zh_Hans",
+        "--style",
+        args.style_query or "手绘白板图解风，少字，大留白，线稿箭头，小场景",
+        "--prompt",
+        prompt,
+        "--research-wait-timeout",
+        "180",
+        "--artifact-wait-timeout",
+        "900",
+        "--preview",
+    ]
+    if style_preset:
+        command.extend(["--style-preset", style_preset])
+    for source in source_records:
+        command.extend(["--input", source["notebooklm_input"]])
+
+    direct_sources = {
+        "schema_version": "1.0.0",
+        "generated_at": now_iso(),
+        "route": route,
+        "final_delivery": args.final_delivery,
+        "source_card_pipeline": {
+            "status": "skipped",
+            "reason": "NotebookLM native generation should consume complete source files/URLs directly; source cards are only for qiaomu editable-PPTX planning.",
+            "skipped_steps": [
+                "source_to_markdown.py",
+                "source_cards.py",
+                "outline_from_source_cards.py",
+                "source_adequacy.py",
+                "content_preflight.py",
+            ],
+        },
+        "sources": source_records,
+        "notebooklm_style_preset": style_preset,
+        "notebooklm_command": command,
+    }
+    write_json(project / "notebooklm_direct_sources.json", direct_sources)
+    write_text(project / "notebooklm_slide_prompt.txt", prompt)
+    write_text(
+        project / "deck_brief.md",
+        f"""# Deck Brief
+
+- topic: {topic}
+- route: notebooklm_native_pptx
+- final_delivery: {args.final_delivery}
+- audience: {args.audience}
+- purpose: {args.purpose}
+- desired_action: {args.desired_action}
+- prepare_status: ready_for_notebooklm_generation
+
+## Direct NotebookLM Sources
+
+{chr(10).join(f"- `{item['source_type']}` {item['notebooklm_input']}" for item in source_records) if source_records else "- no source input recorded"}
+
+## Route Rule
+
+NotebookLM 原生生成直接吃完整来源文件、URL、YouTube 或 NotebookLM research 结果。本路线故意跳过 qiaomu-ppt 的 `source_cards.json`、`slide_plan.json` 和四页预览流程，避免把完整长文先压扁成少量自动证据卡。
+""",
+    )
+    write_text(
+        project / "design_proposal.md",
+        f"""# NotebookLM Native Design Proposal
+
+- route: `notebooklm_native_pptx`
+- status: `ready_for_notebooklm_generation`
+- source_handling: 完整文档直接上传 NotebookLM，不走自动 source card 大纲。
+- target_pages: 12-15 页，当前建议约 {args.slides} 页。
+- recommended_style_preset: `{style_preset or "custom"}`
+- output_boundary: NotebookLM 原生 PPTX/PDF 可能是图片式或部分可编辑，交付时必须标注 `image_backed_ok`。
+
+## Style Direction
+
+{args.style_query or "手绘白板图解风，少字，大留白，线稿箭头，小场景。"}
+
+## NotebookLM Prompt
+
+```text
+{prompt}
+```
+
+## Recommended Command
+
+```bash
+{shell_join(command)}
+```
+
+## Skipped Qiaomu Editable-PPTX Planning
+
+- skipped: `source_to_markdown.py -> source_cards.py -> outline_from_source_cards.py`
+- skipped reason: 这条路线让 NotebookLM 自己基于完整来源构图和组织页序；source card pipeline 适合 qiaomu 可编辑 PPTX，不适合 NotebookLM 原生生成。
+- still required after generation: `notebooklm_generation_manifest.json`、`export_manifest.json`、水印清理报告、下载文件和可用性检查。
+""",
+    )
+    write_text(
+        project / "research_dossier.md",
+        f"""# NotebookLM Native Source Dossier
+
+route: notebooklm_native_pptx
+status: ready_for_notebooklm_generation
+generated_at: {now_iso()}
+
+本路线不生成 `sources/source_cards.json`。NotebookLM 应直接读取完整来源：
+
+{chr(10).join(f"- {item['source_type']}: `{item['notebooklm_input']}`" for item in source_records) if source_records else "- no source input recorded"}
+
+Prompt 见 `notebooklm_slide_prompt.txt`，直接来源清单见 `notebooklm_direct_sources.json`。
+""",
+    )
+    report = {
+        "schema_version": "1.0.0",
+        "ok": True,
+        "generated_at": now_iso(),
+        "project": str(project),
+        "topic": topic,
+        "route": "notebooklm_native_pptx",
+        "final_delivery": args.final_delivery,
+        "status": "ready_for_notebooklm_generation",
+        "inputs": inputs,
+        "source_card_pipeline": direct_sources["source_card_pipeline"],
+        "notebooklm_style_preset": style_preset,
+        "notebooklm_command": command,
+        "artifacts": {
+            "project_index": "README.md",
+            "task_manifest": "task_manifest.json",
+            "deck_brief": "deck_brief.md",
+            "design_proposal": "design_proposal.md",
+            "research_dossier": "research_dossier.md",
+            "notebooklm_direct_sources": "notebooklm_direct_sources.json",
+            "notebooklm_slide_prompt": "notebooklm_slide_prompt.txt",
+        },
+        "next_step": "run notebooklm_deck.py with the recorded command after user approval, then verify downloaded artifacts",
+    }
+    write_json(project / "project_prepare_report.json", report)
+    write_project_index(project, report)
+    write_json(project / "project_prepare_report.json", report)
+    return report
+
+
 def write_pending_preview_gate(project: Path, slide_count: int) -> None:
     if slide_count <= 7:
         return
@@ -492,12 +765,15 @@ generated_at: {now_iso()}
 route: {route}  
 audience: {audience}  
 status: {status}
+archive_root: {project}
 
 ## Context
 
 - Inputs: {", ".join(inputs) if inputs else "topic-only request"}
-- This dossier is the reviewable material base before slide planning.
+- This dossier is the reviewable material base before slide planning and remains useful even if no PPT is rendered.
+- The task archive should preserve source links, downloaded/extracted images, source cards, and this dossier under the project folder.
 - Model prior knowledge may inform search lanes and synthesis, but slide claims should be anchored to supplied or ingested sources.
+- Human-readable index: `README.md`; machine-readable index: `task_manifest.json`.
 
 ## Source Coverage
 
@@ -518,6 +794,14 @@ status: {status}
 ## Visual Assets And Image Candidates
 
 {chr(10).join(image_lines) if image_lines else "- No image candidates were found yet; record source-image gaps or generated-image policy before rendering."}
+
+## Stored Research Package
+
+- Project folder: `{project}`
+- Source files and links: `sources/`
+- Downloaded/extracted source images: `sources/images/` and `assets/source-images/` when present
+- Research synthesis: `research_dossier.md`
+- Archive index: `README.md` and `task_manifest.json`
 
 ## Gaps And Warnings
 
@@ -915,13 +1199,162 @@ Archetype: {top_style.get("archetype", "editorial_argument")}
     write_json(project / "layout_recommendations.json", layout_recs)
 
 
+def rel_if_exists(project: Path, relative: str) -> str:
+    path = project / relative
+    return relative if path.exists() else ""
+
+
+def stage_artifacts(project: Path, candidates: list[str]) -> list[str]:
+    found: list[str] = []
+    for relative in candidates:
+        if (project / relative).exists():
+            found.append(relative)
+    return found
+
+
+def write_project_index(project: Path, report: dict[str, Any]) -> None:
+    topic = str(report.get("topic") or project.name)
+    route = str(report.get("route") or "")
+    status = str(report.get("status") or "")
+    stages = [
+        {
+            "id": "00_research",
+            "label_zh": "资料搜索整理",
+            "purpose": "保存引用链接、下载/提取图片、来源卡、资料综合报告和缺口；即使后续不生成 PPT，也要可独立复用。",
+            "directories": ["sources/", "sources/images/", "assets/source-images/"],
+            "artifacts": stage_artifacts(
+                project,
+                [
+                    "research_plan.md",
+                    "research_dossier.md",
+                    "sources/research_plan.md",
+                    "sources/research_brief.json",
+                    "sources/topic_research_report.json",
+                    "sources/source_manifest.json",
+                    "sources/source_notes.md",
+                    "sources/source_cards.json",
+                    "reports/source_adequacy.json",
+                    "reports/source_adequacy.md",
+                ],
+            ),
+        },
+        {
+            "id": "01_story_planning",
+            "label_zh": "大纲与逐页讲述",
+            "purpose": "基于调研包创建内容契约、逐页大纲、讲解目标、逐字讲稿或演讲备注入口。",
+            "directories": ["page_content/", "notes/"],
+            "artifacts": stage_artifacts(
+                project,
+                [
+                    "deck_brief.md",
+                    "content_contract.json",
+                    "slide_plan_seed.json",
+                    "slide_plan.json",
+                    "page_content_guide.md",
+                    "page_content_guide.json",
+                    "speaker_notes_plan.md",
+                    "notes/total.md",
+                ],
+            ),
+        },
+        {
+            "id": "02_visual_and_config",
+            "label_zh": "视觉、配置与生图提示词",
+            "purpose": "把逐页内容翻译成版式、视觉契约、PPT 配置 JSON、图片采购/生图队列和提示词 sidecar。",
+            "directories": ["assets/images/", "previews/"],
+            "artifacts": stage_artifacts(
+                project,
+                [
+                    "style_brief.md",
+                    "design_proposal.md",
+                    "style_recommendations.json",
+                    "layout_recommendations.json",
+                    "style_direction.json",
+                    "style_direction.md",
+                    "spec_lock.json",
+                    "visual_contract.json",
+                    "visual_asset_rows.json",
+                    "visual_asset_manifest.json",
+                    "image_art_direction.json",
+                    "assets/images/image_prompts.json",
+                    "assets/images/image_prompts.md",
+                    "assets/images/image_generation_queue.json",
+                    "assets/images/image_generation_queue.md",
+                    "preview_gate.json",
+                ],
+            ),
+        },
+        {
+            "id": "03_generation_and_delivery",
+            "label_zh": "生成、导出与验证",
+            "purpose": "正式 PPTX/HTML/PDF/Keynote、缩略图、导出清单、QA 报告和最终验证证据。",
+            "directories": ["svg_output/", "svg_final/", "html/", "html-parity/", "exports/", "reports/"],
+            "artifacts": stage_artifacts(
+                project,
+                [
+                    "deck_create_manifest.json",
+                    "deck_create_report.md",
+                    "project_prepare_report.json",
+                    "qa_report.md",
+                    "export_manifest.json",
+                    "pptx_text_check.json",
+                ],
+            ),
+        },
+    ]
+    manifest = {
+        "schema_version": "1.0.0",
+        "generated_at": now_iso(),
+        "generator": "qiaomu-ppt/scripts/prepare_deck_project.py",
+        "topic": topic,
+        "route": route,
+        "status": status,
+        "project": str(project),
+        "storage_policy": {
+            "default_root": str(DEFAULT_OUTPUTS_ROOT),
+            "project_naming": "<YYYY-MM-DD>-<human-readable-slug>",
+            "rule": "每次任务一个独立项目文件夹；第一阶段调研包可独立交付和复用。",
+        },
+        "stages": stages,
+        "next_step": report.get("next_step", ""),
+    }
+    write_json(project / "task_manifest.json", manifest)
+
+    stage_lines: list[str] = []
+    for stage in stages:
+        artifacts = stage.get("artifacts") or []
+        stage_lines.append(f"## {stage['id']} {stage['label_zh']}\n")
+        stage_lines.append(f"{stage['purpose']}\n")
+        if artifacts:
+            stage_lines.extend(f"- `{item}`" for item in artifacts)
+        else:
+            stage_lines.append("- 尚未产生文件。")
+        stage_lines.append("")
+
+    write_text(
+        project / "README.md",
+        f"""# Qiaomu PPT Task Archive
+
+- topic: {topic}
+- route: {route}
+- status: {status}
+- project: `{project}`
+- generated_at: {now_iso()}
+
+这个文件夹是一整次 PPT 任务的归档。第一阶段资料搜索整理本身就是有价值的交付物：引用链接、下载/提取图片、来源卡和 `research_dossier.md` 都应留在这里，后续是否生成 PPT 不影响它的复用价值。
+
+{chr(10).join(stage_lines)}
+""",
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Prepare a qiaomu-ppt project from topic, file, URL, folder, or ZIP inputs.")
     parser.add_argument("inputs", nargs="*", help="URLs, files, folders, or ZIP archives to ingest.")
     parser.add_argument("--input", dest="extra_inputs", action="append", default=[], help="Additional input. Can be repeated.")
     parser.add_argument("--topic", default="", help="Deck topic/title. Required when no inputs are supplied.")
-    parser.add_argument("--project", type=Path, help="Output project directory. Defaults to outputs/<date>-<slug>.")
-    parser.add_argument("--outputs-root", type=Path, default=Path("outputs"), help="Root used when --project is omitted.")
+    parser.add_argument("--project", type=Path, help="Output project directory. Defaults to ~/Downloads/Qiaomu PPT/<date>-<slug>.")
+    parser.add_argument("--outputs-root", type=Path, default=DEFAULT_OUTPUTS_ROOT, help="Root used when --project is omitted.")
     parser.add_argument("--slug", default="", help="Project slug when --project is omitted.")
     parser.add_argument("--slides", type=int, default=10, help="Target slide count for the seeded outline.")
     parser.add_argument("--audience", default="general Chinese-speaking audience", help="Target audience.")
@@ -939,7 +1372,7 @@ def main() -> int:
     parser.add_argument("--max-cards-per-source", type=int, default=4, help="Source cards per source.")
     parser.add_argument("--skip-auto-research", action="store_true", help="For topic-only requests, write a research brief but do not fetch sources.")
     parser.add_argument("--no-auto-supplement-sources", action="store_true", help="Disable supplemental topic research when provided sources are too thin.")
-    parser.add_argument("--research-provider", choices=["auto", "brave", "wikipedia", "duckduckgo", "openalex"], default="auto")
+    parser.add_argument("--research-provider", choices=["auto", "wikipedia", "duckduckgo", "openalex"], default="auto")
     parser.add_argument("--research-depth", choices=["fast", "balanced", "deep"], default="fast", help="Topic-only research breadth.")
     parser.add_argument("--research-max-pages", type=int, default=3, help="Topic-only research pages to ingest.")
     parser.add_argument("--research-per-url-timeout", type=int, default=25, help="Topic-only research per-URL timeout in seconds.")
@@ -960,6 +1393,16 @@ def main() -> int:
     route = args.route or style_mod.infer_route(" ".join([topic, *inputs])) or "talk_deck"
     project = infer_project(args, inputs)
     project.mkdir(parents=True, exist_ok=True)
+    if is_notebooklm_native_route(route, args.final_delivery):
+        report = prepare_notebooklm_native_project(
+            args=args,
+            project=project,
+            topic=topic,
+            route=route,
+            inputs=inputs,
+        )
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return 0
 
     query = args.style_query or " ".join([topic, route, args.audience, *inputs])
     style_recs = recommend_styles(query, route, args.audience)
@@ -1225,6 +1668,8 @@ def main() -> int:
         "source_adequacy_result": source_adequacy_result,
         "materialize_result": materialize_result,
         "artifacts": {
+            "project_index": "README.md",
+            "task_manifest": "task_manifest.json",
             "deck_brief": "deck_brief.md",
             "research_dossier": "research_dossier.md" if (project / "research_dossier.md").exists() else "",
             "style_brief": "style_brief.md",
@@ -1255,6 +1700,8 @@ def main() -> int:
             else "review design_proposal.md, refine slide_plan.json, then run SVG/PPTX production"
         ),
     }
+    write_json(project / "project_prepare_report.json", report)
+    write_project_index(project, report)
     write_json(project / "project_prepare_report.json", report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0

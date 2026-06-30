@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-06-29",
+  "purpose": "乔木正式 HTML deck 的机器可读设计内核策略。正式路线以 HTML 原生语义为主，SVG 只做局部组件或兼容 fallback；它抽象外部 web-deck 项目的优点，但不复制模板、CSS、类名、页面设计、长提示词或运行时依赖。",
+  "kernel_id": "qiaomu-html-deck-kernel-v1",
+  "required_project_artifacts": [
+    "html/index.html",
+    "exports/<slug>.html",
+    "html_design_kernel.json",
+    "html_source_map.json",
+    "html_delivery_manifest.json"
+  ],
+  "optional_project_artifacts": [
+    "html_motion_manifest.json",
+    "html_layout_intent.json",
+    "presenter_notes_manifest.json",
+    "preview_gate.json"
+  ],
+  "stage_model": {
+    "default_width": 1920,
+    "default_height": 1080,
+    "aspect_ratio": "16:9",
+    "preferred_scaler": "native DOM stage: scale = min(viewportW / 1920, viewportH / 1080); left/top offsets from scaled size; transform-origin top left",
+    "fallback_scaler": "CSS aspect-ratio inner stage with stable tokenized geometry",
+    "host_chrome": "outside_slide_stage",
+    "min_body_px_at_1280_stage": 18
+  },
+  "style_discovery": {
+    "candidate_count": 3,
+    "candidate_roles": ["safe_fit", "distinctive_fit", "wildcard_risk"],
+    "preview_rule": "style candidates must look like real first slides, not mood boards",
+    "approval_gate": "lock selected candidate into html_design_kernel.json before full generation"
+  },
+  "token_contract": {
+    "required_groups": ["color", "typography", "spacing", "radius", "surface", "chart", "emphasis", "motion"],
+    "evidence_levels": ["source_backed", "derived", "fallback"],
+    "rule": "tokens must explain domain fit and avoid-style choices"
+  },
+  "semantic_component_registry": {
+    "allowed_component_types": [
+      "cover",
+      "section_divider",
+      "claim_proof",
+      "evidence_grid",
+      "comparison",
+      "timeline",
+      "roadmap",
+      "process",
+      "architecture",
+      "chart",
+      "kpi",
+      "quote",
+      "code",
+      "terminal",
+      "image_hero",
+      "media_analysis",
+      "closing",
+      "presenter_notes"
+    ],
+    "required_slide_attrs": ["data-slide-id", "data-layout-id"],
+    "point_review_attr": "data-screen-label",
+    "image_slot_attr": "data-image-slot"
+  },
+  "render_strategy": {
+    "primary": "native_semantic_html",
+    "allowed_local_layers": ["svg_diagram", "canvas_chart", "webgl_scene", "lottie_asset"],
+    "fallback": "full_slide_svg_only_when_slide_plan_is_missing_or_pptx_compatibility_export_is_explicit"
+  },
+  "layout_registry_policy": {
+    "ids": "Qiaomu Lxx / ITLxx / component_type ids only",
+    "source_files": ["slide_plan.json", "spec_lock.json", "visual_contract.json", "html_design_kernel.json"],
+    "no_copy_rule": "do not copy upstream layout ids or template class systems",
+    "html_only_rule": "For semantic_html_deck projects with only HTML requested, use html_layout_intent as the primary layout contract; spec_lock layout_execution_contract is optional audit evidence, not a mandatory absolute-coordinate execution JSON."
+  },
+  "html_layout_intent_policy": {
+    "purpose": "Keep HTML decks semantic and flexible while preserving reviewable structure.",
+    "required_fields": [
+      "slide_id",
+      "semantic_role",
+      "density",
+      "hierarchy",
+      "component_family",
+      "renderer_freedom",
+      "visual_motifs",
+      "avoid",
+      "qa_focus"
+    ],
+    "renderer_freedom": "DOM/CSS grid/flex and fixed-stage tokens are allowed; absolute x/y/w/h slots are only required for PPTX parity, precise diagrams, charts, maps, or authored motion paths.",
+    "decorative_asset_rule": "Do not generate arcs, boxes, seals, grids, rails, or image slots solely to satisfy PPTX-oriented contracts. Every visible motif needs a topic or reading-path reason."
+  },
+  "image_slot_policy": {
+    "required_fields": [
+      "slot_id",
+      "slide_id",
+      "role",
+      "aspect_ratio",
+      "fit_policy",
+      "safe_text_area",
+      "source_or_generator",
+      "format",
+      "file_size_kb"
+    ],
+    "fit_policies": ["cover_crop", "contain_letterbox", "native_size", "masked_detail"],
+    "rule": "every content image must be bound to a slide claim and review target"
+  },
+  "motion_policy": {
+    "levels": ["none", "subtle", "expressive", "cinematic"],
+    "engines": ["css", "gsap", "lottie-web", "dotlottie", "custom"],
+    "default_level": "none",
+    "rule": "motion reveals reading path or evidence; decorative motion is rejected",
+    "fallback": "respect prefers-reduced-motion and keep a readable static state"
+  },
+  "qa_gates": {
+    "required_validator": "scripts/validate_html_deck.py",
+    "required_viewports": ["1280x720", "1440x900"],
+    "required_reports": ["reports/html_deck_validation.json", "reports/html_deck_validation.md"],
+    "browser_review": "capture representative screenshots and record them in html_delivery_manifest.json",
+    "package_budget_kb": 3072,
+    "image_budget_kb": 250
+  },
+  "non_copy_policy": {
+    "forbidden": [
+      "third-party templates",
+      "third-party CSS class systems",
+      "third-party visual presets",
+      "third-party long prompts",
+      "full-slide screenshot decks",
+      "visible toolchain/provenance footers inside slides"
+    ],
+    "allowed": [
+      "research-derived workflow ideas",
+      "Qiaomu-owned layout ids",
+      "Qiaomu-owned design tokens",
+      "locally authored DOM/SVG/Canvas/CSS/JS"
+    ]
+  },
+  "research_references": [
+    "https://github.com/zarazhangrui/frontend-slides",
+    "https://github.com/op7418/guizang-ppt-skill",
+    "https://github.com/nexu-io/open-design",
+    "https://github.com/lewislulu/html-ppt-skill"
+  ]
+}

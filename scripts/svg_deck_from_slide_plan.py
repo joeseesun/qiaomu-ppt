@@ -48,9 +48,28 @@ RENDER_STYLE = {
     "proof_language": "editorial-proof-objects",
 }
 
-TITLE_FONT = "Georgia, SimSun, serif"
-BODY_FONT = "Arial, Microsoft YaHei, sans-serif"
+TITLE_FONT_BASE = "Noto Serif CJK SC, Noto Sans CJK SC, Georgia, SimSun, serif"
+BODY_FONT_BASE = "Noto Sans CJK SC, Microsoft YaHei, Arial, sans-serif"
+TITLE_FONT = TITLE_FONT_BASE
+BODY_FONT = BODY_FONT_BASE
 MONO_FONT = "Consolas, Courier New, monospace"
+CJK_FONT_HINTS = (
+    "cjk",
+    "source han",
+    "noto sans",
+    "noto serif",
+    "microsoft yahei",
+    "pingfang",
+    "heiti",
+    "songti",
+    "simsun",
+    "simhei",
+    "kaiti",
+    "fangsong",
+    "lxgw",
+    "sarasa",
+    "smiley",
+)
 
 
 def image_dimensions(path: Path) -> tuple[int, int] | None:
@@ -86,6 +105,15 @@ def hex_from_swatches(swatches: list[Any], role_keywords: tuple[str, ...], fallb
             if re.match(r"^#[0-9a-fA-F]{6}$", value):
                 return value.upper()
     return fallback
+
+
+def cjk_first_font_stack(preferred: str, base_stack: str) -> str:
+    preferred = preferred.strip()
+    if not preferred:
+        return base_stack
+    if any(token in preferred.lower() for token in CJK_FONT_HINTS):
+        return f"{preferred}, {base_stack}"
+    return f"{base_stack}, {preferred}"
 
 
 def lighten_hex(value: str, amount: float = 0.12) -> str:
@@ -227,9 +255,9 @@ def apply_render_style(project: Path) -> None:
     body_font = str(typography.get("body") or "").split("/")[0].strip()
     mono_font = str(typography.get("mono") or "").split("/")[0].strip()
     if title_font:
-        TITLE_FONT = f"{title_font}, Georgia, SimSun, serif"
+        TITLE_FONT = cjk_first_font_stack(title_font, TITLE_FONT_BASE)
     if body_font:
-        BODY_FONT = f"{body_font}, Arial, Microsoft YaHei, sans-serif"
+        BODY_FONT = cjk_first_font_stack(body_font, BODY_FONT_BASE)
     if mono_font:
         MONO_FONT = f"{mono_font}, Consolas, Courier New, monospace"
 

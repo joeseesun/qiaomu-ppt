@@ -60,7 +60,7 @@ def assert_expected(report: dict[str, Any], expected: dict[str, Any]) -> list[st
         if key in expected and actual != expected[key]:
             failures.append(f"{key}: expected {expected[key]!r}, got {actual!r}")
 
-    for key in ("required_references", "optional_references", "primary_scripts", "required_gates"):
+    for key in ("required_references", "optional_references", "primary_scripts", "required_gates", "global_reminders"):
         if key not in expected:
             continue
         actual_list = list(report.get(key, []))

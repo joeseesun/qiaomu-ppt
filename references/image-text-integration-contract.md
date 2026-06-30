@@ -35,6 +35,50 @@ contract before rendering media-rich slides:
   normalization, corner radius, and padding behavior.
 - `overflow_policy`: clip, fit, split slide, or fail. Do not allow accidental
   text/image overlap.
+- `content_binding`: the slide-specific object, system layer, scene, metric,
+  source artifact, user action, or decision that makes the image belong to this
+  exact slide.
+- `claim_to_image_link`: how the visible title/takeaway is proven, clarified,
+  or emotionally sharpened by the image.
+- `negative_visual_styles`: styles that would make the image less credible or
+  less useful for the content domain.
+
+If a media-rich slide does not have `content_binding` and
+`claim_to_image_link`, the image plan is incomplete. Do not proceed by using a
+generic background image and hoping the foreground text will carry the page.
+
+## Image Content Binding
+
+Generated images must be directed by the slide content, not by a style mood.
+Before generating or selecting an image, answer:
+
+- What is the page claim?
+- What concrete object or scene should the audience inspect?
+- What part of the image will the foreground text annotate?
+- Where is the safe reading area?
+- Which visual style would damage trust for this subject?
+
+Good binding examples:
+
+- Technical deployment page: an engineer and domain lead looking at a live
+  workflow board, with space for labels around the workflow, system trace, and
+  outcome metric.
+- AI architecture page: a system cutaway showing eval, orchestration, data,
+  permissions, observability, and business workflow layers as inspectable
+  regions.
+- Product workflow page: a real product surface or realistic task environment
+  that the claim can annotate.
+
+Weak binding examples:
+
+- abstract tech texture with no object to annotate
+- a soft or playful illustration style for a high-stakes proof argument
+- generic dashboard glow that does not correspond to the page metric
+- beautiful background that could be reused unchanged in any unrelated deck
+
+When binding is weak, repair upstream: rewrite the page claim, change the
+`ITLxx` pattern, rewrite the image prompt, use a real source image, or split the
+slide. Do not fix it by adding more labels on top of an unrelated image.
 
 ## Integration Moves
 
@@ -52,6 +96,8 @@ Pick at least one deliberate integration move for media-rich slides:
 - let the image edge fade into a local proof zone without covering the focal
   subject
 - pair image and claim through a repeated shape, axis, or rhythm
+- align the visual subject with the reading path so the title, proof object,
+  annotation, and image focal point form one argument
 
 Avoid placing a large opaque card over a full-bleed image as the default move.
 That often makes the image decorative and the text cramped. Use it only when the
@@ -117,6 +163,11 @@ size, not stretched into a full-bleed hero image.
 - text sits over a busy image without a declared contrast move
 - source evidence is cropped so the important context is no longer inspectable
 - a generated atmosphere image is treated as proof
+- a generated image has no page-specific `content_binding`
+- the image prompt describes style but not the slide's proof object, user scene,
+  system layer, metric, or annotation target
+- the chosen image style weakens the content domain's credibility, clarity, or
+  emotional tone
 - image slot uses arbitrary 50:50 split despite poor source aspect ratio fit
 - media pages repeat the same opaque side panel or bottom label bar across a
   short deck without a deliberate series rationale
@@ -145,6 +196,8 @@ size, not stretched into a full-bleed hero image.
 - crop only after identifying the evidence region
 - move detailed source inspection into a second slide
 - replace generic atmosphere with a page-specific source/user/web/generated asset
+- regenerate the image with the page claim, proof object, safe area, annotation
+  targets, and negative visual styles written into the prompt
 - update `visual_asset_manifest.json` and `spec_lock.json` before rerendering
 
 ## QA
@@ -165,3 +218,5 @@ For formal output, verify:
 - HTML images have `data-image-slot`
 - PPTX foreground text remains editable where the route requires editable PPTX
 - screenshots at deck review size show the image/text relationship clearly
+- every generated image can be explained in one sentence as "this image belongs
+  on this page because..." without referencing only style or atmosphere

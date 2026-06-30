@@ -5,6 +5,7 @@
     "Every choice group has a recommended default.",
     "The user may reply with compact codes such as 1A 2B 3C.",
     "If the user says generate/default/默认 after a guided choice card, use the recommended defaults and begin research/planning; do not treat that as permission to render the final PPT.",
+    "The first substantive artifacts after context are a stored research package and a source-synthesis article under ~/Downloads/Qiaomu PPT/<date>-<slug>/, including source links, downloaded/extracted images, research_dossier.md, content_report.md or 内容母稿-<主题>.md, README.md, and task_manifest.json.",
     "Initial requests such as 生成一个PPT, 做个PPT, 直接生成, 默认, 越快越好, or a page count do not bypass the context card or later confirmation gates.",
     "Ask only decision groups that materially affect output; do not show a long form.",
     "Do not omit production-impact choices such as image generation/API policy and output formats unless the user already specified them.",
@@ -44,8 +45,8 @@
       "output_format",
       "approval_bypass_or_previously_approved_plan"
     ],
-    "first_artifact_after_context": "research_dossier_markdown",
-    "post_choice_short_replies_start": "research_and_design_proposal",
+    "first_artifact_after_context": "downloaded_research_package_plus_source_synthesis_article",
+    "post_choice_short_replies_start": "research_archive_and_design_proposal",
     "post_choice_short_replies_do_not_skip": [
       "research_dossier_confirmation",
       "slide_plan_confirmation",
@@ -250,6 +251,11 @@
           "code": "D",
           "label": "加Keynote",
           "description": "在可用的 macOS/Keynote 环境下额外导出 .key，失败则记录证据。"
+        },
+        {
+          "code": "E",
+          "label": "NotebookLM原生",
+          "description": "使用 NotebookLM 搜索/slide-deck 直接生成 PPTX+PDF；可能是图片式 PPTX，会单独记录水印清理证据。"
         }
       ]
     }

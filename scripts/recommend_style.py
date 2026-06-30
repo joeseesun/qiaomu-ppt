@@ -12,11 +12,12 @@ from typing import Any
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DEFAULT_LIBRARY = DATA_DIR / "design_style_presets.json"
-DEFAULT_EXTRA_LIBRARIES = [
+STYLE_PACKS = DATA_DIR / "style_packs.json"
+DEFAULT_PACKS = ("core", "magazine", "ppt_master_cases")
+DEFAULT_EXTRA_LIBRARIES = (
     DATA_DIR / "magazine_art_styles.json",
     DATA_DIR / "ppt_master_case_styles.json",
-    DATA_DIR / "32kw_bento_style_presets.json",
-]
+)
 
 
 ROUTE_HINTS = {
@@ -237,6 +238,11 @@ def score_style(style: dict[str, Any], query: str, route: str | None, audience: 
         if token in haystack_tokens:
             score += 2
 
+    library_name = str(style.get("_library") or "").lower()
+    if "bento" in query_tokens and "bento" in library_name:
+        score += 6
+        reasons.append("matches optional bento pack")
+
     ppt = style["ppt"]
     if route and route in ppt.get("recommended_routes", []):
         score += 12
@@ -262,6 +268,44 @@ def score_style(style: dict[str, Any], query: str, route: str | None, audience: 
     if not reasons:
         reasons.append("general style-library fit")
     return score, reasons
+
+
+def load_style_pack_config(path: Path = STYLE_PACKS) -> dict[str, Any]:
+    if not path.exists():
+        return {"default_packs": list(DEFAULT_PACKS), "packs": {}}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        return {"default_packs": list(DEFAULT_PACKS), "packs": {}}
+    return payload
+
+
+def pack_library_path(raw_path: str) -> Path:
+    path = Path(raw_path)
+    if path.is_absolute():
+        return path
+    return Path(__file__).resolve().parents[1] / path
+
+
+def libraries_from_packs(pack_ids: list[str], config: dict[str, Any]) -> tuple[list[Path], list[str]]:
+    packs = config.get("packs")
+    if not isinstance(packs, dict) or not packs:
+        return [DEFAULT_LIBRARY], []
+    libraries: list[Path] = []
+    selected: list[str] = []
+    for pack_id in pack_ids:
+        pack = packs.get(pack_id)
+        if not isinstance(pack, dict):
+            raise SystemExit(f"Unknown style pack: {pack_id}")
+        selected.append(pack_id)
+        if pack.get("runtime_library") is False:
+            continue
+        raw_library = pack.get("library")
+        if not raw_library:
+            continue
+        library = pack_library_path(str(raw_library))
+        if library not in libraries:
+            libraries.append(library)
+    return libraries, selected
 
 
 def load_styles(libraries: list[Path]) -> list[dict[str, Any]]:
@@ -291,12 +335,29 @@ def main() -> int:
         "--library",
         type=Path,
         action="append",
-        help="Style library JSON. Can be passed multiple times. Defaults to design_style_presets.json plus magazine_art_styles.json and ppt_master_case_styles.json.",
+        help="Style library JSON. Can be passed multiple times. Overrides style packs.",
+    )
+    parser.add_argument(
+        "--pack",
+        action="append",
+        help="Style pack id. Defaults to core, magazine, ppt_master_cases. Use --pack 32kw_bento to include the bento seed library.",
     )
     parser.add_argument("--json", action="store_true", help="Emit JSON instead of text.")
     args = parser.parse_args()
 
-    libraries = args.library or [DEFAULT_LIBRARY, *DEFAULT_EXTRA_LIBRARIES]
+    pack_config = load_style_pack_config()
+    if args.library:
+        libraries = args.library
+        selected_packs: list[str] = []
+    else:
+        default_packs = pack_config.get("default_packs")
+        base_pack_ids = (
+            [str(item) for item in default_packs]
+            if isinstance(default_packs, list) and default_packs
+            else list(DEFAULT_PACKS)
+        )
+        pack_ids = list(dict.fromkeys([*base_pack_ids, *(args.pack or [])]))
+        libraries, selected_packs = libraries_from_packs(pack_ids, pack_config)
     styles = load_styles(libraries)
     if not styles:
         raise SystemExit("No styles found in the selected libraries.")
@@ -319,13 +380,21 @@ def main() -> int:
             }
         )
     ranked.sort(key=lambda item: (-item["score"], item["label"]))
-    result = {"query": args.query, "route": route, "top": ranked[: args.top]}
+    result = {
+        "query": args.query,
+        "route": route,
+        "style_packs": selected_packs,
+        "libraries": [str(path) for path in libraries],
+        "top": ranked[: args.top],
+    }
 
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
 
     print(f"Route: {route}")
+    if selected_packs:
+        print(f"Style packs: {', '.join(selected_packs)}")
     for index, item in enumerate(result["top"], start=1):
         palette = ", ".join(color["hex"] for color in item["palette"])
         print(f"{index}. {item['label']} [{item['archetype']}] score={item['score']}")

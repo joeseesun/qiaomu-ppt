@@ -79,10 +79,66 @@ def manifest_image_count(sources: list[dict[str, Any]]) -> int:
     return total
 
 
+def is_local_source_derived_asset(item: dict[str, Any]) -> bool:
+    blob = " ".join(
+        str(item.get(key) or "")
+        for key in (
+            "asset_id",
+            "filename",
+            "path",
+            "purpose",
+            "asset_role",
+            "rights_notes",
+            "generator",
+            "art_direction",
+        )
+    ).lower()
+    return any(
+        token in blob
+        for token in (
+            "source-derived",
+            "local-source-derived",
+            "源资料衍生",
+            "本地衍生",
+            "该 png 只提供源资料衍生",
+        )
+    )
+
+
+def is_trusted_source_visual(item: dict[str, Any]) -> bool:
+    via = str(item.get("acquire_via") or "").lower()
+    if is_local_source_derived_asset(item):
+        return False
+    if via == "user":
+        return True
+    if via == "web":
+        return bool(item.get("source_page_url") or item.get("source_url") or item.get("url"))
+    if via == "source":
+        raw_path = str(item.get("path") or "")
+        return bool(
+            raw_path.startswith("sources/")
+            or item.get("source_path")
+            or item.get("source_page_url")
+            or item.get("source_image_id")
+            or item.get("source_page")
+            or item.get("source_url")
+        )
+    return False
+
+
 def visual_asset_counts(project: Path) -> dict[str, int]:
     payload = load_json_if_exists(project / "visual_asset_manifest.json")
     items = payload.get("items") if isinstance(payload, dict) else []
-    counts = {"source": 0, "web": 0, "user": 0, "ai": 0, "formula": 0, "placeholder": 0}
+    counts = {
+        "source": 0,
+        "web": 0,
+        "user": 0,
+        "ai": 0,
+        "formula": 0,
+        "placeholder": 0,
+        "trusted_source_web_user": 0,
+        "local_source_derived": 0,
+    }
     if not isinstance(items, list):
         return counts
     for item in items:
@@ -90,6 +146,11 @@ def visual_asset_counts(project: Path) -> dict[str, int]:
             continue
         via = str(item.get("acquire_via") or "placeholder").lower()
         counts[via] = counts.get(via, 0) + 1
+        if via in {"source", "web", "user"}:
+            if is_trusted_source_visual(item):
+                counts["trusted_source_web_user"] += 1
+            elif is_local_source_derived_asset(item):
+                counts["local_source_derived"] += 1
     return counts
 
 
@@ -128,7 +189,7 @@ def build_report(project: Path, *, slides: int, strict: bool) -> dict[str, Any]:
             unique_ids.update(source_id for source_id in source_ids if isinstance(source_id, str))
     unique_card_sources = sorted(unique_ids)
     manifest_images = manifest_image_count(sources)
-    source_like_visuals = visual_counts.get("source", 0) + visual_counts.get("web", 0) + visual_counts.get("user", 0)
+    source_like_visuals = visual_counts.get("trusted_source_web_user", 0)
     target_evidence_pages = int(targets.get("target_source_evidence_pages") or 0)
 
     min_cards = max(3, min(slides or 6, round((slides or 6) * 0.65)))
@@ -181,6 +242,7 @@ def build_report(project: Path, *, slides: int, strict: bool) -> dict[str, Any]:
             "image_candidate_count": len(image_candidates),
             "manifest_image_count": manifest_images,
             "source_like_visual_asset_count": source_like_visuals,
+            "local_source_derived_visual_asset_count": visual_counts.get("local_source_derived", 0),
             "visual_asset_counts": visual_counts,
         },
         "failures": failures,

@@ -1,6 +1,6 @@
 # Content and Copy Method
 
-This method distills `/Users/joe/Downloads/deep-research-report.md` into Qiaomu-owned production rules. Use it to make decks sharper, more persuasive, and easier to present.
+This method distills Qiaomu's internal presentation research notes into Qiaomu-owned production rules. Use it to make decks sharper, more persuasive, and easier to present.
 
 ## Core Principle
 

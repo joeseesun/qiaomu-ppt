@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import math
 import json
+import os
 import re
 import statistics
 from pathlib import Path
@@ -34,7 +35,6 @@ MEDIA_EXPECTATION_TOKENS = {
     "architecture",
     "architect",
     "fashion",
-    "design",
     "culture",
     "biography",
     "portrait",
@@ -56,7 +56,6 @@ MEDIA_EXPECTATION_TOKENS = {
     "建筑",
     "建筑师",
     "时尚",
-    "设计",
     "文化",
     "人物",
     "传记",
@@ -68,11 +67,97 @@ MEDIA_EXPECTATION_TOKENS = {
     "产品",
     "品牌",
 }
+HTML_FORMAT_NAMES = {
+    "html",
+    "semantic_html",
+    "semantic-html",
+    "formal_html",
+    "formal-html",
+    "html_deck",
+    "semantic_html_deck",
+}
+NON_HTML_DELIVERY_FORMATS = {
+    "ppt",
+    "pptx",
+    "powerpoint",
+    "pdf",
+    "key",
+    "keynote",
+    "html-parity",
+    "html_parity",
+    "parity-html",
+    "parity_html",
+}
 
 
 def load_json(path: Path) -> Any:
     with path.open("r", encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def normalize_format_name(value: Any) -> str:
+    return str(value or "").strip().lower().replace(" ", "_")
+
+
+def semantic_html_route_info(project: Path) -> dict[str, Any]:
+    info: dict[str, Any] = {
+        "semantic_html_manifest": False,
+        "semantic_html_only": False,
+        "requested_formats": [],
+        "last_requested_formats": [],
+        "formats": [],
+        "successful_non_html_formats": [],
+        "requested_non_html_formats": [],
+        "non_html_outputs": [],
+    }
+    html_manifest = project / "html_delivery_manifest.json"
+    if html_manifest.exists():
+        try:
+            payload = load_json(html_manifest)
+            info["semantic_html_manifest"] = isinstance(payload, dict) and payload.get("mode") == "semantic_html_deck"
+        except Exception:
+            info["semantic_html_manifest"] = False
+
+    export_manifest = project / "export_manifest.json"
+    formats: dict[str, Any] = {}
+    if export_manifest.exists():
+        try:
+            payload = load_json(export_manifest)
+        except Exception:
+            payload = {}
+        if isinstance(payload, dict):
+            for key in ("requested_formats", "last_requested_formats"):
+                raw = payload.get(key)
+                normalized = [normalize_format_name(item) for item in raw] if isinstance(raw, list) else []
+                info[key] = [item for item in normalized if item]
+            raw_formats = payload.get("formats")
+            formats = raw_formats if isinstance(raw_formats, dict) else {}
+            info["formats"] = [normalize_format_name(name) for name in formats.keys()]
+
+    requested_all = set(info["requested_formats"]) | set(info["last_requested_formats"])
+    info["requested_non_html_formats"] = sorted(
+        item for item in requested_all if item and item not in HTML_FORMAT_NAMES
+    )
+    for name, item in formats.items():
+        normalized = normalize_format_name(name)
+        if normalized not in NON_HTML_DELIVERY_FORMATS:
+            continue
+        status = str(item.get("status") or "").lower() if isinstance(item, dict) else ""
+        if status in {"existing", "exported", "success"}:
+            info["successful_non_html_formats"].append(normalized)
+
+    export_dir = project / "exports"
+    if export_dir.exists():
+        for pattern in ("*.ppt", "*.pptx", "*.pdf", "*.key"):
+            info["non_html_outputs"].extend(str(path.relative_to(project)) for path in export_dir.glob(pattern))
+
+    info["semantic_html_only"] = bool(
+        info["semantic_html_manifest"]
+        and not info["requested_non_html_formats"]
+        and not info["successful_non_html_formats"]
+        and not info["non_html_outputs"]
+    )
+    return info
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -142,13 +227,98 @@ def is_background_like_asset(item: dict[str, Any]) -> bool:
     return any(token in blob for token in BACKGROUND_ROLE_TOKENS)
 
 
+def is_local_source_derived_asset(item: dict[str, Any]) -> bool:
+    blob = " ".join(
+        str(item.get(key) or "")
+        for key in (
+            "asset_id",
+            "filename",
+            "path",
+            "purpose",
+            "asset_role",
+            "rights_notes",
+            "generator",
+            "art_direction",
+        )
+    ).lower()
+    return any(
+        token in blob
+        for token in (
+            "source-derived",
+            "local-source-derived",
+            "源资料衍生",
+            "本地衍生",
+            "该 png 只提供源资料衍生",
+        )
+    )
+
+
+def is_trusted_source_asset(item: dict[str, Any]) -> bool:
+    acquire_via = str(item.get("acquire_via") or "").lower()
+    if is_local_source_derived_asset(item):
+        return False
+    if acquire_via == "user":
+        return True
+    if acquire_via == "web":
+        return bool(item.get("source_page_url") or item.get("source_url") or item.get("url"))
+    if acquire_via == "source":
+        raw_path = str(item.get("path") or "")
+        return bool(
+            raw_path.startswith("sources/")
+            or item.get("source_path")
+            or item.get("source_page_url")
+            or item.get("source_image_id")
+            or item.get("source_page")
+            or item.get("source_url")
+        )
+    return False
+
+
 def is_primary_media_asset(item: dict[str, Any]) -> bool:
     acquire_via = str(item.get("acquire_via") or "").lower()
+    if is_local_source_derived_asset(item):
+        return False
     if acquire_via in {"source", "web", "user", "formula"}:
-        return True
+        return is_trusted_source_asset(item) or acquire_via == "formula"
     if acquire_via == "ai":
         return not is_background_like_asset(item)
     return False
+
+
+def is_codex_runtime() -> bool:
+    return any(os.environ.get(name) for name in ("CODEX_THREAD_ID", "CODEX_SHELL", "CODEX_CI"))
+
+
+def is_codex_native_image_asset(item: dict[str, Any]) -> bool:
+    blob = " ".join(
+        str(item.get(key) or "")
+        for key in (
+            "asset_id",
+            "filename",
+            "path",
+            "source",
+            "source_path",
+            "generated_asset_source",
+            "original_source",
+            "generator",
+            "provider",
+            "notes",
+            "generation_note",
+            "rights_notes",
+        )
+    ).lower()
+    return any(
+        token in blob
+        for token in (
+            "codex-native",
+            "codex-imagegen",
+            "codex_imagegen",
+            "codex image_gen",
+            "image_gen",
+            ".codex/generated_images",
+            "/.codex/generated_images/",
+        )
+    )
 
 
 def media_expectation_stats(project: Path, slides: list[dict[str, Any]]) -> dict[str, Any]:
@@ -224,9 +394,13 @@ def visual_asset_stats(project: Path) -> dict[str, Any]:
             "terminal_count": 0,
             "terminal_slide_count": 0,
             "real_imagegen_count": 0,
+            "codex_native_imagegen_count": 0,
             "procedural_fallback_count": 0,
             "source_or_web_count": 0,
             "source_or_web_slide_count": 0,
+            "trusted_source_or_web_count": 0,
+            "trusted_source_or_web_slide_count": 0,
+            "local_source_derived_count": 0,
             "primary_media_count": 0,
             "primary_media_slide_count": 0,
             "background_terminal_count": 0,
@@ -238,15 +412,20 @@ def visual_asset_stats(project: Path) -> dict[str, Any]:
         "terminal_count": 0,
         "terminal_slide_count": 0,
         "real_imagegen_count": 0,
+        "codex_native_imagegen_count": 0,
         "procedural_fallback_count": 0,
         "source_or_web_count": 0,
         "source_or_web_slide_count": 0,
+        "trusted_source_or_web_count": 0,
+        "trusted_source_or_web_slide_count": 0,
+        "local_source_derived_count": 0,
         "primary_media_count": 0,
         "primary_media_slide_count": 0,
         "background_terminal_count": 0,
     }
     slides: set[int] = set()
     source_or_web_slides: set[int] = set()
+    trusted_source_or_web_slides: set[int] = set()
     primary_media_slides: set[int] = set()
     for item in items if isinstance(items, list) else []:
         if not isinstance(item, dict):
@@ -262,9 +441,13 @@ def visual_asset_stats(project: Path) -> dict[str, Any]:
                 stats["terminal_count"] += 1
                 slide_numbers = asset_slide_numbers(item)
                 slides.update(slide_numbers)
-                if acquire_via in {"web", "source", "user"} and status in {"Sourced", "Existing"}:
+                if acquire_via in {"web", "source", "user"} and status in {"Sourced", "Existing"} and is_trusted_source_asset(item):
                     stats["source_or_web_count"] += 1
                     source_or_web_slides.update(slide_numbers)
+                    stats["trusted_source_or_web_count"] += 1
+                    trusted_source_or_web_slides.update(slide_numbers)
+                elif acquire_via in {"web", "source", "user"} and status in {"Sourced", "Existing"} and is_local_source_derived_asset(item):
+                    stats["local_source_derived_count"] += 1
                 if is_primary_media_asset(item):
                     stats["primary_media_count"] += 1
                     primary_media_slides.update(slide_numbers)
@@ -275,8 +458,11 @@ def visual_asset_stats(project: Path) -> dict[str, Any]:
                         stats["procedural_fallback_count"] += 1
                     elif generator:
                         stats["real_imagegen_count"] += 1
+                        if is_codex_native_image_asset(item):
+                            stats["codex_native_imagegen_count"] += 1
     stats["terminal_slide_count"] = len(slides)
     stats["source_or_web_slide_count"] = len(source_or_web_slides)
+    stats["trusted_source_or_web_slide_count"] = len(trusted_source_or_web_slides)
     stats["primary_media_slide_count"] = len(primary_media_slides)
     return stats
 
@@ -418,7 +604,7 @@ def export_stats(project: Path) -> dict[str, Any]:
             formats = data.get("formats") if isinstance(data, dict) and isinstance(data.get("formats"), dict) else {}
             keynote_capability = data.get("keynote_capability") if isinstance(data, dict) and isinstance(data.get("keynote_capability"), dict) else {}
             raw_requested = data.get("requested_formats") if isinstance(data, dict) else []
-            requested_formats = [str(item) for item in raw_requested] if isinstance(raw_requested, list) else []
+            requested_formats = [normalize_format_name(item) for item in raw_requested] if isinstance(raw_requested, list) else []
         except Exception:
             formats = {}
             keynote_capability = {}
@@ -445,10 +631,17 @@ def export_stats(project: Path) -> dict[str, Any]:
         successful = discovered
         formats = {name: {"status": "existing", "discovered_without_export_manifest": True} for name in discovered}
     keynote_feasible = bool(keynote_capability.get("can_attempt_keynote_export"))
-    keynote_targeted = keynote_feasible or "keynote" in requested_formats or "keynote" in formats
-    target_format_count = 4 if keynote_targeted else 3
+    requested_set = {item for item in requested_formats if item}
+    html_only_requested = bool(requested_set) and requested_set.issubset(HTML_FORMAT_NAMES)
+    keynote_targeted = (not html_only_requested and keynote_feasible) or "keynote" in requested_set or "keynote" in formats
+    if requested_set:
+        target_format_count = len(requested_set)
+    else:
+        target_format_count = 4 if keynote_targeted else 3
     return {
         "formats": sorted(formats.keys()),
+        "requested_formats": sorted(requested_set),
+        "html_only_requested": html_only_requested,
         "successful_formats": sorted(successful),
         "successful_format_count": len(successful),
         "target_format_count": target_format_count,
@@ -532,6 +725,22 @@ def upstream_creation_stats(project: Path) -> dict[str, Any]:
     failures: list[str] = []
     for name, path in audits:
         if not path.exists():
+            fallback_path = None
+            fallback_score_key = "overall_score"
+            if name == "content_outline":
+                fallback_path = project / "reports" / "content-preflight.json"
+            elif name == "element_plan":
+                fallback_path = project / "reports" / "top-quality-plan.json"
+            if fallback_path and fallback_path.exists():
+                try:
+                    fallback = load_json(fallback_path)
+                    score = int(fallback.get(fallback_score_key) or fallback.get("score") or 0) if isinstance(fallback, dict) else 0
+                    scores[name] = score
+                    ok[name] = bool(fallback.get("ok") or fallback.get("gate_ready")) if isinstance(fallback, dict) else score >= 75
+                    warnings.extend(f"{name}: using {fallback_path.name} as upstream quality evidence")
+                    continue
+                except Exception as exc:
+                    failures.append(f"{name}: cannot read fallback audit report {fallback_path.name}: {exc}")
             scores[name] = 0
             ok[name] = False
             missing.append(name)
@@ -568,6 +777,21 @@ def layout_execution_stats(project: Path, slides: list[dict[str, Any]]) -> dict[
             contract = data.get("layout_execution_contract") if isinstance(data, dict) else {}
             raw = contract.get("slides") if isinstance(contract, dict) else []
             contract_slides = [item for item in raw if isinstance(item, dict)] if isinstance(raw, list) else []
+        except Exception:
+            contract_slides = []
+    if not contract_slides and (project / "html_layout_intent.json").exists():
+        try:
+            data = load_json(project / "html_layout_intent.json")
+            raw = data.get("slides") if isinstance(data, dict) else []
+            if isinstance(raw, list):
+                contract_slides = [
+                    {
+                        "layout_pattern_id": item.get("layout_pattern_id") or item.get("layout_id") or "",
+                        "component_type": item.get("component_type") or item.get("semantic_role") or item.get("component_family") or "",
+                    }
+                    for item in raw
+                    if isinstance(item, dict)
+                ]
         except Exception:
             contract_slides = []
     plan_layouts: set[str] = set()
@@ -711,13 +935,31 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
     style_exec = style_execution_stats(project)
     upstream_creation = upstream_creation_stats(project)
     media_expectation = media_expectation_stats(project, slides)
+    route_info = semantic_html_route_info(project)
+    html_only = bool(route_info.get("semantic_html_only"))
+    route_adjustments: list[str] = []
 
     art_target = max(3, min(slide_count, round(slide_count * 0.55)))
     fp_target = max(3, min(slide_count, round(slide_count * 0.55)))
     image_ratio_target = max(0.45, min(0.9, float(baseline["median_spec_image_refs_per_slide"])))
     terminal_image_ratio = ratio(float(assets["terminal_slide_count"]), slide_count)
     svg_image_ratio = ratio(float(rhythm.get("svg_image_slides") or 0), slide_count)
-    real_image_ratio = ratio(float(assets["real_imagegen_count"]), max(1.0, float(assets["ai_count"])))
+    key_ai_target = max(3, round(slide_count * 0.2)) if slide_count > 8 else (1 if slide_count >= 4 else 0)
+    if html_only:
+        key_ai_target = 0
+        route_adjustments.extend(
+            [
+                "semantic_html_only: requested formats are HTML-only, so export coverage targets only requested HTML outputs",
+                "semantic_html_only: no editable PPTX/PDF/Keynote score caps",
+                "semantic_html_only: Codex image_gen is optional unless the project explicitly requests image-led visuals",
+                "semantic_html_only: SVG image-slide ratio is not required for DOM/CSS-native decks",
+            ]
+        )
+    codex_runtime = is_codex_runtime()
+    codex_native_count = int(assets.get("codex_native_imagegen_count") or 0)
+    required_key_image_count = codex_native_count if codex_runtime else int(assets["real_imagegen_count"])
+    key_image_requirement_label = "Codex-native image_gen assets" if codex_runtime else "real generated assets"
+    real_image_ratio = ratio(float(required_key_image_count), max(1.0, float(key_ai_target or 1)))
     non_ai_terminal_visual_ratio = ratio(float(assets["source_or_web_count"]), max(1.0, float(slide_count or 1)))
     primary_media_target = min(slide_count, max(3, round(slide_count * 0.35))) if media_expectation["expected"] else 0
     primary_media_score = 100 if not media_expectation["expected"] else pct(
@@ -737,19 +979,87 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
         + 0.10 * float(image_diversity.get("overused_count") or 0),
     )
     image_diversity_score = pct(max(0.0, diversity_base - diversity_penalty))
+    structural_variety_score = pct(ratio(float(rhythm.get("unique_structural_fingerprints") or 0), fp_target))
+    structural_variety_evidence = (
+        f"{rhythm.get('unique_structural_fingerprints', 0)} unique SVG fingerprints; target {fp_target}"
+    )
+    image_presence_score = pct(min(terminal_image_ratio, svg_image_ratio) / image_ratio_target if image_ratio_target else 0)
+    image_presence_evidence = (
+        f"terminal image slides {assets['terminal_slide_count']}/{slide_count}, "
+        f"SVG image slides {rhythm.get('svg_image_slides', 0)}/{slide_count}, "
+        f"baseline target ratio {image_ratio_target:.2f}"
+    )
+    real_image_generation_score = pct(real_image_ratio)
+    real_image_generation_evidence = (
+        f"{key_image_requirement_label} {required_key_image_count}/{key_ai_target}; "
+        f"real generated total {assets['real_imagegen_count']}; "
+        f"Codex-native {codex_native_count}; "
+        f"AI asset rows {assets['ai_count']}; procedural fallback {assets['procedural_fallback_count']}; "
+        f"trusted source/web/user visuals {assets['trusted_source_or_web_count']}/{slide_count}; "
+        f"local source-derived visuals {assets['local_source_derived_count']}"
+    )
+    if html_only:
+        structural_variety_score = pct(
+            ratio(float(max(layout_exec["contract_layout_count"], layout_exec["plan_layout_count"])), fp_target)
+        )
+        structural_variety_evidence = (
+            f"semantic HTML layout ids {max(layout_exec['contract_layout_count'], layout_exec['plan_layout_count'])}; "
+            f"SVG fingerprints are optional for this route; target {fp_target}"
+        )
+        if media_expectation["expected"]:
+            image_presence_score = pct(min(1.0, terminal_image_ratio / image_ratio_target if image_ratio_target else 1.0))
+            image_presence_evidence = (
+                f"HTML-only image-rich subject: terminal image slides {assets['terminal_slide_count']}/{slide_count}; "
+                f"baseline target ratio {image_ratio_target:.2f}"
+            )
+        else:
+            image_presence_score = 100 if (project / "html_delivery_manifest.json").exists() else 0
+            image_presence_evidence = (
+                "semantic HTML-only route uses DOM/CSS visual system; image density is advisory unless the subject is image-rich"
+            )
+        real_image_generation_score = 100
+        real_image_generation_evidence = (
+            "semantic HTML-only route does not require AI image generation unless visual_asset_manifest explicitly requests it"
+        )
+        if not media_expectation["expected"]:
+            image_diversity_score = 100
+
+    visual_rhythm_score = pct(ratio(float(rhythm.get("unique_art_directions") or 0), art_target))
+    visual_rhythm_evidence = f"{rhythm.get('unique_art_directions', 0)} unique art directions; target {art_target}"
+    style_execution_score = int(style_exec.get("score") or 0)
+    style_execution_evidence = (
+        f"style {style_exec.get('selected_style', {}).get('id', '')}; "
+        f"audit score {style_exec.get('score', 0)}"
+    )
+    if html_only:
+        html_layout_signal = max(layout_exec["contract_layout_count"], layout_exec["plan_layout_count"])
+        visual_rhythm_score = max(visual_rhythm_score, pct(ratio(float(html_layout_signal), art_target)))
+        visual_rhythm_evidence = (
+            f"semantic HTML layout rhythm {html_layout_signal} layout ids; "
+            f"SVG art-direction report is optional for this route; target {art_target}"
+        )
+        upstream_style_fit = int(upstream_creation.get("scores", {}).get("style_fit") or 0)
+        if upstream_style_fit > style_execution_score:
+            style_execution_score = upstream_style_fit
+            style_execution_evidence = (
+                f"semantic HTML route uses style_fit_audit as primary style evidence; score {upstream_style_fit}"
+            )
+            route_adjustments.append(
+                "semantic_html_only: style execution category uses style_fit_audit when SVG-specific style_execution_audit is weaker"
+            )
 
     categories = [
         {
             "id": "visual_rhythm",
             "weight": 18,
-            "score": pct(ratio(float(rhythm.get("unique_art_directions") or 0), art_target)),
-            "evidence": f"{rhythm.get('unique_art_directions', 0)} unique art directions; target {art_target}",
+            "score": visual_rhythm_score,
+            "evidence": visual_rhythm_evidence,
         },
         {
             "id": "structural_variety",
             "weight": 12,
-            "score": pct(ratio(float(rhythm.get("unique_structural_fingerprints") or 0), fp_target)),
-            "evidence": f"{rhythm.get('unique_structural_fingerprints', 0)} unique SVG fingerprints; target {fp_target}",
+            "score": structural_variety_score,
+            "evidence": structural_variety_evidence,
         },
         {
             "id": "layout_pattern_execution",
@@ -769,11 +1079,8 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
         {
             "id": "style_execution",
             "weight": 10,
-            "score": int(style_exec.get("score") or 0),
-            "evidence": (
-                f"style {style_exec.get('selected_style', {}).get('id', '')}; "
-                f"audit score {style_exec.get('score', 0)}"
-            ),
+            "score": style_execution_score,
+            "evidence": style_execution_evidence,
         },
         {
             "id": "upstream_creation_quality",
@@ -792,12 +1099,8 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
         {
             "id": "image_presence",
             "weight": 16,
-            "score": pct(min(terminal_image_ratio, svg_image_ratio) / image_ratio_target if image_ratio_target else 0),
-            "evidence": (
-                f"terminal image slides {assets['terminal_slide_count']}/{slide_count}, "
-                f"SVG image slides {rhythm.get('svg_image_slides', 0)}/{slide_count}, "
-                f"baseline target ratio {image_ratio_target:.2f}"
-            ),
+            "score": image_presence_score,
+            "evidence": image_presence_evidence,
         },
         {
             "id": "primary_media_evidence",
@@ -828,18 +1131,8 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
         {
             "id": "real_image_generation",
             "weight": 16,
-            "score": pct(real_image_ratio if assets["ai_count"] else non_ai_terminal_visual_ratio),
-            "evidence": (
-                (
-                    f"real generated AI assets {assets['real_imagegen_count']}/{assets['ai_count']}; "
-                    f"procedural fallback {assets['procedural_fallback_count']}"
-                )
-                if assets["ai_count"]
-                else (
-                    "no primary AI assets required; "
-                    f"source/web/user terminal visuals {assets['source_or_web_count']}/{slide_count}"
-                )
-            ),
+            "score": real_image_generation_score,
+            "evidence": real_image_generation_evidence,
         },
         {
             "id": "source_grounding",
@@ -905,9 +1198,12 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
     raw_total = int(round(weighted))
     score_caps: list[str] = []
     total = raw_total
-    if assets["procedural_fallback_count"]:
+    if assets["procedural_fallback_count"] and not html_only:
         total = min(total, 79)
         score_caps.append("procedural fallback assets cap score at 79")
+    if key_ai_target and required_key_image_count < key_ai_target:
+        total = min(total, 82 if required_key_image_count else 69)
+        score_caps.append(f"{key_image_requirement_label} {required_key_image_count}/{key_ai_target} cap score")
     if image_resolution.get("severe_underresolved_count", 0):
         total = min(total, 88)
         score_caps.append("severe image upscaling caps score at 88")
@@ -917,20 +1213,32 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
     if media_expectation["expected"] and primary_media_target and assets["primary_media_slide_count"] < min(3, primary_media_target):
         total = min(total, 82)
         score_caps.append("image-rich subject with insufficient primary media assets caps score at 82")
-    if slide_count >= 8 and not exports["has_pdf"]:
+    if slide_count >= 8 and not exports["has_pdf"] and not html_only:
         total = min(total, 89)
         score_caps.append("missing PDF export caps score at 89")
-    if slide_count >= 8 and not exports["has_pptx"]:
+    if slide_count >= 8 and not exports["has_pptx"] and not html_only:
         total = min(total, 69)
         score_caps.append("missing editable PPTX caps score at 69")
     failures = []
     warnings = []
     if total < min_score:
         failures.append(f"benchmark score {total} below target {min_score}")
-    if assets["procedural_fallback_count"]:
+    if assets["procedural_fallback_count"] and not html_only:
         warnings.append(
             f"{assets['procedural_fallback_count']} AI image asset(s) are procedural fallback, not final-quality image generation"
         )
+    if key_ai_target and required_key_image_count < key_ai_target:
+        if codex_runtime:
+            warnings.append(
+                f"Codex-native key-page images are insufficient: {codex_native_count}/{key_ai_target}; "
+                "use Codex image_gen and record generator=codex-native-image_gen with generated_asset_source. "
+                "Content-only slides, external-provider-only images, source/downloaded images, SVG, and shapes do not satisfy this gate"
+            )
+        else:
+            warnings.append(
+                f"real generated key-page images are insufficient: {assets['real_imagegen_count']}/{key_ai_target}; "
+                "source/downloaded images may support evidence pages but do not replace key-page image generation"
+            )
     if sources["image_candidates"] and not assets["source_or_web_count"]:
         warnings.append("source image candidates exist but no source/web/user visual assets are used")
     if image_resolution.get("underresolved_count", 0):
@@ -950,15 +1258,17 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
             f"{assets['primary_media_slide_count']} primary-media slide(s), "
             f"{assets['background_terminal_count']} background-only asset(s)"
         )
-    if int(style_exec.get("score") or 0) < 75:
-        warnings.append(f"style execution audit is weak: score {style_exec.get('score', 0)}")
+    if style_execution_score < 75:
+        warnings.append(f"style execution audit is weak: score {style_execution_score}")
     if int(upstream_creation.get("score") or 0) < 75:
         warnings.append(f"upstream creation audit is weak: score {upstream_creation.get('score', 0)}")
-    if not exports["has_pdf"]:
+    if not exports["has_pdf"] and not html_only:
         warnings.append("PDF export missing; full multi-format target includes PDF")
-    if exports.get("keynote_targeted") and not exports["has_keynote"]:
+    if exports.get("keynote_targeted") and not exports["has_keynote"] and not html_only:
         warnings.append("Keynote export missing; full multi-format target includes Keynote where feasible")
     ppt_master_ready = (
+        not html_only
+        and
         total >= max(85, min_score)
         and not assets["procedural_fallback_count"]
         and exports["has_pptx"]
@@ -969,9 +1279,13 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
         and int(style_exec.get("score") or 0) >= 75
         and ratio(float(rhythm.get("unique_art_directions") or 0), art_target) >= 1.0
         and (not media_expectation["expected"] or primary_media_score >= 80)
+        and (not key_ai_target or required_key_image_count >= key_ai_target)
     )
+    html_ready = html_only and total >= min_score and exports["has_html"]
     if ppt_master_ready:
         readiness = "ppt_master_ready"
+    elif html_ready:
+        readiness = "semantic_html_ready"
     elif total >= min_score:
         readiness = "production_candidate"
     else:
@@ -982,6 +1296,7 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
         "score": total,
         "raw_score": raw_total,
         "score_caps": score_caps,
+        "route_adjustments": route_adjustments,
         "target_score": min_score,
         "readiness": readiness,
         "ppt_master_ready": ppt_master_ready,
@@ -1000,6 +1315,8 @@ def score_project(project: Path, catalog: Path, min_score: int) -> dict[str, Any
             "media_expectation": media_expectation,
             "style_execution": style_exec,
             "upstream_creation": upstream_creation,
+            "codex_runtime": codex_runtime,
+            "delivery_route": route_info,
         },
         "failures": failures,
         "warnings": warnings,
@@ -1031,6 +1348,9 @@ def render_markdown(report: dict[str, Any]) -> str:
     if report.get("score_caps"):
         lines.extend(["", "## Score Caps", ""])
         lines.extend(f"- {item}" for item in report["score_caps"])
+    if report.get("route_adjustments"):
+        lines.extend(["", "## Route Adjustments", ""])
+        lines.extend(f"- {item}" for item in report["route_adjustments"])
     baseline = report.get("baseline", {})
     lines.extend(
         [

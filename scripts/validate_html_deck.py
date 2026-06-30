@@ -289,6 +289,62 @@ def load_motion_manifest(path: Path) -> dict[str, Any] | None:
     return payload
 
 
+def load_json_sidecar(path: Path) -> dict[str, Any] | None:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def validate_html_sidecars(report: Report, html_path: Path, slides: list[re.Match[str]], *, strict: bool) -> None:
+    project_root = infer_project_root(html_path)
+    severity = "error" if strict else "warning"
+    kernel_path = project_root / "html_design_kernel.json"
+    source_map_path = project_root / "html_source_map.json"
+
+    if not kernel_path.exists():
+        report.add(severity, "Formal HTML should include html_design_kernel.json.")
+    else:
+        kernel = load_json_sidecar(kernel_path)
+        if not kernel:
+            report.add("error", "html_design_kernel.json must be a JSON object.")
+        else:
+            if kernel.get("mode") != "html_design_kernel":
+                report.add("error", "html_design_kernel.json mode must be html_design_kernel.")
+            strategy = str(kernel.get("render_strategy") or "").lower()
+            if strategy and "native" not in strategy:
+                report.add(severity, "html_design_kernel.json should declare native semantic HTML as the primary render strategy.")
+
+    if not source_map_path.exists():
+        report.add(severity, "Formal HTML should include html_source_map.json.")
+        return
+    source_map = load_json_sidecar(source_map_path)
+    if not source_map:
+        report.add("error", "html_source_map.json must be a JSON object.")
+        return
+    if source_map.get("mode") != "html_source_map":
+        report.add("error", "html_source_map.json mode must be html_source_map.")
+    try:
+        mapped_count = int(source_map.get("slide_count", 0))
+    except Exception:
+        mapped_count = 0
+    if mapped_count != len(slides):
+        report.add("error", f"html_source_map.json slide_count {mapped_count} does not match HTML slide count {len(slides)}.")
+    rows = source_map.get("slides")
+    if not isinstance(rows, list):
+        report.add("error", "html_source_map.json needs a slides list.")
+        return
+    mapped_ids = {str(row.get("slide_id") or "").strip() for row in rows if isinstance(row, dict)}
+    html_ids = {
+        attrs.get("data-slide-id") or attrs.get("id") or ""
+        for attrs in (parse_attrs(match.group("tag")) for match in slides)
+    }
+    missing = sorted(value for value in html_ids if value and value not in mapped_ids)
+    if missing:
+        report.add("error", "html_source_map.json missing slide ids: " + ", ".join(missing[:6]))
+
+
 def iter_motion_slides(value: Any) -> Iterable[dict[str, Any]]:
     if isinstance(value, list):
         for item in value:
@@ -513,6 +569,8 @@ def validate_html(
         small_sizes = [float(m.group("size")) for m in STYLE_SIZE_RE.finditer(body)]
         if any(size < 14 for size in small_sizes):
             report.add("warning" if not strict else "error", "Inline font-size below 14px found in slide content.", idx)
+
+    validate_html_sidecars(report, html_path, slides, strict=strict)
 
     stage_markers = [
         "aspect-ratio",

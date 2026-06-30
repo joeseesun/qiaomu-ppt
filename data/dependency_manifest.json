@@ -48,10 +48,23 @@
         "package": "crawl4ai aiohttp",
         "used_for": "Optional route for WeChat article crawling projects that need rendered pages, MicroMessenger UA, and hotlink-safe image downloads.",
         "install": "python3 -m pip install crawl4ai aiohttp && crawl4ai-setup"
+      },
+      {
+        "package": "opencv-python-headless numpy",
+        "used_for": "Optional NotebookLM raster watermark cleanup in scripts/notebooklm_raster_watermark.py and scripts/strip_notebooklm_watermark.py --inpaint-raster-watermark.",
+        "install": "python3 -m pip install opencv-python-headless numpy"
       }
     ]
   },
   "external_tools": [
+    {
+      "name": "NotebookLM CLI",
+      "required": false,
+      "commands": ["notebooklm"],
+      "used_for": "Optional NotebookLM-native slide-deck route in scripts/notebooklm_deck.py: source add, Fast/Deep Research, generate slide-deck, and download PPTX/PDF.",
+      "manual_install": "Install the local notebooklm CLI and run notebooklm login",
+      "agent_install_policy": "Agent may check availability and status. Do not upload private sources to NotebookLM unless the user explicitly requested NotebookLM or approved the external upload route."
+    },
     {
       "name": "Node.js",
       "required": false,

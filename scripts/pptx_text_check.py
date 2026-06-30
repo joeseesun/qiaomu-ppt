@@ -50,6 +50,10 @@ FORBIDDEN_VISIBLE = [
     ("asset placement method", r"(不是.{0,12}(装饰|贴上去)|贴上去|摆放环境)"),
     ("editable-object wording", r"可编辑.{0,8}(对象|文本|图形|前景|PPTX?|PowerPoint)"),
     ("preview/test wording", r"(预览方向|生成测试页|测试页|四页预览|视觉方向验证)"),
+    (
+        "NotebookLM style prompt leak",
+        r"(像老师|老师.{0,8}白板|讲清一个概念|白板讲解风|教学白板风|手绘白板图解风|白板线稿图解|手绘极简少字版|创意方向|内部视觉方向|可读性要求|视觉要求|结构要求|少字硬约束)",
+    ),
     ("toolchain name", r"(ppt-master|qiaomu-ppt|Codex|gpt-image)"),
     ("deck", r"\bdeck\b"),
     ("route", r"\broute\b"),

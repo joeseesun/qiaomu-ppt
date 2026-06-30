@@ -1,18 +1,29 @@
 {
   "schema_version": "1.0.0",
   "artifact": "research_dossier.md",
-  "purpose": "把资料收集结果组织成可直接支撑 PPT 页面主张、视觉机会和缺口判断的证据库。",
+  "purpose": "把资料收集结果组织成可支撑 PPT 页面主张、视觉机会和缺口判断的证据库。它是资料档案，不是内容母稿；主题型 PPT 还需要 content_report.md 或 内容母稿-<主题>.md，把资料消化成有主张、有结构的长文后再抽取 slide_plan。",
   "upstream_artifacts": [
+    "README.md 或 task_manifest.json",
     "content_brief.json 或 content_contract.json",
     "research_questions.json",
     "sources/source_cards.json 或 evidence_matrix.json",
     "content-preflight.json/md"
+  ],
+  "downstream_artifacts": [
+    "content_report.md 或 内容母稿-<主题>.md",
+    "content_contract.json",
+    "slide_plan.json"
   ],
   "required_sections": [
     {
       "id": "scope",
       "label_zh": "任务范围",
       "description": "主题、受众、使用场景、交付格式、资料深度和禁止事项。"
+    },
+    {
+      "id": "archive_index",
+      "label_zh": "归档索引",
+      "description": "说明本次任务文件夹、来源目录、下载/提取图片目录、规划产物、提示词和后续导出文件位置。"
     },
     {
       "id": "question_tree_alignment",
@@ -45,6 +56,11 @@
       "description": "候选来源图、可生成主视觉、可做图解/图表/对比的内容。"
     },
     {
+      "id": "reference_links_and_downloaded_assets",
+      "label_zh": "引用链接与已下载素材",
+      "description": "列出已引用 URL/文件、提取或下载的图片路径、使用建议、权利状态和不可用原因。"
+    },
+    {
       "id": "rights_and_risks",
       "label_zh": "权利与风险",
       "description": "版权、品牌、人物肖像、假截图/假数据风险和 missing evidence。"
@@ -68,8 +84,11 @@
     "risk"
   ],
   "quality_rules": [
+    "调研档案必须能独立阅读和复用，即使用户后来不生成 PPT。",
+    "引用链接、下载/提取图片和来源文件路径必须写进档案或 task_manifest，不要只保存在聊天记录里。",
     "先回答研究问题树，再写资料档案；不要边搜边把随机材料堆成摘要。",
     "不要把来源摘要直接当页面文案。",
+    "不要把 research_dossier.md 当内容母稿；正式 slide_plan 应从 source-synthesis article 中抽取。",
     "不要把没有来源的解释判断写成事实。",
     "每个核心页面至少有一个具体事实、例子、数据、原文或用户提供证据。",
     "候选图片要说明用途：证据图、背景、主视觉、图解参考或禁止使用。",
